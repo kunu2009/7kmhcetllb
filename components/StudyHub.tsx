@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../types';
-import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
+import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle } from 'lucide-react';
 import { generateStudyPlan } from '../services/geminiService';
 
 const subjects = [
@@ -78,6 +78,10 @@ const StudyHub: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<Subject>(Subject.LegalAptitude);
   const [studyPlan, setStudyPlan] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
+  
+  // Personalization State
+  const [weakAreas, setWeakAreas] = useState('');
+  const [hoursPerDay, setHoursPerDay] = useState('4');
 
   // Flashcard State
   const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case'>('All');
@@ -94,7 +98,7 @@ const StudyHub: React.FC = () => {
 
   const handleGeneratePlan = async () => {
     setLoadingPlan(true);
-    const plan = await generateStudyPlan();
+    const plan = await generateStudyPlan(weakAreas, hoursPerDay);
     setStudyPlan(plan);
     setLoadingPlan(false);
   };
@@ -294,17 +298,49 @@ const StudyHub: React.FC = () => {
       ) : (
         <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-8 overflow-hidden flex flex-col">
            {!studyPlan && !loadingPlan ? (
-             <div className="flex flex-col items-center justify-center h-full text-center max-w-lg mx-auto">
+             <div className="flex flex-col items-center justify-center h-full text-center max-w-lg mx-auto animate-in fade-in slide-in-from-bottom-4">
                <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
                  <Calendar className="w-10 h-10 text-indigo-600" />
                </div>
                <h3 className="text-2xl font-bold text-gray-800 mb-3">Personalized 12-Week Blueprint</h3>
-               <p className="text-gray-500 mb-8">
-                 Get a tailored schedule that adapts to MHCET patterns. Covers daily goals, revision cycles, and mock test strategy to ensure you hit that AIR 1 target.
+               <p className="text-gray-500 mb-6">
+                 Tell us a bit about your prep status, and we will craft a tailored schedule to hit AIR 1.
                </p>
+               
+               {/* Personalization Inputs */}
+               <div className="w-full space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-100 text-left mb-6">
+                 <div>
+                   <label className="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
+                     <AlertCircle className="w-4 h-4 text-orange-500" /> Weak Subjects
+                   </label>
+                   <input 
+                     type="text" 
+                     placeholder="e.g., Legal Torts, Math, Syllogisms"
+                     value={weakAreas}
+                     onChange={(e) => setWeakAreas(e.target.value)}
+                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
+                   />
+                 </div>
+                 <div>
+                   <label className="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
+                     <Clock className="w-4 h-4 text-blue-500" /> Study Hours / Day
+                   </label>
+                   <select 
+                     value={hoursPerDay}
+                     onChange={(e) => setHoursPerDay(e.target.value)}
+                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-200 outline-none text-sm bg-white"
+                   >
+                     <option value="2">2 Hours (Working Professional)</option>
+                     <option value="4">4 Hours (Student)</option>
+                     <option value="6">6 Hours (Dedicated)</option>
+                     <option value="8+">8+ Hours (Rank 1 Target)</option>
+                   </select>
+                 </div>
+               </div>
+
                <button 
                  onClick={handleGeneratePlan}
-                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                >
                  <Sparkles className="w-5 h-5" /> Generate My Plan
                </button>
@@ -312,17 +348,20 @@ const StudyHub: React.FC = () => {
            ) : loadingPlan ? (
              <div className="flex flex-col items-center justify-center h-full">
                <RefreshCw className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-               <p className="text-gray-600 font-medium">Crafting your roadmap to success...</p>
+               <p className="text-gray-600 font-medium">Analyzing your profile & crafting roadmap...</p>
              </div>
            ) : (
              <div className="h-full flex flex-col">
                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                 <h3 className="text-xl font-bold text-gray-800">Your 12-Week Success Roadmap</h3>
+                 <div>
+                   <h3 className="text-xl font-bold text-gray-800">Your Rank 1 Strategy</h3>
+                   <p className="text-xs text-gray-500 mt-1">Optimized for {hoursPerDay} hours/day • Focus: {weakAreas || 'Balanced'}</p>
+                 </div>
                  <button 
-                   onClick={handleGeneratePlan}
+                   onClick={() => setStudyPlan(null)}
                    className="text-sm text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-1"
                  >
-                   <RefreshCw className="w-3 h-3" /> Regenerate
+                   <RefreshCw className="w-3 h-3" /> New Plan
                  </button>
                </div>
                <div className="prose prose-indigo max-w-none overflow-y-auto pr-4 flex-1 text-gray-700 leading-relaxed whitespace-pre-wrap">

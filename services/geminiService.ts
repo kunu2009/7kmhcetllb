@@ -1,6 +1,25 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
+// Robust API Key retrieval to prevent "process is not defined" crashes on Vercel/Vite
+const getApiKey = (): string => {
+  try {
+    // Priority 1: Standard Node/Webpack env (used in this editor)
+    if (typeof process !== 'undefined' && process.env?.API_KEY) {
+      return process.env.API_KEY;
+    }
+    // Priority 2: Vite/Vercel env
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    console.warn("Error retrieving API key", e);
+  }
+  return '';
+};
+
+const apiKey = getApiKey();
 
 const ai = new GoogleGenAI({ apiKey });
 
@@ -55,7 +74,8 @@ export const generateQuestion = async (subject: string, difficulty: string = 'Me
       - question (string)
       - options (array of 4 strings)
       - correctIndex (number 0-3)
-      - explanation (string) - Include the specific legal section, principle, or logic used.`,
+      - explanation (string) - Include the specific legal section, principle, or logic used.
+      - topic (string) - The specific sub-topic this question belongs to.`,
       config: {
         responseMimeType: "application/json"
       }
@@ -70,18 +90,25 @@ export const generateQuestion = async (subject: string, difficulty: string = 'Me
 /**
  * Generates a personalized 12-week study plan.
  */
-export const generateStudyPlan = async (): Promise<string> => {
+export const generateStudyPlan = async (weakAreas?: string, hoursPerDay?: string): Promise<string> => {
   try {
+    const customization = weakAreas 
+      ? `Focus heavily on improving these weak areas: ${weakAreas}. The student can dedicate ${hoursPerDay || '4'} hours per day.`
+      : `The student can dedicate ${hoursPerDay || '4'} hours per day.`;
+
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: `Create a detailed, week-by-week 12-Week "Rank 1" Study Plan for MHCET 5-Year LLB.
+      contents: `Create a highly personalized, detailed, week-by-week 12-Week "Rank 1" Study Plan for MHCET 5-Year LLB.
+      
+      Profile Context:
+      ${customization}
       
       Requirements:
       - Cover all 5 subjects: Legal Aptitude, GK, Logical Reasoning, English, Math.
       - Structure it into 3 Phases: Foundation (Weeks 1-4), Strengthening & Speed (Weeks 5-8), Mastery & Mocks (Weeks 9-12).
       - Include explicit reminders for "Daily Newspaper Analysis" and "Weekly Mock Tests".
-      - Mention specific high-yield topics (e.g., Law of Torts, Syllogisms, Indian Constitution).
-      - Format the output clearly with headers (Phase 1, Week 1, etc.) and bullet points using Markdown.`,
+      - Format the output clearly with headers (Phase 1, Week 1, etc.) and bullet points using Markdown.
+      - Provide specific time slots/strategy for the weak areas mentioned.`,
     });
     return response.text || "Could not generate study plan.";
   } catch (error) {
