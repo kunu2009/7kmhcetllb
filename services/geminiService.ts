@@ -35,17 +35,20 @@ export const askAiTutor = async (prompt: string): Promise<string> => {
 /**
  * Generates a practice question for a specific subject and difficulty.
  */
-export const generateQuestion = async (subject: string, difficulty: string = 'Medium'): Promise<string> => {
+export const generateQuestion = async (subject: string, difficulty: string = 'Medium', topic?: string): Promise<string> => {
   try {
     const difficultyPrompt = difficulty === 'Hard' 
       ? "Create a complex, passage-based or principle-fact based question that tests deep understanding." 
       : difficulty === 'Easy' 
       ? "Create a direct, concept-based question." 
       : "Create a standard exam-level question.";
+    
+    const topicPrompt = topic ? `Focus specifically on the topic: ${topic}.` : '';
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: `Generate one multiple-choice question for MHCET LLB 5-Year exam subject: ${subject}. 
+      ${topicPrompt}
       Difficulty Level: ${difficulty}. ${difficultyPrompt}
       
       Return ONLY raw JSON (no markdown formatting) with fields: 
