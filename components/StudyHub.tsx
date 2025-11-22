@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../types';
-import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target } from 'lucide-react';
+import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target, Star } from 'lucide-react';
 import { generateStudyPlan } from '../services/geminiService';
 
 // --- Types for Rich Content ---
@@ -447,13 +447,47 @@ const StudyHub: React.FC = () => {
   const [hoursPerDay, setHoursPerDay] = useState('4');
 
   // Flashcard State
-  const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case'>('All');
+  const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case' | 'Difficult'>('All');
+  const [difficultCardIds, setDifficultCardIds] = useState<number[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
-  const filteredCards = flashcardsData.filter(c => cardFilter === 'All' || c.type === cardFilter);
+  // Load saved difficult cards
+  useEffect(() => {
+    const saved = localStorage.getItem('lawranker_flashcards_difficult');
+    if (saved) {
+      try {
+        setDifficultCardIds(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load difficult cards");
+      }
+    }
+  }, []);
+
+  // Save difficult cards
+  useEffect(() => {
+    localStorage.setItem('lawranker_flashcards_difficult', JSON.stringify(difficultCardIds));
+  }, [difficultCardIds]);
+
+  const filteredCards = flashcardsData.filter(c => {
+    if (cardFilter === 'Difficult') return difficultCardIds.includes(c.id);
+    return cardFilter === 'All' || c.type === cardFilter;
+  });
+  
   const currentCard = filteredCards[currentCardIndex];
 
+  // Reset index when filter changes or list shrinks (e.g. unmarking a difficult card)
+  useEffect(() => {
+    if (currentCardIndex >= filteredCards.length && filteredCards.length > 0) {
+      setCurrentCardIndex(filteredCards.length - 1);
+    } else if (filteredCards.length === 0) {
+      setCurrentCardIndex(0);
+    } else if (currentCardIndex < 0) {
+      setCurrentCardIndex(0);
+    }
+  }, [filteredCards.length, currentCardIndex, cardFilter]);
+
+  // Reset to 0 specifically when switching main filter type
   useEffect(() => {
     setCurrentCardIndex(0);
     setIsFlipped(false);
@@ -483,6 +517,14 @@ const StudyHub: React.FC = () => {
     setTimeout(() => {
       setCurrentCardIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length);
     }, 200);
+  };
+
+  const toggleDifficult = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent flipping
+    setDifficultCardIds(prev => {
+      if (prev.includes(id)) return prev.filter(cid => cid !== id);
+      return [...prev, id];
+    });
   };
 
   const toggleTopic = (index: number) => {
@@ -661,18 +703,19 @@ const StudyHub: React.FC = () => {
         <div className="flex-1 bg-gray-50 rounded-xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[600px]">
           <div className="max-w-2xl w-full flex flex-col gap-6">
             {/* Filters */}
-            <div className="flex justify-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 mx-auto">
-              {['All', 'Maxim', 'Case'].map((type) => (
+            <div className="flex justify-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 mx-auto flex-wrap">
+              {['All', 'Maxim', 'Case', 'Difficult'].map((type) => (
                 <button
                   key={type}
                   onClick={() => setCardFilter(type as any)}
-                  className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${
                     cardFilter === type 
                       ? 'bg-indigo-600 text-white shadow-md' 
                       : 'text-gray-500 hover:bg-gray-50'
                   }`}
                 >
-                  {type === 'All' ? 'All Cards' : type === 'Maxim' ? 'Legal Maxims' : 'Landmark Cases'}
+                  {type === 'Difficult' && <Star className="w-3 h-3 fill-current" />}
+                  {type === 'All' ? 'All Cards' : type === 'Maxim' ? 'Legal Maxims' : type === 'Case' ? 'Landmark Cases' : 'Review Difficult'}
                 </button>
               ))}
             </div>
@@ -684,10 +727,18 @@ const StudyHub: React.FC = () => {
                   
                   {/* Front */}
                   <div className="absolute w-full h-full backface-hidden bg-white border-2 border-indigo-100 rounded-2xl shadow-xl flex flex-col items-center justify-center p-8">
+                    <button 
+                      onClick={(e) => toggleDifficult(currentCard.id, e)}
+                      className="absolute top-4 left-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                      title="Mark as Difficult for Review"
+                    >
+                      <Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                    </button>
+
                     <span className="absolute top-4 right-4 bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
                       {currentCard.type}
                     </span>
-                    <span className="absolute top-4 left-4 text-gray-300 font-bold text-4xl opacity-20">?</span>
+                    <span className="absolute top-4 left-4 text-gray-300 font-bold text-4xl opacity-20 pointer-events-none">?</span>
                     <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
                       {currentCard.front}
                     </h3>
@@ -698,6 +749,14 @@ const StudyHub: React.FC = () => {
 
                   {/* Back */}
                   <div className="absolute w-full h-full backface-hidden bg-indigo-900 text-white rounded-2xl shadow-xl flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
+                    <button 
+                      onClick={(e) => toggleDifficult(currentCard.id, e)}
+                      className="absolute top-4 left-4 z-10 p-2 hover:bg-indigo-800 rounded-full transition-colors"
+                      title="Mark as Difficult for Review"
+                    >
+                       <Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
+                    </button>
+                    
                     <span className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
                       Answer
                     </span>
@@ -711,24 +770,41 @@ const StudyHub: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-12">No flashcards found for this category.</div>
+              <div className="text-center text-gray-500 py-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl">
+                {cardFilter === 'Difficult' ? (
+                  <>
+                    <Star className="w-12 h-12 text-gray-300 mb-2" />
+                    <p>No cards marked as difficult yet.</p>
+                    <button onClick={() => setCardFilter('All')} className="text-indigo-600 font-bold text-sm mt-2 hover:underline">
+                      Browse all cards to mark them
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Layers className="w-12 h-12 text-gray-300 mb-2" />
+                    <p>No flashcards found for this category.</p>
+                  </>
+                )}
+              </div>
             )}
 
             {/* Controls */}
-            <div className="flex items-center justify-between text-gray-600 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-               <button onClick={handlePrevCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                 <ChevronLeft className="w-6 h-6" />
-               </button>
-               
-               <div className="flex flex-col items-center">
-                 <span className="font-bold text-gray-800">Card {currentCardIndex + 1} of {filteredCards.length}</span>
-                 <span className="text-xs text-gray-400">Press Space to Flip</span>
-               </div>
+            {filteredCards.length > 0 && (
+              <div className="flex items-center justify-between text-gray-600 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <button onClick={handlePrevCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                
+                <div className="flex flex-col items-center">
+                  <span className="font-bold text-gray-800">Card {currentCardIndex + 1} of {filteredCards.length}</span>
+                  <span className="text-xs text-gray-400">Press Space to Flip</span>
+                </div>
 
-               <button onClick={handleNextCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                 <ChevronRight className="w-6 h-6" />
-               </button>
-            </div>
+                <button onClick={handleNextCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : (
