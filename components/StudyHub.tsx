@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Subject } from '../types';
-import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw } from 'lucide-react';
+import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb } from 'lucide-react';
 import { generateStudyPlan } from '../services/geminiService';
 
 const subjects = [
@@ -58,17 +58,59 @@ const topicData: Record<string, string[]> = {
   ]
 };
 
+const flashcardsData = [
+  { id: 1, type: 'Maxim', front: 'Volenti non fit injuria', back: 'To a willing person, injury is not done. (Key defense in Torts, e.g., Sports spectators)' },
+  { id: 2, type: 'Maxim', front: 'Audi alteram partem', back: 'No one should be condemned unheard. (A core principle of Natural Justice)' },
+  { id: 3, type: 'Case', front: 'Kesavananda Bharati v. State of Kerala (1973)', back: 'Established the "Basic Structure Doctrine". Parliament cannot alter basic features of the Constitution.' },
+  { id: 4, type: 'Maxim', front: 'Res ipsa loquitur', back: 'The thing speaks for itself. (Used in Negligence cases where accident implies negligence)' },
+  { id: 5, type: 'Case', front: 'Maneka Gandhi v. Union of India (1978)', back: 'Expanded Art. 21. Right to Life includes right to live with dignity & right to travel abroad.' },
+  { id: 6, type: 'Maxim', front: 'Ubi jus ibi remedium', back: 'Where there is a right, there is a remedy.' },
+  { id: 7, type: 'Case', front: 'M.C. Mehta v. Union of India', back: 'Established "Absolute Liability" for hazardous industries. (Oleum Gas Leak case)' },
+  { id: 8, type: 'Maxim', front: 'Actus non facit reum nisi mens sit rea', back: 'The act itself does not constitute guilt unless done with a guilty mind.' },
+  { id: 9, type: 'Case', front: 'Vishaka v. State of Rajasthan', back: 'Laid down guidelines against sexual harassment at workplace.' },
+  { id: 10, type: 'Maxim', front: 'Nemo judex in causa sua', back: 'No one should be a judge in their own cause. (Rule against Bias)' },
+  { id: 11, type: 'Case', front: 'S.R. Bommai v. Union of India', back: 'Discussed provisions of Article 356 (President\'s Rule) and Federalism.' },
+  { id: 12, type: 'Maxim', front: 'De minimis non curat lex', back: 'The law does not concern itself with trifles.' },
+];
+
 const StudyHub: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'materials' | 'plan'>('materials');
+  const [activeTab, setActiveTab] = useState<'materials' | 'plan' | 'flashcards'>('materials');
   const [selectedSubject, setSelectedSubject] = useState<Subject>(Subject.LegalAptitude);
   const [studyPlan, setStudyPlan] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
+
+  // Flashcard State
+  const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case'>('All');
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const filteredCards = flashcardsData.filter(c => cardFilter === 'All' || c.type === cardFilter);
+  const currentCard = filteredCards[currentCardIndex];
+
+  useEffect(() => {
+    setCurrentCardIndex(0);
+    setIsFlipped(false);
+  }, [cardFilter]);
 
   const handleGeneratePlan = async () => {
     setLoadingPlan(true);
     const plan = await generateStudyPlan();
     setStudyPlan(plan);
     setLoadingPlan(false);
+  };
+
+  const handleNextCard = () => {
+    setIsFlipped(false);
+    setTimeout(() => {
+      setCurrentCardIndex((prev) => (prev + 1) % filteredCards.length);
+    }, 200);
+  };
+
+  const handlePrevCard = () => {
+    setIsFlipped(false);
+    setTimeout(() => {
+      setCurrentCardIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length);
+    }, 200);
   };
 
   return (
@@ -78,18 +120,26 @@ const StudyHub: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-800">Study Hub</h2>
           <p className="text-gray-500">Your arsenal for Rank 1 preparation.</p>
         </div>
-        <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+        <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200 overflow-x-auto">
           <button
             onClick={() => setActiveTab('materials')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === 'materials' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Subject Materials
           </button>
           <button
+            onClick={() => setActiveTab('flashcards')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'flashcards' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <Layers className="w-4 h-4" /> Flashcards
+          </button>
+          <button
             onClick={() => setActiveTab('plan')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
               activeTab === 'plan' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -164,6 +214,80 @@ const StudyHub: React.FC = () => {
                 <h4 className="font-bold text-blue-800 mb-1 text-sm">AI Concept Summarizer</h4>
                 <p className="text-sm text-blue-600">Select any topic above to get a concise, exam-oriented summary generated by AI.</p>
               </div>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === 'flashcards' ? (
+        <div className="flex-1 bg-gray-50 rounded-xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[600px]">
+          <div className="max-w-2xl w-full flex flex-col gap-6">
+            {/* Filters */}
+            <div className="flex justify-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 mx-auto">
+              {['All', 'Maxim', 'Case'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setCardFilter(type as any)}
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${
+                    cardFilter === type 
+                      ? 'bg-indigo-600 text-white shadow-md' 
+                      : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {type === 'All' ? 'All Cards' : type === 'Maxim' ? 'Legal Maxims' : 'Landmark Cases'}
+                </button>
+              ))}
+            </div>
+
+            {/* Card Container */}
+            {filteredCards.length > 0 ? (
+              <div className="relative perspective-1000 w-full h-80 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
+                <div className={`relative w-full h-full text-center transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+                  
+                  {/* Front */}
+                  <div className="absolute w-full h-full backface-hidden bg-white border-2 border-indigo-100 rounded-2xl shadow-xl flex flex-col items-center justify-center p-8">
+                    <span className="absolute top-4 right-4 bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                      {currentCard.type}
+                    </span>
+                    <span className="absolute top-4 left-4 text-gray-300 font-bold text-4xl opacity-20">?</span>
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
+                      {currentCard.front}
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-4 font-medium flex items-center gap-2">
+                      <RotateCw className="w-3 h-3" /> Click to flip
+                    </p>
+                  </div>
+
+                  {/* Back */}
+                  <div className="absolute w-full h-full backface-hidden bg-indigo-900 text-white rounded-2xl shadow-xl flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
+                    <span className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                      Answer
+                    </span>
+                    <div className="bg-white/10 p-3 rounded-full mb-4">
+                      <Lightbulb className="w-6 h-6 text-yellow-400" />
+                    </div>
+                    <p className="text-lg md:text-xl font-medium leading-relaxed">
+                      {currentCard.back}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-12">No flashcards found for this category.</div>
+            )}
+
+            {/* Controls */}
+            <div className="flex items-center justify-between text-gray-600 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+               <button onClick={handlePrevCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                 <ChevronLeft className="w-6 h-6" />
+               </button>
+               
+               <div className="flex flex-col items-center">
+                 <span className="font-bold text-gray-800">Card {currentCardIndex + 1} of {filteredCards.length}</span>
+                 <span className="text-xs text-gray-400">Press Space to Flip</span>
+               </div>
+
+               <button onClick={handleNextCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                 <ChevronRight className="w-6 h-6" />
+               </button>
             </div>
           </div>
         </div>
