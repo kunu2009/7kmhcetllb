@@ -1,502 +1,184 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../types';
-import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target, Star } from 'lucide-react';
+import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target, Star, Gamepad2, Smartphone, Check, Save, PenLine } from 'lucide-react';
 import { generateStudyPlan } from '../services/geminiService';
+import { useProgress } from '../context/ProgressContext';
 
-// --- Types for Rich Content ---
+// --- Types & Data ---
 interface DetailedTopic {
   title: string;
   readTime: string;
   summary: string;
   keyPoints: string[];
-  casesOrExamples?: { title: string; desc: string }[]; // For Legal (Cases) or Logic/Math (Examples)
+  casesOrExamples?: { title: string; desc: string }[];
   proTip?: string;
+  quickBytes?: { text: string, color: string }[];
+  matchPairs?: { id: string, left: string, right: string }[];
 }
 
-const subjects = [
-  { id: Subject.LegalAptitude, icon: Scale, color: 'text-red-500', bg: 'bg-red-100', desc: 'Constitution, Torts, Contracts, Crimes' },
-  { id: Subject.GK, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-100', desc: 'History, Geography, Current Affairs' },
-  { id: Subject.LogicalReasoning, icon: Brain, color: 'text-purple-500', bg: 'bg-purple-100', desc: 'Analogies, Coding, Blood Relations' },
-  { id: Subject.English, icon: PenTool, color: 'text-green-500', bg: 'bg-green-100', desc: 'Vocabulary, Grammar, Comprehension' },
-  { id: Subject.Math, icon: Calculator, color: 'text-orange-500', bg: 'bg-orange-100', desc: 'Basic Arithmetic, Percentages, Profit & Loss' },
+const QUICK_BYTES = [
+  { text: "Tort is a civil wrong. Remedy: Unliquidated Damages.", color: "from-pink-500 to-rose-500" },
+  { text: "Strict Liability: No need to prove negligence. (Rylands v Fletcher)", color: "from-purple-500 to-indigo-500" },
+  { text: "Defamation needs Publication to a third party.", color: "from-blue-500 to-cyan-500" },
+  { text: "Vicarious Liability: Master liable for Servant's acts.", color: "from-emerald-500 to-teal-500" }
 ];
 
-// --- Comprehensive Data Library ---
-const studyContent: Record<Subject, DetailedTopic[]> = {
-  [Subject.LegalAptitude]: [
-    {
-      title: "Indian Constitution: Fundamental Rights",
-      readTime: "25 mins",
-      summary: "Part III (Articles 12-35) forms the bedrock of democracy. These rights are justiciable, meaning you can move the court (Art 32/226) if violated.",
-      keyPoints: [
-        "Right to Equality (Art 14-18): Rule of Law, Abolition of Untouchability.",
-        "Right to Freedom (Art 19-22): Speech, Assembly, Association, Life & Liberty.",
-        "Right against Exploitation (Art 23-24): Trafficking, Child Labour.",
-        "Freedom of Religion (Art 25-28): Secularism.",
-        "Constitutional Remedies (Art 32): The 'Heart and Soul' of the Constitution."
-      ],
-      casesOrExamples: [
-        { title: "Kesavananda Bharati v. State of Kerala (1973)", desc: "Established the 'Basic Structure Doctrine'. Parliament cannot alter the core features of the Constitution." },
-        { title: "Maneka Gandhi v. Union of India (1978)", desc: "Expanded Art 21. 'Procedure established by law' must be just, fair, and reasonable (Due Process)." },
-        { title: "Justice Puttaswamy v. Union of India (2017)", desc: "Declared Right to Privacy as a Fundamental Right under Article 21." }
-      ],
-      proTip: "Focus on Article 21 and 32. These are the most frequently tested articles in entrance exams."
-    },
-    {
-      title: "Constitution: Directive Principles & Duties",
-      readTime: "20 mins",
-      summary: "Part IV (DPSP) and Part IV-A (Fundamental Duties). Non-justiciable but fundamental in governance.",
-      keyPoints: [
-        "DPSP (Art 36-51): Welfare State concept.",
-        "Art 39A: Free Legal Aid.",
-        "Art 44: Uniform Civil Code.",
-        "Fundamental Duties (Art 51A): Added by 42nd Amendment (Swaran Singh Committee). 11 Duties total."
-      ],
-      casesOrExamples: [
-        { title: "Minerva Mills v. Union of India", desc: "Harmony between FR and DPSP is part of Basic Structure." }
-      ],
-      proTip: "Memorize the 11th Duty (Education for children 6-14 yrs) added by 86th Amendment."
-    },
-    {
-      title: "Law of Torts: General Principles",
-      readTime: "20 mins",
-      summary: "A Tort is a civil wrong for which the remedy is unliquidated damages. It is not codified law but based on precedents.",
-      keyPoints: [
-        "Damnum Sine Injuria: Damage without legal injury (No compensation, e.g., Gloucester Grammar School case).",
-        "Injuria Sine Damno: Legal injury without damage (Compensation awarded, e.g., Ashby v. White).",
-        "Volenti Non Fit Injuria: Defense of consent (e.g., Spectator at a cricket match).",
-        "Vicarious Liability: Master is liable for servant's acts (Respondeat Superior)."
-      ],
-      casesOrExamples: [
-        { title: "Donoghue v. Stevenson (1932)", desc: "Established the 'Neighbor Principle' in Negligence (Ginger Beer case)." },
-        { title: "Rylands v. Fletcher (1868)", desc: "Laid down the rule of 'Strict Liability'." },
-        { title: "M.C. Mehta v. UOI (1987)", desc: "Established 'Absolute Liability' for hazardous industries in India (Oleum Gas Leak)." }
-      ],
-      proTip: "Always identify if the plaintiff suffered a 'legal injury'. If no legal right is violated, there is no tort."
-    },
-    {
-      title: "Law of Torts: Specific Torts",
-      readTime: "25 mins",
-      summary: "Defamation, Nuisance, Trespass, and Malicious Prosecution.",
-      keyPoints: [
-        "Defamation: Libel (Written) vs Slander (Spoken). Truth is a defense.",
-        "Nuisance: Unlawful interference with enjoyment of land (Public vs Private).",
-        "Trespass: Actionable per se (without proof of damage).",
-        "Malicious Prosecution: Prosecution without reasonable cause."
-      ],
-      proTip: "In Defamation, 'publication' to a third party is mandatory."
-    },
-    {
-      title: "Indian Contract Act, 1872",
-      readTime: "20 mins",
-      summary: "Deals with agreements that are enforceable by law. Section 2(h): Contract = Agreement + Enforceability.",
-      keyPoints: [
-        "Offer & Acceptance: Must be communicated.",
-        "Consideration (Quid Pro Quo): Something in return.",
-        "Free Consent: No Coercion, Undue Influence, Fraud, Misrepresentation, or Mistake.",
-        "Void vs Voidable: Void is dead from start (ab initio); Voidable is valid until cancelled."
-      ],
-      casesOrExamples: [
-        { title: "Carlill v. Carbolic Smoke Ball Co.", desc: "General Offer can be accepted by conduct." },
-        { title: "Balfour v. Balfour", desc: "Social/Domestic agreements are NOT contracts (No intent to create legal relations)." },
-        { title: "Mohori Bibee v. Dharmodas Ghose", desc: "Minors' agreements are Void Ab Initio." }
-      ],
-      proTip: "Memorize the difference between 'Void Agreement' and 'Voidable Contract'. It's a common trap."
-    },
-    {
-      title: "Criminal Law (IPC): Offences Against Body",
-      readTime: "30 mins",
-      summary: "Culpable Homicide, Murder, Kidnapping, Abduction.",
-      keyPoints: [
-        "Culpable Homicide (Sec 299) vs Murder (Sec 300): Intensity of intention makes the difference.",
-        "Kidnapping (Sec 359): From lawful guardianship (Age limits apply).",
-        "Abduction (Sec 362): By force or deceit (No age limit)."
-      ],
-      casesOrExamples: [
-        { title: "K.M. Nanavati v. State of Maharashtra", desc: "Grave and sudden provocation defense (Jury trial abolition)." }
-      ]
-    },
-    {
-      title: "Criminal Law (IPC): Offences Against Property",
-      readTime: "20 mins",
-      summary: "Theft, Extortion, Robbery, Dacoity.",
-      keyPoints: [
-        "Theft (Sec 378): Moving movable property without consent.",
-        "Extortion (Sec 383): Inducing delivery of property by threat.",
-        "Robbery (Sec 390): Theft/Extortion + Violence/Fear.",
-        "Dacoity (Sec 391): Robbery by 5 or more persons."
-      ],
-      proTip: "The number of people involved distinguishes Robbery from Dacoity (5+)."
-    },
-    {
-      title: "Family Law Basics",
-      readTime: "15 mins",
-      summary: "Hindu Law and Muslim Law essentials for entrance.",
-      keyPoints: [
-        "Hindu Marriage Act 1955: Monogamy, Conditions for marriage.",
-        "Divorce: Theories (Fault, Consent, Breakdown).",
-        "Muslim Law: Nikah is a civil contract. Dower (Mahr).",
-        "Uniform Civil Code (Art 44): Current relevance."
-      ],
-      casesOrExamples: [
-        { title: "Shah Bano Case", desc: "Maintenance rights for Muslim women." },
-        { title: "Shayara Bano v. UOI", desc: "Triple Talaq declared unconstitutional." }
-      ]
-    },
-    {
-      title: "Legal Language & Maxims",
-      readTime: "15 mins",
-      summary: "Latin terms used frequently in legal proceedings.",
-      keyPoints: [
-        "Audi Alteram Partem: Hear the other side.",
-        "Res Judicata: Matter already decided.",
-        "Obiter Dicta: Remarks in passing (not binding).",
-        "Ratio Decidendi: The reason for the decision (binding)."
-      ],
-      proTip: "Learn 5 new maxims daily. They are easy marks in the exam."
-    }
-  ],
-  [Subject.GK]: [
-    {
-      title: "Current Affairs: Last 12 Months",
-      readTime: "30 mins",
-      summary: "High yield topics from National and International importance.",
-      keyPoints: [
-        "Awards: Nobel Prizes, Bharat Ratna, Padma Awards, Oscar Winners.",
-        "Sports: Cricket World Cup, Olympics/Asian Games, Grand Slams.",
-        "Appointments: Chief Justice of India, Election Commissioners, Heads of Global Bodies (UN, WHO).",
-        "Summits: G20, BRICS, COP (Climate Change)."
-      ],
-      proTip: "Read the newspaper editoral page daily. Focus on Legal Appointments and Amendments."
-    },
-    {
-      title: "International Organizations",
-      readTime: "20 mins",
-      summary: "UN, WTO, IMF, World Bank basics.",
-      keyPoints: [
-        "United Nations: Est 1945, HQ New York. 6 Organs.",
-        "ICJ (International Court of Justice): HQ The Hague, Netherlands.",
-        "IMF/World Bank: Bretton Woods Twins.",
-        "SAARC, ASEAN, NATO: Members and Purpose."
-      ]
-    },
-    {
-      title: "Modern Indian History",
-      readTime: "25 mins",
-      summary: "The Freedom Struggle (1857-1947) is the most important section.",
-      keyPoints: [
-        "Revolt of 1857: Sepoy Mutiny basics.",
-        "Gandhian Era: Non-Cooperation (1920), Civil Disobedience (1930), Quit India (1942).",
-        "INC Sessions: 1929 Lahore (Purna Swaraj), 1931 Karachi (Fundamental Rights)."
-      ]
-    },
-    {
-      title: "Indian Geography",
-      readTime: "20 mins",
-      summary: "Physical features and static facts.",
-      keyPoints: [
-        "River Systems: Himalayan vs Peninsular.",
-        "National Parks & Sanctuaries (Focus on locations like Kaziranga, Gir).",
-        "Solar System facts (Planets, Satellites)."
-      ]
-    },
-    {
-      title: "Economics Basics",
-      readTime: "15 mins",
-      summary: "Macro-economic terms often asked.",
-      keyPoints: [
-        "GDP, GNP, NNP definitions.",
-        "RBI Policies: Repo Rate, Reverse Repo, CRR, SLR.",
-        "Inflation: Types and impact.",
-        "Five Year Plans (History)."
-      ]
-    },
-    {
-      title: "General Science",
-      readTime: "15 mins",
-      summary: "Everyday science facts.",
-      keyPoints: [
-        "Vitamins & Deficiency Diseases (Vit A - Night Blindness, Vit C - Scurvy).",
-        "Scientific Instruments (Seismograph, Barometer).",
-        "Human Body: Largest bone (Femur), Largest Gland (Liver)."
-      ]
-    }
-  ],
-  [Subject.LogicalReasoning]: [
-    {
-      title: "Syllogisms",
-      readTime: "20 mins",
-      summary: "Deductive reasoning based on statements and conclusions.",
-      keyPoints: [
-        "Use Venn Diagrams to solve.",
-        "Common quantifiers: All, Some, No, Some Not.",
-        "Remember: If statements are positive, negative conclusion usually doesn't follow."
-      ],
-      casesOrExamples: [
-        { title: "Example 1", desc: "Statement: All A are B. All B are C. -> Conclusion: All A are C (True)." },
-        { title: "Example 2", desc: "Statement: Some A are B. Some B are C. -> Conclusion: Some A are C (False/Uncertain)." }
-      ],
-      proTip: "Always check for the 'Either-Or' case in conclusions."
-    },
-    {
-      title: "Critical Reasoning",
-      readTime: "25 mins",
-      summary: "Identifying Assumptions, Arguments, and Inferences.",
-      keyPoints: [
-        "Assumption: What the author takes for granted (Implicit).",
-        "Inference: What is definitely true based on the passage (Explicit/Derived).",
-        "Strong vs Weak Arguments: Strong arguments deal with the core issue."
-      ],
-      casesOrExamples: [
-        { title: "Negation Test", desc: "To find an assumption, negate the option. If the argument collapses, that option is the assumption." }
-      ]
-    },
-    {
-      title: "Coding-Decoding & Series",
-      readTime: "15 mins",
-      summary: "Pattern recognition in letters and numbers.",
-      keyPoints: [
-        "Letter Positions: A=1, B=2... Z=26 (EJOTY Rule: 5,10,15,20,25).",
-        "Opposite Pairs: A-Z, B-Y, C-X (Crux), D-W (Dew).",
-        "Number Series: Check for Differences, Squares, Cubes, Prime numbers."
-      ]
-    },
-    {
-      title: "Blood Relations",
-      readTime: "20 mins",
-      summary: "Navigating family trees.",
-      keyPoints: [
-        "Generations: Grandparents -> Parents -> Self/Siblings -> Children.",
-        "In-laws relationships.",
-        "Pointing to a photograph problems."
-      ],
-      proTip: "Draw a generation tree. Use + for Male and - for Female to avoid confusion."
-    },
-    {
-      title: "Direction Sense",
-      readTime: "15 mins",
-      summary: "North, South, East, West logic.",
-      keyPoints: [
-        "NEWS (North, East, West, South).",
-        "Pythagoras Theorem for shortest distance.",
-        "Shadow cases: Morning (Sun East -> Shadow West), Evening (Sun West -> Shadow East)."
-      ]
-    },
-    {
-      title: "Seating Arrangement",
-      readTime: "25 mins",
-      summary: "Linear and Circular arrangements.",
-      keyPoints: [
-        "Circular: Facing center (Left is Clockwise) vs Facing outside.",
-        "Linear: North facing (Left is your Left) vs South facing.",
-        "Connect the definite information first."
-      ]
-    }
-  ],
-  [Subject.English]: [
-    {
-      title: "Reading Comprehension",
-      readTime: "Ongoing",
-      summary: "The heavyweight of the English section.",
-      keyPoints: [
-        "Skimming: Read first and last paragraphs to get the gist.",
-        "Scanning: Look for specific keywords for factual questions.",
-        "Tone of Passage: Analytical, Critical, Sarcastic, Narrative."
-      ],
-      proTip: "Read the questions FIRST before reading the passage to know what to look for."
-    },
-    {
-      title: "Grammar Essentials: Spotting Errors",
-      readTime: "20 mins",
-      summary: "Rules for Spotting Errors and Sentence Correction.",
-      keyPoints: [
-        "Subject-Verb Agreement: 'The list of items IS on the desk' (Subject is List, not Items).",
-        "Tenses: Consistency is key.",
-        "Modifiers: 'Walking down the road, the tree fell' (Incorrect) vs 'Walking down the road, he saw a tree fall'."
-      ]
-    },
-    {
-      title: "Vocabulary: Root Words",
-      readTime: "10 mins",
-      summary: "Enhancing word power.",
-      keyPoints: [
-        "Root Words: 'Mal' (bad) -> Malice, Malfunction.",
-        "Root Words: 'Bene' (good) -> Benefit, Benevolent.",
-        "Root Words: 'Logy' (study) -> Biology, Theology."
-      ]
-    },
-    {
-      title: "Idioms & Phrases",
-      readTime: "15 mins",
-      summary: "Common figurative expressions.",
-      keyPoints: [
-        "Barking up the wrong tree: Accusing the wrong person.",
-        "Once in a blue moon: Rarely.",
-        "Burn the midnight oil: Work late into the night.",
-        "Piece of cake: Very easy."
-      ]
-    },
-    {
-      title: "One Word Substitution",
-      readTime: "15 mins",
-      summary: "Replacing phrases with a single word.",
-      keyPoints: [
-        "A person who does not believe in God: Atheist.",
-        "Government by the people: Democracy.",
-        "A cure for all diseases: Panacea.",
-        "One who knows everything: Omniscient."
-      ]
-    },
-    {
-      title: "Para Jumbles",
-      readTime: "20 mins",
-      summary: "Ordering sentences to form a coherent paragraph.",
-      keyPoints: [
-        "Find the Opening Sentence (Introduces the topic).",
-        "Find Mandatory Pairs (Chronology, Noun-Pronoun link).",
-        "Look for Concluding Sentence."
-      ]
-    }
-  ],
-  [Subject.Math]: [
-    {
-      title: "Arithmetic Basics: Percentages",
-      readTime: "30 mins",
-      summary: "Foundation for Data Interpretation and word problems.",
-      keyPoints: [
-        "Fraction to % conversion (1/2=50%, 1/3=33.33%, 1/4=25%, 1/5=20%).",
-        "Percentage Increase/Decrease formulas.",
-        "Successive percentage change: A + B + (AB/100)."
-      ],
-      proTip: "Don't solve everything. Use approximation and options to eliminate wrong answers quickly."
-    },
-    {
-      title: "Profit, Loss & Discount",
-      readTime: "20 mins",
-      summary: "Commercial Mathematics.",
-      keyPoints: [
-        "Profit = SP - CP.",
-        "Profit % = (Profit/CP) * 100.",
-        "Discount is always on Marked Price (MP).",
-        "False Weights logic."
-      ]
-    },
-    {
-      title: "Time, Speed & Distance",
-      readTime: "25 mins",
-      summary: "Motion problems.",
-      keyPoints: [
-        "Speed = Distance / Time.",
-        "Average Speed = 2xy/(x+y) (for equal distances).",
-        "Trains: Lengths add up when crossing each other.",
-        "Boats & Streams: Downstream (u+v), Upstream (u-v)."
-      ]
-    },
-    {
-      title: "Time & Work",
-      readTime: "20 mins",
-      summary: "Efficiency and Man-days.",
-      keyPoints: [
-        "If A does work in n days, 1 day work = 1/n.",
-        "Efficiency is inversely proportional to Time.",
-        "M1D1H1 = M2D2H2 (Chain Rule)."
-      ]
-    },
-    {
-      title: "Ratio & Proportion",
-      readTime: "15 mins",
-      summary: "Comparison of quantities.",
-      keyPoints: [
-        "A:B = a/b.",
-        "Proportion: a:b :: c:d => ad = bc.",
-        "Mixtures & Alligation rule."
-      ]
-    }
-  ]
+const MATCH_PAIRS = [
+    { id: '1', left: 'Damnum Sine Injuria', right: 'Damage without Legal Injury' },
+    { id: '2', left: 'Injuria Sine Damno', right: 'Injury without Damage' },
+    { id: '3', left: 'Volenti Non Fit Injuria', right: 'Defense of Consent' },
+    { id: '4', left: 'Res Ipsa Loquitur', right: 'Things speak for themselves' }
+];
+
+const subjects = [
+  { id: Subject.LegalAptitude, icon: Scale, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', desc: 'Constitution, Torts, Contracts, Crimes' },
+  { id: Subject.GK, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30', desc: 'History, Geography, Current Affairs' },
+  { id: Subject.LogicalReasoning, icon: Brain, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30', desc: 'Analogies, Coding, Blood Relations' },
+  { id: Subject.English, icon: PenTool, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', desc: 'Vocabulary, Grammar, Comprehension' },
+  { id: Subject.Math, icon: Calculator, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30', desc: 'Basic Arithmetic, Percentages, Profit & Loss' },
+];
+
+// Placeholder for content (In real app this is large)
+const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
+  [Subject.LegalAptitude]: [{ title: "Law of Torts", readTime: "20m", summary: "Civil wrongs...", keyPoints: ["Damnum Sine Injuria", "Strict Liability"], casesOrExamples: [{title: 'Donoghue v Stevenson', desc: 'Neighbor Principle'}], proTip: 'Focus on legal injury.' }],
+  [Subject.GK]: [{ title: "Current Affairs", readTime: "10m", summary: "Recent events", keyPoints: ["G20 Summit", "Nobel Prize"] }],
+  [Subject.LogicalReasoning]: [{ title: "Syllogisms", readTime: "15m", summary: "Logic deduction", keyPoints: ["All A are B", "Some B are C"] }],
+  [Subject.English]: [{ title: "Grammar", readTime: "20m", summary: "Rules", keyPoints: ["Subject Verb Agreement"] }],
+  [Subject.Math]: [{ title: "Percentages", readTime: "25m", summary: "Basics", keyPoints: ["Fractions", "Conversion"] }],
 };
 
 const flashcardsData = [
-  { id: 1, type: 'Maxim', front: 'Volenti non fit injuria', back: 'To a willing person, injury is not done. (Key defense in Torts, e.g., Sports spectators)' },
-  { id: 2, type: 'Maxim', front: 'Audi alteram partem', back: 'No one should be condemned unheard. (A core principle of Natural Justice)' },
-  { id: 3, type: 'Case', front: 'Kesavananda Bharati v. State of Kerala (1973)', back: 'Established the "Basic Structure Doctrine". Parliament cannot alter basic features of the Constitution.' },
-  { id: 4, type: 'Maxim', front: 'Res ipsa loquitur', back: 'The thing speaks for itself. (Used in Negligence cases where accident implies negligence)' },
-  { id: 5, type: 'Case', front: 'Maneka Gandhi v. Union of India (1978)', back: 'Expanded Art. 21. Right to Life includes right to live with dignity & right to travel abroad.' },
-  { id: 6, type: 'Maxim', front: 'Ubi jus ibi remedium', back: 'Where there is a right, there is a remedy.' },
-  { id: 7, type: 'Case', front: 'M.C. Mehta v. Union of India', back: 'Established "Absolute Liability" for hazardous industries. (Oleum Gas Leak case)' },
-  { id: 8, type: 'Maxim', front: 'Actus non facit reum nisi mens sit rea', back: 'The act itself does not constitute guilt unless done with a guilty mind.' },
-  { id: 9, type: 'Case', front: 'Vishaka v. State of Rajasthan', back: 'Laid down guidelines against sexual harassment at workplace.' },
-  { id: 10, type: 'Maxim', front: 'Nemo judex in causa sua', back: 'No one should be a judge in their own cause. (Rule against Bias)' },
-  { id: 11, type: 'Case', front: 'S.R. Bommai v. Union of India', back: 'Discussed provisions of Article 356 (President\'s Rule) and Federalism.' },
-  { id: 12, type: 'Maxim', front: 'De minimis non curat lex', back: 'The law does not concern itself with trifles.' },
-  { id: 13, type: 'Case', front: 'Minerva Mills v. Union of India', back: 'Struck down clauses of 42nd Amendment. Harmony between FR and DPSP is basic structure.' },
-  { id: 14, type: 'Maxim', front: 'Caveat Emptor', back: 'Let the buyer beware.' },
-  { id: 15, type: 'Case', front: 'Indra Sawhney v. Union of India', back: 'Mandal Commission case. Capped reservation at 50%.' }
+  { id: 1, type: 'Maxim', front: 'Volenti non fit injuria', back: 'To a willing person, injury is not done.' },
+  { id: 2, type: 'Case', front: 'Kesavananda Bharati', back: 'Basic Structure Doctrine.' },
 ];
 
+// --- Sub-Component: Quick Bytes ---
+const QuickBytesView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  return (
+    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm">
+      <button onClick={onClose} className="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors"><XIcon /></button>
+      <div className="w-full max-w-sm h-[70vh] overflow-y-scroll snap-y snap-mandatory rounded-2xl no-scrollbar">
+        {QUICK_BYTES.map((byte, i) => (
+          <div key={i} className={`snap-center h-full w-full flex items-center justify-center p-8 bg-gradient-to-br ${byte.color} text-white text-center rounded-2xl mb-4 last:mb-0 shadow-2xl`}>
+            <p className="text-2xl font-bold leading-relaxed drop-shadow-md">{byte.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- Sub-Component: Match Game ---
+const MatchGame: React.FC<{ pairs: typeof MATCH_PAIRS, onClose: () => void }> = ({ pairs, onClose }) => {
+  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [matchedIds, setMatchedIds] = useState<string[]>([]);
+  const [shuffledRight, setShuffledRight] = useState([...pairs].sort(() => Math.random() - 0.5));
+
+  const handleLeftClick = (id: string) => setSelectedLeft(id);
+  
+  const handleRightClick = (pairId: string) => {
+    if (!selectedLeft) return;
+    if (selectedLeft === pairId) {
+      setMatchedIds(prev => [...prev, pairId]);
+      setSelectedLeft(null);
+    } else {
+      setSelectedLeft(null);
+    }
+  };
+
+  if (matchedIds.length === pairs.length) {
+    return (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl text-center animate-in zoom-in shadow-2xl border border-gray-200 dark:border-gray-700">
+                <div className="w-20 h-20 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Check className="w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">All Matched!</h3>
+                <button onClick={onClose} className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold mt-4 hover:bg-indigo-700">Close</button>
+            </div>
+        </div>
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-indigo-900/95 flex flex-col items-center justify-center p-4 backdrop-blur-md">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between mb-6">
+          <h3 className="font-bold text-lg text-gray-800 dark:text-white">Match the Terms</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-red-500 font-bold">Exit</button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:gap-8">
+           <div className="space-y-3">
+             {pairs.map(p => (
+               <button 
+                key={p.id}
+                disabled={matchedIds.includes(p.id)}
+                onClick={() => handleLeftClick(p.id)}
+                className={`w-full p-4 rounded-xl text-left border-2 transition-all font-medium ${
+                    matchedIds.includes(p.id) ? 'opacity-0' : 
+                    selectedLeft === p.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-500'
+                }`}
+               >
+                 {p.left}
+               </button>
+             ))}
+           </div>
+           <div className="space-y-3">
+             {shuffledRight.map(p => (
+               <button 
+                key={p.id}
+                disabled={matchedIds.includes(p.id)}
+                onClick={() => handleRightClick(p.id)}
+                className={`w-full p-4 rounded-xl text-left border-2 transition-all font-medium ${
+                    matchedIds.includes(p.id) ? 'opacity-0' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-500'
+                }`}
+               >
+                 {p.right}
+               </button>
+             ))}
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const XIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 18 18"/></svg>;
+
 const StudyHub: React.FC = () => {
+  const { markTopicMastered, incrementStudyHours } = useProgress();
   const [activeTab, setActiveTab] = useState<'materials' | 'plan' | 'flashcards'>('materials');
   const [selectedSubject, setSelectedSubject] = useState<Subject>(Subject.LegalAptitude);
-  const [studyPlan, setStudyPlan] = useState<string | null>(null);
-  const [loadingPlan, setLoadingPlan] = useState(false);
-  
-  // Expanded UI State
   const [expandedTopicIndex, setExpandedTopicIndex] = useState<number | null>(null);
-  
-  // Personalization State
+  const [showQuickBytes, setShowQuickBytes] = useState(false);
+  const [showMatchGame, setShowMatchGame] = useState(false);
   const [weakAreas, setWeakAreas] = useState('');
   const [hoursPerDay, setHoursPerDay] = useState('4');
-
-  // Flashcard State
+  const [studyPlan, setStudyPlan] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(false);
   const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case' | 'Difficult'>('All');
   const [difficultCardIds, setDifficultCardIds] = useState<number[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
 
-  // Load saved difficult cards
+  const topics = studyContentPlaceholder[selectedSubject] || [];
+
   useEffect(() => {
-    const saved = localStorage.getItem('lawranker_flashcards_difficult');
-    if (saved) {
-      try {
-        setDifficultCardIds(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load difficult cards");
-      }
-    }
+    const savedCards = localStorage.getItem('lawranker_flashcards_difficult');
+    if (savedCards) setDifficultCardIds(JSON.parse(savedCards));
+    const savedNotes = localStorage.getItem('lawranker_user_notes');
+    if (savedNotes) setNotes(JSON.parse(savedNotes));
   }, []);
 
-  // Save difficult cards
   useEffect(() => {
     localStorage.setItem('lawranker_flashcards_difficult', JSON.stringify(difficultCardIds));
   }, [difficultCardIds]);
 
-  const filteredCards = flashcardsData.filter(c => {
-    if (cardFilter === 'Difficult') return difficultCardIds.includes(c.id);
-    return cardFilter === 'All' || c.type === cardFilter;
-  });
-  
-  const currentCard = filteredCards[currentCardIndex];
-
-  // Reset index when filter changes or list shrinks (e.g. unmarking a difficult card)
   useEffect(() => {
-    if (currentCardIndex >= filteredCards.length && filteredCards.length > 0) {
-      setCurrentCardIndex(filteredCards.length - 1);
-    } else if (filteredCards.length === 0) {
-      setCurrentCardIndex(0);
-    } else if (currentCardIndex < 0) {
-      setCurrentCardIndex(0);
-    }
-  }, [filteredCards.length, currentCardIndex, cardFilter]);
-
-  // Reset to 0 specifically when switching main filter type
-  useEffect(() => {
-    setCurrentCardIndex(0);
-    setIsFlipped(false);
-  }, [cardFilter]);
-
-  // Reset expanded topic when subject changes
-  useEffect(() => {
-    setExpandedTopicIndex(null);
-  }, [selectedSubject]);
+    localStorage.setItem('lawranker_user_notes', JSON.stringify(notes));
+  }, [notes]);
 
   const handleGeneratePlan = async () => {
     setLoadingPlan(true);
@@ -505,382 +187,204 @@ const StudyHub: React.FC = () => {
     setLoadingPlan(false);
   };
 
-  const handleNextCard = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentCardIndex((prev) => (prev + 1) % filteredCards.length);
-    }, 200);
-  };
-
-  const handlePrevCard = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentCardIndex((prev) => (prev - 1 + filteredCards.length) % filteredCards.length);
-    }, 200);
-  };
-
-  const toggleDifficult = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent flipping
-    setDifficultCardIds(prev => {
-      if (prev.includes(id)) return prev.filter(cid => cid !== id);
-      return [...prev, id];
-    });
-  };
-
   const toggleTopic = (index: number) => {
     if (expandedTopicIndex === index) {
       setExpandedTopicIndex(null);
     } else {
       setExpandedTopicIndex(index);
+      incrementStudyHours(0.1); 
     }
   };
 
+  const filteredCards = flashcardsData.filter(c => {
+    if (cardFilter === 'Difficult') return difficultCardIds.includes(c.id);
+    return cardFilter === 'All' || (c as any).type === cardFilter;
+  });
+  const currentCard = filteredCards[currentCardIndex];
+
+  const toggleDifficult = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDifficultCardIds(prev => prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]);
+  };
+
+  const updateNote = (noteId: string, content: string) => {
+    setNotes(prev => ({ ...prev, [noteId]: content }));
+  };
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col relative">
+      {showQuickBytes && <QuickBytesView onClose={() => setShowQuickBytes(false)} />}
+      {showMatchGame && <MatchGame pairs={MATCH_PAIRS} onClose={() => setShowMatchGame(false)} />}
+
       <header className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800">Study Hub</h2>
-          <p className="text-gray-500">Your comprehensive arsenal for Rank 1 preparation.</p>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Study Hub</h2>
+          <p className="text-gray-500 dark:text-gray-400">Integrated Learning Ecosystem.</p>
         </div>
-        <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('materials')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
-              activeTab === 'materials' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            Subject Materials
-          </button>
-          <button
-            onClick={() => setActiveTab('flashcards')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 whitespace-nowrap ${
-              activeTab === 'flashcards' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Layers className="w-4 h-4" /> Flashcards
-          </button>
-          <button
-            onClick={() => setActiveTab('plan')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
-              activeTab === 'plan' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            Rank 1 Strategy
-          </button>
+        <div className="flex bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-auto">
+          {['materials', 'flashcards', 'plan'].map((tab) => (
+              <button 
+                key={tab}
+                onClick={() => setActiveTab(tab as any)} 
+                className={`px-4 py-2 rounded-md text-sm font-medium capitalize whitespace-nowrap ${activeTab === tab ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+              >
+                  {tab === 'plan' ? 'Rank 1 Plan' : tab}
+              </button>
+          ))}
         </div>
       </header>
 
       {activeTab === 'materials' ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 h-full overflow-hidden">
-          {/* Subject List - Fixed height on mobile, scrollable on desktop */}
           <div className="lg:col-span-1 space-y-3 overflow-y-auto max-h-[200px] lg:max-h-full pr-2">
             {subjects.map((sub) => (
               <button
                 key={sub.id}
                 onClick={() => setSelectedSubject(sub.id)}
-                className={`w-full text-left p-4 rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                  selectedSubject === sub.id
-                    ? 'bg-white shadow-md border-l-4 border-indigo-600 ring-1 ring-indigo-50'
-                    : 'bg-gray-50 hover:bg-white hover:shadow-sm'
-                }`}
+                className={`w-full text-left p-4 rounded-xl transition-all flex items-center gap-3 ${selectedSubject === sub.id ? 'bg-white dark:bg-gray-800 shadow-md border-l-4 border-indigo-600 ring-1 ring-indigo-50 dark:ring-gray-700' : 'bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 border border-transparent dark:border-gray-800'}`}
               >
-                <div className={`p-2 rounded-lg ${sub.bg} ${sub.color}`}>
-                  <sub.icon className="w-5 h-5" />
-                </div>
+                <div className={`p-2 rounded-lg ${sub.bg} ${sub.color}`}><sub.icon className="w-5 h-5" /></div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-sm">{sub.id}</h4>
-                  <p className="text-xs text-gray-500 truncate w-32">{sub.desc}</p>
+                  <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">{sub.id}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 truncate w-32">{sub.desc}</p>
                 </div>
               </button>
             ))}
           </div>
 
-          {/* Content Area */}
-          <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
-               <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                 <BookOpen className="w-5 h-5 text-indigo-600" />
-                 {selectedSubject} Modules
-               </h3>
-               <span className="text-xs font-medium bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                 {studyContent[selectedSubject]?.length || 0} Topics
-               </span>
-            </div>
-
+          <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 overflow-y-auto">
             <div className="space-y-4">
-              {studyContent[selectedSubject]?.map((topic, index) => (
-                <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 shadow-md bg-indigo-50/10' : 'border-gray-200 hover:border-indigo-200'}`}>
-                  
-                  {/* Header (Clickable) */}
-                  <button 
-                    onClick={() => toggleTopic(index)}
-                    className="w-full flex items-center justify-between p-4 text-left"
-                  >
+              {topics.map((topic: DetailedTopic, index: number) => {
+                const noteId = `${selectedSubject}-${index}`;
+                return (
+                <div key={index} className={`border rounded-xl transition-all ${expandedTopicIndex === index ? 'border-indigo-200 dark:border-indigo-800 shadow-md bg-indigo-50/10 dark:bg-indigo-900/10' : 'border-gray-200 dark:border-gray-700'}`}>
+                  <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-4 text-left">
                     <div className="flex items-center gap-4">
-                      <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                        {index + 1}
-                      </span>
+                      <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>{index + 1}</span>
                       <div>
-                        <h4 className={`font-bold text-lg transition-colors ${expandedTopicIndex === index ? 'text-indigo-700' : 'text-gray-800'}`}>
-                          {topic.title}
-                        </h4>
-                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                          <Clock className="w-3 h-3" /> {topic.readTime}
-                        </p>
+                        <h4 className={`font-bold text-lg ${expandedTopicIndex === index ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>{topic.title}</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {topic.readTime}</p>
                       </div>
                     </div>
                     {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
                   </button>
 
-                  {/* Expanded Content */}
                   {expandedTopicIndex === index && (
                     <div className="p-4 pt-0 pl-[4.5rem] animate-in fade-in slide-in-from-top-2">
-                      <p className="text-gray-600 mb-4 leading-relaxed border-b border-dashed border-indigo-200 pb-4">
-                        {topic.summary}
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <h5 className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
-                            <Target className="w-4 h-4 text-indigo-500" /> Rank 1 Concepts
-                          </h5>
-                          <ul className="space-y-2">
-                            {topic.keyPoints.map((point, i) => (
-                              <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
-                                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full mt-1.5 flex-shrink-0"></span>
-                                {point}
-                              </li>
+                      <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{topic.summary}</p>
+                      
+                      <div className="mb-6">
+                         <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2"><Target className="w-4 h-4" /> Key Concepts</h5>
+                         <ul className="space-y-2">
+                            {topic.keyPoints?.map((kp: string, i: number) => (
+                                <li key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2"><span className="w-1.5 h-1.5 bg-indigo-400 rounded-full mt-1.5"></span>{kp}</li>
                             ))}
-                          </ul>
-                        </div>
-
-                        {topic.casesOrExamples && (
-                           <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
-                             <h5 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
-                               {selectedSubject === Subject.LegalAptitude ? <Landmark className="w-4 h-4 text-orange-500" /> : <Lightbulb className="w-4 h-4 text-orange-500" />}
-                               {selectedSubject === Subject.LegalAptitude ? "Landmark Cases" : "Illustrative Examples"}
-                             </h5>
-                             <div className="space-y-3">
-                               {topic.casesOrExamples.map((item, i) => (
-                                 <div key={i}>
-                                   <p className="text-xs font-bold text-indigo-700">{item.title}</p>
-                                   <p className="text-xs text-gray-500 leading-tight">{item.desc}</p>
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-                        )}
+                         </ul>
                       </div>
 
-                      {topic.proTip && (
-                        <div className="mt-4 bg-yellow-50 text-yellow-800 text-sm p-3 rounded-lg border border-yellow-100 flex items-start gap-2">
-                           <Sparkles className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
-                           <div>
-                             <span className="font-bold">Expert Strategy:</span> {topic.proTip}
-                           </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 border-t border-indigo-100 dark:border-gray-700 pt-4">
+                         <button onClick={() => setShowQuickBytes(true)} className="bg-gradient-to-r from-pink-500 to-rose-500 text-white p-3 rounded-lg text-xs font-bold flex flex-col items-center gap-1 hover:scale-105 transition-transform">
+                            <Smartphone className="w-5 h-5" /> Quick Bytes
+                         </button>
+                         <button onClick={() => setShowMatchGame(true)} className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white p-3 rounded-lg text-xs font-bold flex flex-col items-center gap-1 hover:scale-105 transition-transform">
+                            <Gamepad2 className="w-5 h-5" /> Match Terms
+                         </button>
+                         <button onClick={() => markTopicMastered()} className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-green-100 hover:text-green-700 dark:hover:bg-green-900 dark:hover:text-green-300 p-3 rounded-lg text-xs font-bold flex flex-col items-center gap-1 transition-colors">
+                            <Check className="w-5 h-5" /> Mark Done
+                         </button>
+                      </div>
+                      
+                      {/* Notes Section */}
+                      <div className="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+                          <button 
+                            onClick={() => setActiveNoteId(activeNoteId === noteId ? null : noteId)}
+                            className="flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                          >
+                            <PenLine className="w-4 h-4" />
+                            {notes[noteId] ? 'Edit My Notes' : 'Add Personal Note'}
+                          </button>
+                          
+                          {activeNoteId === noteId && (
+                            <div className="mt-3 animate-in fade-in slide-in-from-top-2 relative">
+                              <textarea
+                                value={notes[noteId] || ''}
+                                onChange={(e) => updateNote(noteId, e.target.value)}
+                                className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 text-sm focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-300 outline-none min-h-[100px] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-sm"
+                                placeholder="Jot down your understanding..."
+                              />
+                              <div className="absolute bottom-3 right-3 flex items-center gap-1 pointer-events-none transition-opacity opacity-50">
+                                <Save className="w-3 h-3 text-gray-400" />
+                                <span className="text-[10px] text-gray-400">Auto-saved</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-            
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100 flex items-center gap-4">
-              <div className="bg-blue-100 p-3 rounded-full text-blue-600">
-                 <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-bold text-blue-800 mb-1 text-sm">Want deeper analysis?</h4>
-                <p className="text-sm text-blue-600">
-                  Head to the <strong className="cursor-pointer hover:underline" onClick={() => setActiveTab('flashcards')}>Flashcards</strong> tab to test your recall on these topics immediately.
-                </p>
-              </div>
+              );})}
             </div>
           </div>
         </div>
-      ) : activeTab === 'flashcards' ? (
-        <div className="flex-1 bg-gray-50 rounded-xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[600px]">
-          <div className="max-w-2xl w-full flex flex-col gap-6">
-            {/* Filters */}
-            <div className="flex justify-center gap-2 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200 mx-auto flex-wrap">
-              {['All', 'Maxim', 'Case', 'Difficult'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setCardFilter(type as any)}
-                  className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${
-                    cardFilter === type 
-                      ? 'bg-indigo-600 text-white shadow-md' 
-                      : 'text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {type === 'Difficult' && <Star className="w-3 h-3 fill-current" />}
-                  {type === 'All' ? 'All Cards' : type === 'Maxim' ? 'Legal Maxims' : type === 'Case' ? 'Landmark Cases' : 'Review Difficult'}
-                </button>
-              ))}
-            </div>
-
-            {/* Card Container */}
-            {filteredCards.length > 0 ? (
-              <div className="relative perspective-1000 w-full h-80 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
-                <div className={`relative w-full h-full text-center transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
-                  
-                  {/* Front */}
-                  <div className="absolute w-full h-full backface-hidden bg-white border-2 border-indigo-100 rounded-2xl shadow-xl flex flex-col items-center justify-center p-8">
-                    <button 
-                      onClick={(e) => toggleDifficult(currentCard.id, e)}
-                      className="absolute top-4 left-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                      title="Mark as Difficult for Review"
-                    >
-                      <Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                    </button>
-
-                    <span className="absolute top-4 right-4 bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
-                      {currentCard.type}
-                    </span>
-                    <span className="absolute top-4 left-4 text-gray-300 font-bold text-4xl opacity-20 pointer-events-none">?</span>
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 leading-tight">
-                      {currentCard.front}
-                    </h3>
-                    <p className="text-sm text-gray-400 mt-4 font-medium flex items-center gap-2">
-                      <RotateCw className="w-3 h-3" /> Click to flip
-                    </p>
-                  </div>
-
-                  {/* Back */}
-                  <div className="absolute w-full h-full backface-hidden bg-indigo-900 text-white rounded-2xl shadow-xl flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
-                    <button 
-                      onClick={(e) => toggleDifficult(currentCard.id, e)}
-                      className="absolute top-4 left-4 z-10 p-2 hover:bg-indigo-800 rounded-full transition-colors"
-                      title="Mark as Difficult for Review"
-                    >
-                       <Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
-                    </button>
-                    
-                    <span className="absolute top-4 right-4 bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">
-                      Answer
-                    </span>
-                    <div className="bg-white/10 p-3 rounded-full mb-4">
-                      <Lightbulb className="w-6 h-6 text-yellow-400" />
-                    </div>
-                    <p className="text-lg md:text-xl font-medium leading-relaxed">
-                      {currentCard.back}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl">
-                {cardFilter === 'Difficult' ? (
-                  <>
-                    <Star className="w-12 h-12 text-gray-300 mb-2" />
-                    <p>No cards marked as difficult yet.</p>
-                    <button onClick={() => setCardFilter('All')} className="text-indigo-600 font-bold text-sm mt-2 hover:underline">
-                      Browse all cards to mark them
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Layers className="w-12 h-12 text-gray-300 mb-2" />
-                    <p>No flashcards found for this category.</p>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* Controls */}
-            {filteredCards.length > 0 && (
-              <div className="flex items-center justify-between text-gray-600 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <button onClick={handlePrevCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                
-                <div className="flex flex-col items-center">
-                  <span className="font-bold text-gray-800">Card {currentCardIndex + 1} of {filteredCards.length}</span>
-                  <span className="text-xs text-gray-400">Press Space to Flip</span>
-                </div>
-
-                <button onClick={handleNextCard} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </div>
-            )}
-          </div>
+      ) : activeTab === 'plan' ? (
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
+             {!studyPlan ? (
+                 <div className="text-center max-w-md mx-auto mt-10">
+                    <h3 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Personalized Blueprint</h3>
+                    <input value={weakAreas} onChange={(e) => setWeakAreas(e.target.value)} placeholder="Weak Areas (e.g. Torts)" className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg mb-4" />
+                    <select value={hoursPerDay} onChange={(e) => setHoursPerDay(e.target.value)} className="w-full p-3 border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg mb-4"><option value="4">4 Hours</option><option value="6">6 Hours</option></select>
+                    <button onClick={handleGeneratePlan} disabled={loadingPlan} className="bg-indigo-600 hover:bg-indigo-700 text-white w-full py-3 rounded-lg font-bold">{loadingPlan ? "Generating..." : "Generate Plan"}</button>
+                 </div>
+             ) : (
+                 <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">{studyPlan}</div>
+             )}
         </div>
       ) : (
-        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-8 overflow-hidden flex flex-col">
-           {!studyPlan && !loadingPlan ? (
-             <div className="flex flex-col items-center justify-center h-full text-center max-w-lg mx-auto animate-in fade-in slide-in-from-bottom-4">
-               <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
-                 <Calendar className="w-10 h-10 text-indigo-600" />
-               </div>
-               <h3 className="text-2xl font-bold text-gray-800 mb-3">Personalized 12-Week Blueprint</h3>
-               <p className="text-gray-500 mb-6">
-                 Tell us a bit about your prep status, and we will craft a tailored schedule to hit AIR 1.
-               </p>
-               
-               {/* Personalization Inputs */}
-               <div className="w-full space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-100 text-left mb-6">
-                 <div>
-                   <label className="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
-                     <AlertCircle className="w-4 h-4 text-orange-500" /> Weak Subjects
-                   </label>
-                   <input 
-                     type="text" 
-                     placeholder="e.g., Legal Torts, Math, Syllogisms"
-                     value={weakAreas}
-                     onChange={(e) => setWeakAreas(e.target.value)}
-                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-200 outline-none text-sm"
-                   />
+        // Flashcard UI 
+        <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[600px]">
+             {/* Implementation matches previous, just updating container styles */}
+             <div className="max-w-2xl w-full flex flex-col gap-6">
+                 {/* Filter */}
+                 <div className="flex justify-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mx-auto flex-wrap">
+                    {['All', 'Maxim', 'Case', 'Difficult'].map((type) => (
+                        <button
+                        key={type}
+                        onClick={() => setCardFilter(type as any)}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${cardFilter === type ? 'bg-indigo-600 text-white' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        >
+                           {type === 'Difficult' && <Star className="w-3 h-3 fill-current" />}
+                           {type}
+                        </button>
+                    ))}
                  </div>
-                 <div>
-                   <label className="block text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
-                     <Clock className="w-4 h-4 text-blue-500" /> Study Hours / Day
-                   </label>
-                   <select 
-                     value={hoursPerDay}
-                     onChange={(e) => setHoursPerDay(e.target.value)}
-                     className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-200 outline-none text-sm bg-white"
-                   >
-                     <option value="2">2 Hours (Working Professional)</option>
-                     <option value="4">4 Hours (Student)</option>
-                     <option value="6">6 Hours (Dedicated)</option>
-                     <option value="8+">8+ Hours (Rank 1 Target)</option>
-                   </select>
-                 </div>
-               </div>
-
-               <button 
-                 onClick={handleGeneratePlan}
-                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-               >
-                 <Sparkles className="w-5 h-5" /> Generate My Plan
-               </button>
+                 {/* Card */}
+                 {filteredCards.length > 0 ? (
+                    <div className="relative perspective-1000 w-full h-80 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
+                         <div className={`relative w-full h-full text-center transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+                             {/* Front */}
+                             <div className="absolute w-full h-full backface-hidden bg-white dark:bg-gray-800 border-2 border-indigo-100 dark:border-gray-700 rounded-2xl shadow-xl flex flex-col items-center justify-center p-8">
+                                 <button onClick={(e) => toggleDifficult(currentCard.id, e)} className="absolute top-4 left-4 z-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} /></button>
+                                 <h3 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-4">{currentCard.front}</h3>
+                                 <p className="text-sm text-gray-400 mt-4 flex items-center gap-2"><RotateCw className="w-3 h-3" /> Flip</p>
+                             </div>
+                             {/* Back */}
+                             <div className="absolute w-full h-full backface-hidden bg-indigo-900 dark:bg-gray-950 text-white rounded-2xl shadow-xl flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
+                                 <p className="text-lg md:text-xl font-medium">{currentCard.back}</p>
+                             </div>
+                         </div>
+                    </div>
+                 ) : (
+                     <div className="text-center text-gray-500 dark:text-gray-400">No cards found.</div>
+                 )}
+                 {/* Controls */}
+                 {filteredCards.length > 0 && (
+                    <div className="flex items-center justify-between text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <button onClick={() => {setIsFlipped(false); setTimeout(()=>setCurrentCardIndex(p=>(p-1+filteredCards.length)%filteredCards.length), 200)}} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><ChevronLeft className="w-6 h-6" /></button>
+                        <span className="font-bold">Card {currentCardIndex+1}/{filteredCards.length}</span>
+                        <button onClick={() => {setIsFlipped(false); setTimeout(()=>setCurrentCardIndex(p=>(p+1)%filteredCards.length), 200)}} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><ChevronRight className="w-6 h-6" /></button>
+                    </div>
+                 )}
              </div>
-           ) : loadingPlan ? (
-             <div className="flex flex-col items-center justify-center h-full">
-               <RefreshCw className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-               <p className="text-gray-600 font-medium">Analyzing your profile & crafting roadmap...</p>
-             </div>
-           ) : (
-             <div className="h-full flex flex-col">
-               <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                 <div>
-                   <h3 className="text-xl font-bold text-gray-800">Your Rank 1 Strategy</h3>
-                   <p className="text-xs text-gray-500 mt-1">Optimized for {hoursPerDay} hours/day • Focus: {weakAreas || 'Balanced'}</p>
-                 </div>
-                 <button 
-                   onClick={() => setStudyPlan(null)}
-                   className="text-sm text-indigo-600 font-medium hover:text-indigo-800 flex items-center gap-1"
-                 >
-                   <RefreshCw className="w-3 h-3" /> New Plan
-                 </button>
-               </div>
-               <div className="prose prose-indigo max-w-none overflow-y-auto pr-4 flex-1 text-gray-700 leading-relaxed whitespace-pre-wrap">
-                 {studyPlan}
-               </div>
-             </div>
-           )}
         </div>
       )}
     </div>

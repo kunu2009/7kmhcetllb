@@ -21,6 +21,7 @@ export interface Question {
   correctAnswer: number;
   explanation?: string;
   subject: Subject;
+  topic?: string;
 }
 
 export interface ChatMessage {
