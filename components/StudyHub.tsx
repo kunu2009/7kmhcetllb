@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Subject } from '../types';
-import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle } from 'lucide-react';
+import { Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target } from 'lucide-react';
 import { generateStudyPlan } from '../services/geminiService';
+
+// --- Types for Rich Content ---
+interface DetailedTopic {
+  title: string;
+  readTime: string;
+  summary: string;
+  keyPoints: string[];
+  casesOrExamples?: { title: string; desc: string }[]; // For Legal (Cases) or Logic/Math (Examples)
+  proTip?: string;
+}
 
 const subjects = [
   { id: Subject.LegalAptitude, icon: Scale, color: 'text-red-500', bg: 'bg-red-100', desc: 'Constitution, Torts, Contracts, Crimes' },
@@ -11,50 +21,397 @@ const subjects = [
   { id: Subject.Math, icon: Calculator, color: 'text-orange-500', bg: 'bg-orange-100', desc: 'Basic Arithmetic, Percentages, Profit & Loss' },
 ];
 
-const topicData: Record<string, string[]> = {
+// --- Comprehensive Data Library ---
+const studyContent: Record<Subject, DetailedTopic[]> = {
   [Subject.LegalAptitude]: [
-    "Indian Constitution: Preamble & Fundamental Rights",
-    "Law of Torts: Negligence & Nuisance",
-    "Indian Contract Act: Essentials of Valid Contract",
-    "Indian Penal Code: General Exceptions",
-    "Legal Maxims & Terms",
-    "Family Law: Hindu Marriage Act Basics",
-    "Landmark Supreme Court Judgments"
+    {
+      title: "Indian Constitution: Fundamental Rights",
+      readTime: "25 mins",
+      summary: "Part III (Articles 12-35) forms the bedrock of democracy. These rights are justiciable, meaning you can move the court (Art 32/226) if violated.",
+      keyPoints: [
+        "Right to Equality (Art 14-18): Rule of Law, Abolition of Untouchability.",
+        "Right to Freedom (Art 19-22): Speech, Assembly, Association, Life & Liberty.",
+        "Right against Exploitation (Art 23-24): Trafficking, Child Labour.",
+        "Freedom of Religion (Art 25-28): Secularism.",
+        "Constitutional Remedies (Art 32): The 'Heart and Soul' of the Constitution."
+      ],
+      casesOrExamples: [
+        { title: "Kesavananda Bharati v. State of Kerala (1973)", desc: "Established the 'Basic Structure Doctrine'. Parliament cannot alter the core features of the Constitution." },
+        { title: "Maneka Gandhi v. Union of India (1978)", desc: "Expanded Art 21. 'Procedure established by law' must be just, fair, and reasonable (Due Process)." },
+        { title: "Justice Puttaswamy v. Union of India (2017)", desc: "Declared Right to Privacy as a Fundamental Right under Article 21." }
+      ],
+      proTip: "Focus on Article 21 and 32. These are the most frequently tested articles in entrance exams."
+    },
+    {
+      title: "Constitution: Directive Principles & Duties",
+      readTime: "20 mins",
+      summary: "Part IV (DPSP) and Part IV-A (Fundamental Duties). Non-justiciable but fundamental in governance.",
+      keyPoints: [
+        "DPSP (Art 36-51): Welfare State concept.",
+        "Art 39A: Free Legal Aid.",
+        "Art 44: Uniform Civil Code.",
+        "Fundamental Duties (Art 51A): Added by 42nd Amendment (Swaran Singh Committee). 11 Duties total."
+      ],
+      casesOrExamples: [
+        { title: "Minerva Mills v. Union of India", desc: "Harmony between FR and DPSP is part of Basic Structure." }
+      ],
+      proTip: "Memorize the 11th Duty (Education for children 6-14 yrs) added by 86th Amendment."
+    },
+    {
+      title: "Law of Torts: General Principles",
+      readTime: "20 mins",
+      summary: "A Tort is a civil wrong for which the remedy is unliquidated damages. It is not codified law but based on precedents.",
+      keyPoints: [
+        "Damnum Sine Injuria: Damage without legal injury (No compensation, e.g., Gloucester Grammar School case).",
+        "Injuria Sine Damno: Legal injury without damage (Compensation awarded, e.g., Ashby v. White).",
+        "Volenti Non Fit Injuria: Defense of consent (e.g., Spectator at a cricket match).",
+        "Vicarious Liability: Master is liable for servant's acts (Respondeat Superior)."
+      ],
+      casesOrExamples: [
+        { title: "Donoghue v. Stevenson (1932)", desc: "Established the 'Neighbor Principle' in Negligence (Ginger Beer case)." },
+        { title: "Rylands v. Fletcher (1868)", desc: "Laid down the rule of 'Strict Liability'." },
+        { title: "M.C. Mehta v. UOI (1987)", desc: "Established 'Absolute Liability' for hazardous industries in India (Oleum Gas Leak)." }
+      ],
+      proTip: "Always identify if the plaintiff suffered a 'legal injury'. If no legal right is violated, there is no tort."
+    },
+    {
+      title: "Law of Torts: Specific Torts",
+      readTime: "25 mins",
+      summary: "Defamation, Nuisance, Trespass, and Malicious Prosecution.",
+      keyPoints: [
+        "Defamation: Libel (Written) vs Slander (Spoken). Truth is a defense.",
+        "Nuisance: Unlawful interference with enjoyment of land (Public vs Private).",
+        "Trespass: Actionable per se (without proof of damage).",
+        "Malicious Prosecution: Prosecution without reasonable cause."
+      ],
+      proTip: "In Defamation, 'publication' to a third party is mandatory."
+    },
+    {
+      title: "Indian Contract Act, 1872",
+      readTime: "20 mins",
+      summary: "Deals with agreements that are enforceable by law. Section 2(h): Contract = Agreement + Enforceability.",
+      keyPoints: [
+        "Offer & Acceptance: Must be communicated.",
+        "Consideration (Quid Pro Quo): Something in return.",
+        "Free Consent: No Coercion, Undue Influence, Fraud, Misrepresentation, or Mistake.",
+        "Void vs Voidable: Void is dead from start (ab initio); Voidable is valid until cancelled."
+      ],
+      casesOrExamples: [
+        { title: "Carlill v. Carbolic Smoke Ball Co.", desc: "General Offer can be accepted by conduct." },
+        { title: "Balfour v. Balfour", desc: "Social/Domestic agreements are NOT contracts (No intent to create legal relations)." },
+        { title: "Mohori Bibee v. Dharmodas Ghose", desc: "Minors' agreements are Void Ab Initio." }
+      ],
+      proTip: "Memorize the difference between 'Void Agreement' and 'Voidable Contract'. It's a common trap."
+    },
+    {
+      title: "Criminal Law (IPC): Offences Against Body",
+      readTime: "30 mins",
+      summary: "Culpable Homicide, Murder, Kidnapping, Abduction.",
+      keyPoints: [
+        "Culpable Homicide (Sec 299) vs Murder (Sec 300): Intensity of intention makes the difference.",
+        "Kidnapping (Sec 359): From lawful guardianship (Age limits apply).",
+        "Abduction (Sec 362): By force or deceit (No age limit)."
+      ],
+      casesOrExamples: [
+        { title: "K.M. Nanavati v. State of Maharashtra", desc: "Grave and sudden provocation defense (Jury trial abolition)." }
+      ]
+    },
+    {
+      title: "Criminal Law (IPC): Offences Against Property",
+      readTime: "20 mins",
+      summary: "Theft, Extortion, Robbery, Dacoity.",
+      keyPoints: [
+        "Theft (Sec 378): Moving movable property without consent.",
+        "Extortion (Sec 383): Inducing delivery of property by threat.",
+        "Robbery (Sec 390): Theft/Extortion + Violence/Fear.",
+        "Dacoity (Sec 391): Robbery by 5 or more persons."
+      ],
+      proTip: "The number of people involved distinguishes Robbery from Dacoity (5+)."
+    },
+    {
+      title: "Family Law Basics",
+      readTime: "15 mins",
+      summary: "Hindu Law and Muslim Law essentials for entrance.",
+      keyPoints: [
+        "Hindu Marriage Act 1955: Monogamy, Conditions for marriage.",
+        "Divorce: Theories (Fault, Consent, Breakdown).",
+        "Muslim Law: Nikah is a civil contract. Dower (Mahr).",
+        "Uniform Civil Code (Art 44): Current relevance."
+      ],
+      casesOrExamples: [
+        { title: "Shah Bano Case", desc: "Maintenance rights for Muslim women." },
+        { title: "Shayara Bano v. UOI", desc: "Triple Talaq declared unconstitutional." }
+      ]
+    },
+    {
+      title: "Legal Language & Maxims",
+      readTime: "15 mins",
+      summary: "Latin terms used frequently in legal proceedings.",
+      keyPoints: [
+        "Audi Alteram Partem: Hear the other side.",
+        "Res Judicata: Matter already decided.",
+        "Obiter Dicta: Remarks in passing (not binding).",
+        "Ratio Decidendi: The reason for the decision (binding)."
+      ],
+      proTip: "Learn 5 new maxims daily. They are easy marks in the exam."
+    }
   ],
   [Subject.GK]: [
-    "Important Awards & Honours 2024",
-    "International Organizations (UN, WHO)",
-    "Indian Geography: Rivers & Dams",
-    "Modern Indian History: Freedom Struggle",
-    "Recent Supreme Court Judgments",
-    "Economic Terms & Budget 2024",
-    "Sports & Books Authors"
+    {
+      title: "Current Affairs: Last 12 Months",
+      readTime: "30 mins",
+      summary: "High yield topics from National and International importance.",
+      keyPoints: [
+        "Awards: Nobel Prizes, Bharat Ratna, Padma Awards, Oscar Winners.",
+        "Sports: Cricket World Cup, Olympics/Asian Games, Grand Slams.",
+        "Appointments: Chief Justice of India, Election Commissioners, Heads of Global Bodies (UN, WHO).",
+        "Summits: G20, BRICS, COP (Climate Change)."
+      ],
+      proTip: "Read the newspaper editoral page daily. Focus on Legal Appointments and Amendments."
+    },
+    {
+      title: "International Organizations",
+      readTime: "20 mins",
+      summary: "UN, WTO, IMF, World Bank basics.",
+      keyPoints: [
+        "United Nations: Est 1945, HQ New York. 6 Organs.",
+        "ICJ (International Court of Justice): HQ The Hague, Netherlands.",
+        "IMF/World Bank: Bretton Woods Twins.",
+        "SAARC, ASEAN, NATO: Members and Purpose."
+      ]
+    },
+    {
+      title: "Modern Indian History",
+      readTime: "25 mins",
+      summary: "The Freedom Struggle (1857-1947) is the most important section.",
+      keyPoints: [
+        "Revolt of 1857: Sepoy Mutiny basics.",
+        "Gandhian Era: Non-Cooperation (1920), Civil Disobedience (1930), Quit India (1942).",
+        "INC Sessions: 1929 Lahore (Purna Swaraj), 1931 Karachi (Fundamental Rights)."
+      ]
+    },
+    {
+      title: "Indian Geography",
+      readTime: "20 mins",
+      summary: "Physical features and static facts.",
+      keyPoints: [
+        "River Systems: Himalayan vs Peninsular.",
+        "National Parks & Sanctuaries (Focus on locations like Kaziranga, Gir).",
+        "Solar System facts (Planets, Satellites)."
+      ]
+    },
+    {
+      title: "Economics Basics",
+      readTime: "15 mins",
+      summary: "Macro-economic terms often asked.",
+      keyPoints: [
+        "GDP, GNP, NNP definitions.",
+        "RBI Policies: Repo Rate, Reverse Repo, CRR, SLR.",
+        "Inflation: Types and impact.",
+        "Five Year Plans (History)."
+      ]
+    },
+    {
+      title: "General Science",
+      readTime: "15 mins",
+      summary: "Everyday science facts.",
+      keyPoints: [
+        "Vitamins & Deficiency Diseases (Vit A - Night Blindness, Vit C - Scurvy).",
+        "Scientific Instruments (Seismograph, Barometer).",
+        "Human Body: Largest bone (Femur), Largest Gland (Liver)."
+      ]
+    }
   ],
   [Subject.LogicalReasoning]: [
-    "Syllogisms",
-    "Blood Relations",
-    "Coding-Decoding",
-    "Direction Sense Test",
-    "Critical Reasoning: Assumptions",
-    "Seating Arrangements (Linear & Circular)",
-    "Puzzles"
+    {
+      title: "Syllogisms",
+      readTime: "20 mins",
+      summary: "Deductive reasoning based on statements and conclusions.",
+      keyPoints: [
+        "Use Venn Diagrams to solve.",
+        "Common quantifiers: All, Some, No, Some Not.",
+        "Remember: If statements are positive, negative conclusion usually doesn't follow."
+      ],
+      casesOrExamples: [
+        { title: "Example 1", desc: "Statement: All A are B. All B are C. -> Conclusion: All A are C (True)." },
+        { title: "Example 2", desc: "Statement: Some A are B. Some B are C. -> Conclusion: Some A are C (False/Uncertain)." }
+      ],
+      proTip: "Always check for the 'Either-Or' case in conclusions."
+    },
+    {
+      title: "Critical Reasoning",
+      readTime: "25 mins",
+      summary: "Identifying Assumptions, Arguments, and Inferences.",
+      keyPoints: [
+        "Assumption: What the author takes for granted (Implicit).",
+        "Inference: What is definitely true based on the passage (Explicit/Derived).",
+        "Strong vs Weak Arguments: Strong arguments deal with the core issue."
+      ],
+      casesOrExamples: [
+        { title: "Negation Test", desc: "To find an assumption, negate the option. If the argument collapses, that option is the assumption." }
+      ]
+    },
+    {
+      title: "Coding-Decoding & Series",
+      readTime: "15 mins",
+      summary: "Pattern recognition in letters and numbers.",
+      keyPoints: [
+        "Letter Positions: A=1, B=2... Z=26 (EJOTY Rule: 5,10,15,20,25).",
+        "Opposite Pairs: A-Z, B-Y, C-X (Crux), D-W (Dew).",
+        "Number Series: Check for Differences, Squares, Cubes, Prime numbers."
+      ]
+    },
+    {
+      title: "Blood Relations",
+      readTime: "20 mins",
+      summary: "Navigating family trees.",
+      keyPoints: [
+        "Generations: Grandparents -> Parents -> Self/Siblings -> Children.",
+        "In-laws relationships.",
+        "Pointing to a photograph problems."
+      ],
+      proTip: "Draw a generation tree. Use + for Male and - for Female to avoid confusion."
+    },
+    {
+      title: "Direction Sense",
+      readTime: "15 mins",
+      summary: "North, South, East, West logic.",
+      keyPoints: [
+        "NEWS (North, East, West, South).",
+        "Pythagoras Theorem for shortest distance.",
+        "Shadow cases: Morning (Sun East -> Shadow West), Evening (Sun West -> Shadow East)."
+      ]
+    },
+    {
+      title: "Seating Arrangement",
+      readTime: "25 mins",
+      summary: "Linear and Circular arrangements.",
+      keyPoints: [
+        "Circular: Facing center (Left is Clockwise) vs Facing outside.",
+        "Linear: North facing (Left is your Left) vs South facing.",
+        "Connect the definite information first."
+      ]
+    }
   ],
   [Subject.English]: [
-    "Reading Comprehension Strategies",
-    "Common Errors in Grammar",
-    "Synonyms & Antonyms",
-    "Idioms & Phrases",
-    "Sentence Rearrangement",
-    "Cloze Test",
-    "One Word Substitution"
+    {
+      title: "Reading Comprehension",
+      readTime: "Ongoing",
+      summary: "The heavyweight of the English section.",
+      keyPoints: [
+        "Skimming: Read first and last paragraphs to get the gist.",
+        "Scanning: Look for specific keywords for factual questions.",
+        "Tone of Passage: Analytical, Critical, Sarcastic, Narrative."
+      ],
+      proTip: "Read the questions FIRST before reading the passage to know what to look for."
+    },
+    {
+      title: "Grammar Essentials: Spotting Errors",
+      readTime: "20 mins",
+      summary: "Rules for Spotting Errors and Sentence Correction.",
+      keyPoints: [
+        "Subject-Verb Agreement: 'The list of items IS on the desk' (Subject is List, not Items).",
+        "Tenses: Consistency is key.",
+        "Modifiers: 'Walking down the road, the tree fell' (Incorrect) vs 'Walking down the road, he saw a tree fall'."
+      ]
+    },
+    {
+      title: "Vocabulary: Root Words",
+      readTime: "10 mins",
+      summary: "Enhancing word power.",
+      keyPoints: [
+        "Root Words: 'Mal' (bad) -> Malice, Malfunction.",
+        "Root Words: 'Bene' (good) -> Benefit, Benevolent.",
+        "Root Words: 'Logy' (study) -> Biology, Theology."
+      ]
+    },
+    {
+      title: "Idioms & Phrases",
+      readTime: "15 mins",
+      summary: "Common figurative expressions.",
+      keyPoints: [
+        "Barking up the wrong tree: Accusing the wrong person.",
+        "Once in a blue moon: Rarely.",
+        "Burn the midnight oil: Work late into the night.",
+        "Piece of cake: Very easy."
+      ]
+    },
+    {
+      title: "One Word Substitution",
+      readTime: "15 mins",
+      summary: "Replacing phrases with a single word.",
+      keyPoints: [
+        "A person who does not believe in God: Atheist.",
+        "Government by the people: Democracy.",
+        "A cure for all diseases: Panacea.",
+        "One who knows everything: Omniscient."
+      ]
+    },
+    {
+      title: "Para Jumbles",
+      readTime: "20 mins",
+      summary: "Ordering sentences to form a coherent paragraph.",
+      keyPoints: [
+        "Find the Opening Sentence (Introduces the topic).",
+        "Find Mandatory Pairs (Chronology, Noun-Pronoun link).",
+        "Look for Concluding Sentence."
+      ]
+    }
   ],
   [Subject.Math]: [
-    "Percentages",
-    "Profit, Loss & Discount",
-    "Time, Speed & Distance",
-    "Average",
-    "Ratio & Proportion",
-    "Simple & Compound Interest"
+    {
+      title: "Arithmetic Basics: Percentages",
+      readTime: "30 mins",
+      summary: "Foundation for Data Interpretation and word problems.",
+      keyPoints: [
+        "Fraction to % conversion (1/2=50%, 1/3=33.33%, 1/4=25%, 1/5=20%).",
+        "Percentage Increase/Decrease formulas.",
+        "Successive percentage change: A + B + (AB/100)."
+      ],
+      proTip: "Don't solve everything. Use approximation and options to eliminate wrong answers quickly."
+    },
+    {
+      title: "Profit, Loss & Discount",
+      readTime: "20 mins",
+      summary: "Commercial Mathematics.",
+      keyPoints: [
+        "Profit = SP - CP.",
+        "Profit % = (Profit/CP) * 100.",
+        "Discount is always on Marked Price (MP).",
+        "False Weights logic."
+      ]
+    },
+    {
+      title: "Time, Speed & Distance",
+      readTime: "25 mins",
+      summary: "Motion problems.",
+      keyPoints: [
+        "Speed = Distance / Time.",
+        "Average Speed = 2xy/(x+y) (for equal distances).",
+        "Trains: Lengths add up when crossing each other.",
+        "Boats & Streams: Downstream (u+v), Upstream (u-v)."
+      ]
+    },
+    {
+      title: "Time & Work",
+      readTime: "20 mins",
+      summary: "Efficiency and Man-days.",
+      keyPoints: [
+        "If A does work in n days, 1 day work = 1/n.",
+        "Efficiency is inversely proportional to Time.",
+        "M1D1H1 = M2D2H2 (Chain Rule)."
+      ]
+    },
+    {
+      title: "Ratio & Proportion",
+      readTime: "15 mins",
+      summary: "Comparison of quantities.",
+      keyPoints: [
+        "A:B = a/b.",
+        "Proportion: a:b :: c:d => ad = bc.",
+        "Mixtures & Alligation rule."
+      ]
+    }
   ]
 };
 
@@ -71,6 +428,9 @@ const flashcardsData = [
   { id: 10, type: 'Maxim', front: 'Nemo judex in causa sua', back: 'No one should be a judge in their own cause. (Rule against Bias)' },
   { id: 11, type: 'Case', front: 'S.R. Bommai v. Union of India', back: 'Discussed provisions of Article 356 (President\'s Rule) and Federalism.' },
   { id: 12, type: 'Maxim', front: 'De minimis non curat lex', back: 'The law does not concern itself with trifles.' },
+  { id: 13, type: 'Case', front: 'Minerva Mills v. Union of India', back: 'Struck down clauses of 42nd Amendment. Harmony between FR and DPSP is basic structure.' },
+  { id: 14, type: 'Maxim', front: 'Caveat Emptor', back: 'Let the buyer beware.' },
+  { id: 15, type: 'Case', front: 'Indra Sawhney v. Union of India', back: 'Mandal Commission case. Capped reservation at 50%.' }
 ];
 
 const StudyHub: React.FC = () => {
@@ -78,6 +438,9 @@ const StudyHub: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<Subject>(Subject.LegalAptitude);
   const [studyPlan, setStudyPlan] = useState<string | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(false);
+  
+  // Expanded UI State
+  const [expandedTopicIndex, setExpandedTopicIndex] = useState<number | null>(null);
   
   // Personalization State
   const [weakAreas, setWeakAreas] = useState('');
@@ -95,6 +458,11 @@ const StudyHub: React.FC = () => {
     setCurrentCardIndex(0);
     setIsFlipped(false);
   }, [cardFilter]);
+
+  // Reset expanded topic when subject changes
+  useEffect(() => {
+    setExpandedTopicIndex(null);
+  }, [selectedSubject]);
 
   const handleGeneratePlan = async () => {
     setLoadingPlan(true);
@@ -117,12 +485,20 @@ const StudyHub: React.FC = () => {
     }, 200);
   };
 
+  const toggleTopic = (index: number) => {
+    if (expandedTopicIndex === index) {
+      setExpandedTopicIndex(null);
+    } else {
+      setExpandedTopicIndex(index);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <header className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-800">Study Hub</h2>
-          <p className="text-gray-500">Your arsenal for Rank 1 preparation.</p>
+          <p className="text-gray-500">Your comprehensive arsenal for Rank 1 preparation.</p>
         </div>
         <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200 overflow-x-auto">
           <button
@@ -153,16 +529,16 @@ const StudyHub: React.FC = () => {
       </header>
 
       {activeTab === 'materials' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
-          {/* Subject List */}
-          <div className="lg:col-span-1 space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 h-full overflow-hidden">
+          {/* Subject List - Fixed height on mobile, scrollable on desktop */}
+          <div className="lg:col-span-1 space-y-3 overflow-y-auto max-h-[200px] lg:max-h-full pr-2">
             {subjects.map((sub) => (
               <button
                 key={sub.id}
                 onClick={() => setSelectedSubject(sub.id)}
                 className={`w-full text-left p-4 rounded-xl transition-all duration-200 flex items-center gap-3 ${
                   selectedSubject === sub.id
-                    ? 'bg-white shadow-md border-l-4 border-indigo-600'
+                    ? 'bg-white shadow-md border-l-4 border-indigo-600 ring-1 ring-indigo-50'
                     : 'bg-gray-50 hover:bg-white hover:shadow-sm'
                 }`}
               >
@@ -178,34 +554,92 @@ const StudyHub: React.FC = () => {
           </div>
 
           {/* Content Area */}
-          <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="lg:col-span-3 bg-white rounded-xl shadow-sm border border-gray-100 p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                 <Book className="w-5 h-5 text-indigo-600" />
+                 <BookOpen className="w-5 h-5 text-indigo-600" />
                  {selectedSubject} Modules
                </h3>
                <span className="text-xs font-medium bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                 {topicData[selectedSubject]?.length || 0} Topics
+                 {studyContent[selectedSubject]?.length || 0} Topics
                </span>
             </div>
 
-            <div className="grid gap-4">
-              {topicData[selectedSubject]?.map((topic, index) => (
-                <div key={index} className="group border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-md transition-all cursor-pointer bg-white">
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-3">
-                      <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-500 font-bold text-sm group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
+            <div className="space-y-4">
+              {studyContent[selectedSubject]?.map((topic, index) => (
+                <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 shadow-md bg-indigo-50/10' : 'border-gray-200 hover:border-indigo-200'}`}>
+                  
+                  {/* Header (Clickable) */}
+                  <button 
+                    onClick={() => toggleTopic(index)}
+                    className="w-full flex items-center justify-between p-4 text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-500'}`}>
                         {index + 1}
                       </span>
                       <div>
-                        <h4 className="font-semibold text-gray-800 group-hover:text-indigo-700 transition-colors">{topic}</h4>
-                        <p className="text-sm text-gray-500 mt-1">Estimated read: 10-15 mins</p>
+                        <h4 className={`font-bold text-lg transition-colors ${expandedTopicIndex === index ? 'text-indigo-700' : 'text-gray-800'}`}>
+                          {topic.title}
+                        </h4>
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3" /> {topic.readTime}
+                        </p>
                       </div>
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <PlayCircle className="w-6 h-6 text-indigo-600" />
+                    {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                  </button>
+
+                  {/* Expanded Content */}
+                  {expandedTopicIndex === index && (
+                    <div className="p-4 pt-0 pl-[4.5rem] animate-in fade-in slide-in-from-top-2">
+                      <p className="text-gray-600 mb-4 leading-relaxed border-b border-dashed border-indigo-200 pb-4">
+                        {topic.summary}
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h5 className="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2">
+                            <Target className="w-4 h-4 text-indigo-500" /> Rank 1 Concepts
+                          </h5>
+                          <ul className="space-y-2">
+                            {topic.keyPoints.map((point, i) => (
+                              <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
+                                <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full mt-1.5 flex-shrink-0"></span>
+                                {point}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {topic.casesOrExamples && (
+                           <div className="bg-white rounded-lg p-4 border border-gray-100 shadow-sm">
+                             <h5 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
+                               {selectedSubject === Subject.LegalAptitude ? <Landmark className="w-4 h-4 text-orange-500" /> : <Lightbulb className="w-4 h-4 text-orange-500" />}
+                               {selectedSubject === Subject.LegalAptitude ? "Landmark Cases" : "Illustrative Examples"}
+                             </h5>
+                             <div className="space-y-3">
+                               {topic.casesOrExamples.map((item, i) => (
+                                 <div key={i}>
+                                   <p className="text-xs font-bold text-indigo-700">{item.title}</p>
+                                   <p className="text-xs text-gray-500 leading-tight">{item.desc}</p>
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                        )}
+                      </div>
+
+                      {topic.proTip && (
+                        <div className="mt-4 bg-yellow-50 text-yellow-800 text-sm p-3 rounded-lg border border-yellow-100 flex items-start gap-2">
+                           <Sparkles className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                           <div>
+                             <span className="font-bold">Expert Strategy:</span> {topic.proTip}
+                           </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -215,8 +649,10 @@ const StudyHub: React.FC = () => {
                  <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-blue-800 mb-1 text-sm">AI Concept Summarizer</h4>
-                <p className="text-sm text-blue-600">Select any topic above to get a concise, exam-oriented summary generated by AI.</p>
+                <h4 className="font-bold text-blue-800 mb-1 text-sm">Want deeper analysis?</h4>
+                <p className="text-sm text-blue-600">
+                  Head to the <strong className="cursor-pointer hover:underline" onClick={() => setActiveTab('flashcards')}>Flashcards</strong> tab to test your recall on these topics immediately.
+                </p>
               </div>
             </div>
           </div>
