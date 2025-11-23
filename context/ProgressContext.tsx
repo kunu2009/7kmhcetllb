@@ -30,6 +30,7 @@ interface ProgressState {
 
 interface ProgressContextType extends ProgressState {
   toggleTodo: (id: string) => void;
+  addTodo: (task: string) => void;
   addTestResult: (result: TestResult) => void;
   incrementStudyHours: (hours: number) => void;
   markTopicMastered: () => void;
@@ -84,6 +85,19 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setState(prev => ({
       ...prev,
       todos: prev.todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
+    }));
+  };
+
+  const addTodo = (task: string) => {
+    const newTodo: TodoItem = {
+      id: Date.now().toString(),
+      task,
+      subject: Subject.LegalAptitude, // Default subject
+      completed: false
+    };
+    setState(prev => ({
+      ...prev,
+      todos: [newTodo, ...prev.todos]
     }));
   };
 
@@ -151,7 +165,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   return (
-    <ProgressContext.Provider value={{ ...state, toggleTodo, addTestResult, incrementStudyHours, markTopicMastered }}>
+    <ProgressContext.Provider value={{ ...state, toggleTodo, addTodo, addTestResult, incrementStudyHours, markTopicMastered }}>
       {children}
     </ProgressContext.Provider>
   );

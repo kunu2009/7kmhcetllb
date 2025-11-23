@@ -52,6 +52,30 @@ export const askAiTutor = async (prompt: string): Promise<string> => {
 };
 
 /**
+ * Explains a specific concept in detail.
+ */
+export const explainConcept = async (concept: string, subject: string): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Explain the concept of "${concept}" in the context of ${subject} for the MHCET Law Entrance Exam.
+      
+      Structure:
+      1. Simple Definition (ELI5)
+      2. Key Legal Principle
+      3. Relevant Case Law or Example (Crucial for Law)
+      4. Exam Tip (How they trick you in questions)
+      
+      Keep it concise but comprehensive. Use Markdown formatting.`,
+    });
+    return response.text || "Could not explain concept.";
+  } catch (error) {
+    console.error("Gemini API Explain Error:", error);
+    return "Error generating explanation.";
+  }
+};
+
+/**
  * Generates a practice question for a specific subject and difficulty.
  */
 export const generateQuestion = async (subject: string, difficulty: string = 'Medium', topic?: string): Promise<string> => {
@@ -84,6 +108,33 @@ export const generateQuestion = async (subject: string, difficulty: string = 'Me
   } catch (error) {
     console.error("Gemini API Question Error:", error);
     return "{}";
+  }
+};
+
+/**
+ * Generates a quick 3-question quiz for a specific topic.
+ */
+export const generateTopicQuiz = async (topic: string, subject: string): Promise<any[]> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Generate 3 multiple-choice questions specifically about "${topic}" for ${subject} (MHCET Law).
+      
+      Return ONLY raw JSON (no markdown formatting) as an array of objects with fields: 
+      - question (string)
+      - options (array of 4 strings)
+      - correctIndex (number 0-3)
+      - explanation (string)
+      `,
+      config: {
+        responseMimeType: "application/json"
+      }
+    });
+    const text = response.text || "[]";
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Gemini API Quiz Error:", error);
+    return [];
   }
 };
 
