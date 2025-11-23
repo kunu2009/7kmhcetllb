@@ -501,153 +501,158 @@ const StudyHub: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 overflow-y-auto flex flex-col">
+          <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col overflow-hidden">
             
-            {/* Search Bar */}
-            <div className="mb-6 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-5 w-5 text-gray-400" />
+            {/* Sticky Search Header */}
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 z-10">
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={`Search topics in ${selectedSubject}...`}
+                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                    />
                 </div>
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={`Search topics in ${selectedSubject}...`}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
-                />
             </div>
 
-            {filteredTopics.length === 0 ? (
-                <div className="flex flex-col items-center justify-center flex-1 text-gray-400 py-12">
-                    {searchQuery ? (
-                         <>
-                            <Search className="w-16 h-16 mb-4 opacity-20" />
-                            <p>No topics found matching "{searchQuery}".</p>
-                            <button onClick={() => setSearchQuery('')} className="mt-2 text-indigo-500 hover:underline">Clear Search</button>
-                         </>
-                    ) : (
-                        <>
-                            <BookOpen className="w-16 h-16 mb-4 opacity-20" />
-                            <p>Select a subject to view topics.</p>
-                        </>
-                    )}
-                </div>
-            ) : (
-                <div className="space-y-4">
-                {filteredTopics.map((topic: DetailedTopic, index: number) => {
-                    const noteId = `${selectedSubject}-${index}`;
-                    return (
-                    <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 dark:border-indigo-800 shadow-lg bg-white dark:bg-gray-800 ring-1 ring-indigo-50 dark:ring-indigo-900/30' : 'border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 hover:border-indigo-200'}`}>
-                    <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-5 text-left">
-                        <div className="flex items-center gap-4">
-                        <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'}`}>{index + 1}</span>
-                        <div>
-                            <h4 className={`font-bold text-lg ${expandedTopicIndex === index ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>{topic.title}</h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {topic.readTime} Read</p>
-                        </div>
-                        </div>
-                        {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-                    </button>
-
-                    {expandedTopicIndex === index && (
-                        <div className="p-5 pt-0 pl-4 md:pl-[4.5rem] animate-in fade-in slide-in-from-top-2">
-                        <div className="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-lg mb-6 border border-indigo-100 dark:border-indigo-900/20">
-                             <div className="flex justify-between items-start gap-4">
-                                <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base">{topic.summary}</p>
-                                <button 
-                                    onClick={() => setExplainModalData({ concept: topic.title, subject: selectedSubject })}
-                                    className="flex-shrink-0 bg-white dark:bg-gray-700 shadow-sm border border-indigo-100 dark:border-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-1 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
-                                >
-                                    <Sparkles className="w-3 h-3" /> Explain with AI
-                                </button>
-                             </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Scrollable List */}
+            <div className="p-6 overflow-y-auto flex-1">
+                {filteredTopics.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
+                        {searchQuery ? (
+                             <>
+                                <Search className="w-16 h-16 mb-4 opacity-20" />
+                                <p>No topics found matching "{searchQuery}".</p>
+                                <button onClick={() => setSearchQuery('')} className="mt-2 text-indigo-500 hover:underline">Clear Search</button>
+                             </>
+                        ) : (
+                            <>
+                                <BookOpen className="w-16 h-16 mb-4 opacity-20" />
+                                <p>Select a subject to view topics.</p>
+                            </>
+                        )}
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                    {filteredTopics.map((topic: DetailedTopic, index: number) => {
+                        const noteId = `${selectedSubject}-${index}`;
+                        return (
+                        <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 dark:border-indigo-800 shadow-lg bg-white dark:bg-gray-800 ring-1 ring-indigo-50 dark:ring-indigo-900/30' : 'border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 hover:border-indigo-200'}`}>
+                        <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-5 text-left">
+                            <div className="flex items-center gap-4">
+                            <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'}`}>{index + 1}</span>
                             <div>
-                                <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><Target className="w-4 h-4 text-indigo-500" /> Key Concepts</h5>
-                                <ul className="space-y-2">
-                                    {topic.keyPoints?.map((kp: string, i: number) => (
-                                        <li key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2 group cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                            onClick={() => setExplainModalData({ concept: kp, subject: selectedSubject })}
-                                        >
-                                            <span className="w-1.5 h-1.5 bg-indigo-300 rounded-full mt-1.5 group-hover:bg-indigo-500 transition-colors"></span>
-                                            {kp}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <h4 className={`font-bold text-lg ${expandedTopicIndex === index ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>{topic.title}</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {topic.readTime} Read</p>
                             </div>
-                            {topic.casesOrExamples && (
+                            </div>
+                            {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                        </button>
+
+                        {expandedTopicIndex === index && (
+                            <div className="p-5 pt-0 pl-4 md:pl-[4.5rem] animate-in fade-in slide-in-from-top-2">
+                            <div className="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-lg mb-6 border border-indigo-100 dark:border-indigo-900/20">
+                                 <div className="flex justify-between items-start gap-4">
+                                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base">{topic.summary}</p>
+                                    <button 
+                                        onClick={() => setExplainModalData({ concept: topic.title, subject: selectedSubject })}
+                                        className="flex-shrink-0 bg-white dark:bg-gray-700 shadow-sm border border-indigo-100 dark:border-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-1 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
+                                    >
+                                        <Sparkles className="w-3 h-3" /> Explain with AI
+                                    </button>
+                                 </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><GavelIcon /> Cases & Examples</h5>
-                                    <div className="space-y-2">
-                                        {topic.casesOrExamples.map((ce, i) => (
-                                            <div key={i} className="bg-gray-50 dark:bg-gray-700/50 p-2.5 rounded-lg border border-gray-100 dark:border-gray-700">
-                                                <p className="text-xs font-bold text-gray-800 dark:text-gray-200">{ce.title}</p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{ce.desc}</p>
-                                            </div>
+                                    <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><Target className="w-4 h-4 text-indigo-500" /> Key Concepts</h5>
+                                    <ul className="space-y-2">
+                                        {topic.keyPoints?.map((kp: string, i: number) => (
+                                            <li key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2 group cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                                                onClick={() => setExplainModalData({ concept: kp, subject: selectedSubject })}
+                                            >
+                                                <span className="w-1.5 h-1.5 bg-indigo-300 rounded-full mt-1.5 group-hover:bg-indigo-500 transition-colors"></span>
+                                                {kp}
+                                            </li>
                                         ))}
+                                    </ul>
+                                </div>
+                                {topic.casesOrExamples && (
+                                    <div>
+                                        <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><GavelIcon /> Cases & Examples</h5>
+                                        <div className="space-y-2">
+                                            {topic.casesOrExamples.map((ce, i) => (
+                                                <div key={i} className="bg-gray-50 dark:bg-gray-700/50 p-2.5 rounded-lg border border-gray-100 dark:border-gray-700">
+                                                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200">{ce.title}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{ce.desc}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {topic.proTip && (
+                                <div className="mb-6 flex gap-3 items-start bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
+                                    <Lightbulb className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <span className="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase tracking-wide">Rank 1 Tip</span>
+                                        <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-0.5">{topic.proTip}</p>
                                     </div>
                                 </div>
                             )}
-                        </div>
 
-                        {topic.proTip && (
-                            <div className="mb-6 flex gap-3 items-start bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
-                                <Lightbulb className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                                <div>
-                                    <span className="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase tracking-wide">Rank 1 Tip</span>
-                                    <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-0.5">{topic.proTip}</p>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-gray-100 dark:border-gray-700 pt-5">
+                                <button onClick={() => setShowQuickBytes(true)} className="bg-gray-50 hover:bg-white border hover:border-pink-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
+                                    <Smartphone className="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform" /> Quick Bytes
+                                </button>
+                                <button onClick={() => setShowMatchGame(true)} className="bg-gray-50 hover:bg-white border hover:border-indigo-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
+                                    <Gamepad2 className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" /> Match Terms
+                                </button>
+                                <button onClick={() => setQuizModalData({ topic: topic.title, subject: selectedSubject })} className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
+                                    <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" /> Take Quiz
+                                </button>
+                                <button onClick={() => markTopicMastered()} className="bg-green-50 hover:bg-green-100 border border-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:border-green-800 text-green-700 dark:text-green-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
+                                    <Check className="w-5 h-5 group-hover:scale-110 transition-transform" /> Mark Done
+                                </button>
+                            </div>
+                            
+                            {/* Notes Section */}
+                            <div className="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
+                                <button 
+                                    onClick={() => setActiveNoteId(activeNoteId === noteId ? null : noteId)}
+                                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
+                                >
+                                    <PenLine className="w-4 h-4" />
+                                    {notes[noteId] ? 'Edit My Notes' : 'Add Personal Note'}
+                                </button>
+                                
+                                {activeNoteId === noteId && (
+                                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 relative">
+                                    <textarea
+                                        value={notes[noteId] || ''}
+                                        onChange={(e) => updateNote(noteId, e.target.value)}
+                                        className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-300 outline-none min-h-[120px] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner resize-none"
+                                        placeholder="Jot down your understanding..."
+                                    />
+                                    <div className="absolute bottom-3 right-3 flex items-center gap-1 pointer-events-none transition-opacity opacity-50">
+                                        <Save className="w-3 h-3 text-gray-400" />
+                                        <span className="text-[10px] text-gray-400">Auto-saved</span>
+                                    </div>
+                                    </div>
+                                )}
                                 </div>
                             </div>
                         )}
-
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-gray-100 dark:border-gray-700 pt-5">
-                            <button onClick={() => setShowQuickBytes(true)} className="bg-gray-50 hover:bg-white border hover:border-pink-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
-                                <Smartphone className="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform" /> Quick Bytes
-                            </button>
-                            <button onClick={() => setShowMatchGame(true)} className="bg-gray-50 hover:bg-white border hover:border-indigo-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
-                                <Gamepad2 className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" /> Match Terms
-                            </button>
-                            <button onClick={() => setQuizModalData({ topic: topic.title, subject: selectedSubject })} className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
-                                <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" /> Take Quiz
-                            </button>
-                            <button onClick={() => markTopicMastered()} className="bg-green-50 hover:bg-green-100 border border-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:border-green-800 text-green-700 dark:text-green-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
-                                <Check className="w-5 h-5 group-hover:scale-110 transition-transform" /> Mark Done
-                            </button>
                         </div>
-                        
-                        {/* Notes Section */}
-                        <div className="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
-                            <button 
-                                onClick={() => setActiveNoteId(activeNoteId === noteId ? null : noteId)}
-                                className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
-                            >
-                                <PenLine className="w-4 h-4" />
-                                {notes[noteId] ? 'Edit My Notes' : 'Add Personal Note'}
-                            </button>
-                            
-                            {activeNoteId === noteId && (
-                                <div className="mt-3 animate-in fade-in slide-in-from-top-2 relative">
-                                <textarea
-                                    value={notes[noteId] || ''}
-                                    onChange={(e) => updateNote(noteId, e.target.value)}
-                                    className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-300 outline-none min-h-[120px] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner resize-none"
-                                    placeholder="Jot down your understanding..."
-                                />
-                                <div className="absolute bottom-3 right-3 flex items-center gap-1 pointer-events-none transition-opacity opacity-50">
-                                    <Save className="w-3 h-3 text-gray-400" />
-                                    <span className="text-[10px] text-gray-400">Auto-saved</span>
-                                </div>
-                                </div>
-                            )}
-                            </div>
-                        </div>
-                    )}
+                    );})}
                     </div>
-                );})}
-                </div>
-            )}
+                )}
+            </div>
           </div>
         </div>
       ) : activeTab === 'plan' ? (
