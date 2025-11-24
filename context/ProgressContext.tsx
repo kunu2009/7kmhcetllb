@@ -127,7 +127,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const subjectTotals: Record<string, {correct: number, total: number}> = {};
 
       newHistory.forEach(test => {
-        Object.entries(test.subjectBreakdown).forEach(([sub, data]) => {
+        Object.entries(test.subjectBreakdown).forEach(([sub, data]: [string, { correct: number, total: number }]) => {
           if (!subjectTotals[sub]) subjectTotals[sub] = { correct: 0, total: 0 };
           subjectTotals[sub].correct += data.correct;
           subjectTotals[sub].total += data.total;
@@ -144,7 +144,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       let weakest = 'None yet';
       let minScore = 101;
-      Object.entries(newSubjectMastery).forEach(([sub, score]) => {
+      Object.entries(newSubjectMastery).forEach(([sub, score]: [string, number]) => {
         if (score < minScore && score >= 0 && subjectTotals[sub]?.total > 0) {
           minScore = score;
           weakest = sub;

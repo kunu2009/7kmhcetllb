@@ -29,14 +29,21 @@ const QUICK_BYTES = [
   { text: "Defamation needs Publication to a third party.", color: "from-blue-500 to-cyan-500", icon: MessageCircle },
   { text: "Vicarious Liability: Master liable for Servant's acts.", color: "from-emerald-500 to-teal-500", icon: Users },
   { text: "Res Judicata: A matter once decided cannot be heard again.", color: "from-orange-500 to-red-500", icon: GavelIcon },
-  { text: "Audi Alteram Partem: No one should be condemned unheard.", color: "from-teal-500 to-green-500", icon: Ear }
+  { text: "Audi Alteram Partem: No one should be condemned unheard.", color: "from-teal-500 to-green-500", icon: Ear },
+  { text: "Quid Pro Quo: Something for Something (Consideration).", color: "from-indigo-500 to-blue-600", icon: Scale },
+  { text: "Ignorantia Juris Non Excusat: Mistake of Law is NO excuse.", color: "from-red-500 to-pink-600", icon: AlertCircle },
+  { text: "Caveat Emptor: Let the buyer beware.", color: "from-yellow-500 to-orange-500", icon: Book }
 ];
 
 const MATCH_PAIRS = [
     { id: '1', left: 'Damnum Sine Injuria', right: 'Damage without Legal Injury' },
     { id: '2', left: 'Injuria Sine Damno', right: 'Injury without Damage' },
     { id: '3', left: 'Volenti Non Fit Injuria', right: 'Defense of Consent' },
-    { id: '4', left: 'Res Ipsa Loquitur', right: 'Things speak for themselves' }
+    { id: '4', left: 'Res Ipsa Loquitur', right: 'Things speak for themselves' },
+    { id: '5', left: 'Actus Reus', right: 'Guilty Act' },
+    { id: '6', left: 'Mens Rea', right: 'Guilty Mind' },
+    { id: '7', left: 'Locus Standi', right: 'Right to appear/be heard' },
+    { id: '8', left: 'Force Majeure', right: 'Unforeseeable Circumstances' }
 ];
 
 const subjects = [
@@ -47,17 +54,209 @@ const subjects = [
   { id: Subject.Math, icon: Calculator, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30', desc: 'Basic Arithmetic, Percentages, Profit & Loss' },
 ];
 
-// Placeholder for content (In real app this is large)
+// Expanded Content Library
 const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
   [Subject.LegalAptitude]: [
-    { title: "Law of Torts: Basics", readTime: "20m", summary: "Tort is a civil wrong for which the remedy is a common law action for unliquidated damages, and which is not exclusively the breach of a contract.", keyPoints: ["Damnum Sine Injuria (Damage without injury)", "Injuria Sine Damnum (Injury without damage)", "Strict Liability vs Absolute Liability"], casesOrExamples: [{title: 'Donoghue v Stevenson', desc: 'Established the "Neighbor Principle" in negligence.'}, {title: 'Rylands v Fletcher', desc: 'Established the rule of Strict Liability.'}], proTip: 'Always check if there is a legal injury. No legal injury = No Tort (usually).' },
-    { title: "Indian Constitution: Preamble", readTime: "25m", summary: "The Preamble is the soul of the Constitution. It declares India to be a Sovereign, Socialist, Secular, Democratic Republic.", keyPoints: ["Justice, Liberty, Equality, Fraternity", "42nd Amendment added Socialist, Secular, Integrity"], casesOrExamples: [{title: 'Kesavananda Bharati Case', desc: 'Held Preamble is part of the Constitution and Basic Structure.'}], proTip: 'Memorize the order: Sovereign -> Socialist -> Secular -> Democratic -> Republic.' },
-    { title: "Criminal Law: General Exceptions", readTime: "30m", summary: "IPC provides general exceptions (Sec 76-106) where an act is not an offence.", keyPoints: ["Mistake of Fact (Sec 76, 79)", "Right to Private Defense", "Insanity (Sec 84)"], casesOrExamples: [{title: 'McNaughten Rule', desc: 'Relates to the defense of Insanity.'}], proTip: 'Mistake of Law is NOT a defense.' },
+    { 
+        title: "Law of Torts: Nature & Defenses", 
+        readTime: "20m", 
+        summary: "Tort is a civil wrong for which the remedy is a common law action for unliquidated damages. It differs from crime and contract breach.", 
+        keyPoints: [
+            "Damnum Sine Injuria: Damage without legal injury is NOT actionable (Gloucester Grammar School Case).",
+            "Injuria Sine Damnum: Legal injury without damage IS actionable (Ashby v White).",
+            "Volenti Non Fit Injuria: Defense of consent.",
+            "Vis Major: Act of God."
+        ], 
+        casesOrExamples: [
+            {title: 'Donoghue v Stevenson', desc: 'Established the "Neighbor Principle" in negligence.'}, 
+            {title: 'Rylands v Fletcher', desc: 'Established the rule of Strict Liability.'},
+            {title: 'MC Mehta v Union of India', desc: 'Established Absolute Liability in India (Oleum Gas Leak case).'}
+        ], 
+        proTip: 'Always check if there is a legal injury. No legal injury = No Tort (usually), unless it is Strict Liability.' 
+    },
+    { 
+        title: "Indian Constitution: Fundamental Rights", 
+        readTime: "35m", 
+        summary: "Fundamental Rights (Part III, Art 12-35) are the Magna Carta of India. They are justiciable and enforceable via Art 32 & 226.", 
+        keyPoints: [
+            "Right to Equality (Art 14-18).", 
+            "Right to Freedom (Art 19-22).",
+            "Right against Exploitation (Art 23-24).",
+            "Right to Constitutional Remedies (Art 32) - The 'Heart and Soul' (Ambedkar)."
+        ], 
+        casesOrExamples: [
+            {title: 'Kesavananda Bharati Case', desc: 'Held Preamble is part of Constitution & Basic Structure doctrine.'},
+            {title: 'Maneka Gandhi v Union of India', desc: 'Expanded Art 21 (Right to Life) to include Due Process.'},
+            {title: 'Puttaswamy Case', desc: 'Right to Privacy is a fundamental right.'}
+        ], 
+        proTip: 'Memorize the writs: Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto.' 
+    },
+    { 
+        title: "Law of Contracts: Essentials", 
+        readTime: "25m", 
+        summary: "According to the Indian Contract Act, 1872, an agreement enforceable by law is a contract. Section 10 defines the essentials.", 
+        keyPoints: [
+            "Offer + Acceptance = Agreement.", 
+            "Agreement + Enforceability = Contract.",
+            "Free Consent: Not caused by Coercion, Undue Influence, Fraud, Misrepresentation, or Mistake.",
+            "Consideration: Something in return (Quid Pro Quo)."
+        ], 
+        casesOrExamples: [
+            {title: 'Carlill v Carbolic Smoke Ball Co', desc: 'General Offer can be accepted by performance.'},
+            {title: 'Mohori Bibee v Dharmodas Ghose', desc: 'Minors agreement is void ab initio.'}
+        ], 
+        proTip: 'Silence does not amount to acceptance (Felthouse v Bindley).' 
+    },
+    { 
+        title: "Criminal Law: General Exceptions", 
+        readTime: "20m", 
+        summary: "IPC Chapter IV (Sec 76-106) outlines conditions where an act is not an offence.", 
+        keyPoints: [
+            "Mistake of Fact (Sec 76, 79) is a defense; Mistake of Law is NOT.", 
+            "Insanity (Sec 84): McNaughten Rules apply.",
+            "Private Defense (Sec 96-106): Right to defend body and property."
+        ], 
+        casesOrExamples: [
+            {title: 'R v Dudley and Stephens', desc: 'Necessity is not a defense for murder.'},
+            {title: 'KM Nanavati v State of Maharashtra', desc: 'Grave and Sudden Provocation defense.'}
+        ], 
+        proTip: 'Child under 7 years is Doli Incapax (incapable of crime).' 
+    },
+    { 
+        title: "Family Law: Hindu Marriage Act", 
+        readTime: "15m", 
+        summary: "Basics of HMA 1955, conditions for valid marriage, and grounds for divorce.", 
+        keyPoints: [
+            "Monogamy is mandatory (Sec 5).", 
+            "Age: Groom 21, Bride 18.",
+            "Sapinda Relationship: Prohibited degrees of relationship.",
+            "Divorce by Mutual Consent (Sec 13B)."
+        ], 
+        proTip: 'Marriage registration is now compulsory in most states but non-registration does not invalidate it.' 
+    },
   ],
-  [Subject.GK]: [{ title: "Current Affairs", readTime: "10m", summary: "Recent events", keyPoints: ["G20 Summit", "Nobel Prize"] }],
-  [Subject.LogicalReasoning]: [{ title: "Syllogisms", readTime: "15m", summary: "Logic deduction", keyPoints: ["All A are B", "Some B are C"] }],
-  [Subject.English]: [{ title: "Grammar", readTime: "20m", summary: "Rules", keyPoints: ["Subject Verb Agreement"] }],
-  [Subject.Math]: [{ title: "Percentages", readTime: "25m", summary: "Basics", keyPoints: ["Fractions", "Conversion"] }],
+  [Subject.GK]: [
+    { 
+        title: "Modern History: Freedom Struggle", 
+        readTime: "30m", 
+        summary: "Key timeline of India's fight for independence (1857-1947).", 
+        keyPoints: [
+            "1857: First War of Independence.", 
+            "1905: Partition of Bengal.",
+            "1919: Jallianwala Bagh & Rowlatt Act.",
+            "1930: Dandi March (Civil Disobedience).",
+            "1942: Quit India Movement."
+        ], 
+        proTip: 'Remember Chronology: Non-Cooperation -> Civil Disobedience -> Quit India.' 
+    },
+    { 
+        title: "Geography: Indian Physiography", 
+        readTime: "20m", 
+        summary: "Physical features and river systems of India.", 
+        keyPoints: [
+            "Himalayan Rivers: Ganga, Indus, Brahmaputra (Perennial).", 
+            "Peninsular Rivers: Godavari, Krishna, Kaveri (Rain-fed).",
+            "West Flowing: Narmada, Tapti (Rift Valley)."
+        ], 
+        proTip: 'Godavari is known as Dakshin Ganga.' 
+    },
+    { 
+        title: "International Organizations", 
+        readTime: "15m", 
+        summary: "Headquarters and Heads of major global bodies.", 
+        keyPoints: [
+            "UN: New York.", 
+            "ICJ: The Hague, Netherlands.",
+            "WTO/WHO/ILO: Geneva, Switzerland.",
+            "UNESCO: Paris."
+        ], 
+        proTip: 'Most organizations ending in "Organization" and starting with "World" are in Geneva.' 
+    },
+    { 
+        title: "Important Days", 
+        readTime: "10m", 
+        summary: "Crucial dates often asked in exams.", 
+        keyPoints: ["Jan 26: Republic Day", "Nov 26: Constitution Day", "Dec 10: Human Rights Day", "June 5: Environment Day"] 
+    }
+  ],
+  [Subject.LogicalReasoning]: [
+    { 
+        title: "Syllogisms: 100-50 Method", 
+        readTime: "20m", 
+        summary: "Deductive reasoning. Drawing conclusions from premises.", 
+        keyPoints: ["All A are B.", "Some A are B.", "No A is B.", "If premises are positive, conclusion must be positive."], 
+        casesOrExamples: [{title: 'Example', desc: 'All Cats are Dogs. All Dogs are Birds. -> All Cats are Birds.'}],
+        proTip: 'Draw Venn Diagrams for visual confirmation.' 
+    },
+    { 
+        title: "Blood Relations", 
+        readTime: "15m", 
+        summary: "Analyzing family trees.", 
+        keyPoints: ["Paternal = Father's side.", "Maternal = Mother's side.", "Spouse = Husband/Wife."], 
+        proTip: 'Break the sentence from the end. "My father\'s only son" is ME (if male).' 
+    },
+    { 
+        title: "Coding & Decoding", 
+        readTime: "15m", 
+        summary: "Deciphering patterns.", 
+        keyPoints: ["Letter Shifting (+1, -1).", "Reverse Order (A=Z).", "Opposite Pairs (AZ, BY, CX)."], 
+        proTip: 'Write A-M and N-Z below it to find opposite pairs quickly.' 
+    },
+    {
+        title: "Direction Sense",
+        readTime: "10m",
+        summary: "Solving movement based problems.",
+        keyPoints: ["NEWS: North, East, West, South.", "Right turn from North = East.", "Pythagoras theorem for shortest distance."],
+        proTip: 'Always draw a compass (+) before starting.'
+    }
+  ],
+  [Subject.English]: [
+    { 
+        title: "Grammar: Subject-Verb Agreement", 
+        readTime: "20m", 
+        summary: "The verb must agree with the subject in number and person.", 
+        keyPoints: ["Singular subject -> Singular verb.", "Everyone/Anyone -> Singular verb.", "Neither/Nor -> Verb agrees with nearest subject."], 
+        casesOrExamples: [{title: 'Proximity Rule', desc: 'Neither the teacher nor the students WERE present.'}],
+        proTip: '"One of the boys IS coming" (not are).' 
+    },
+    { 
+        title: "Reading Comprehension Strategy", 
+        readTime: "25m", 
+        summary: "Techniques for speed reading and accuracy.", 
+        keyPoints: ["Read questions FIRST.", "Skim first/last lines of paragraphs.", "Eliminate extreme options (always, never)."], 
+        proTip: 'Do not bring outside knowledge. Answer only from the passage.' 
+    },
+    { 
+        title: "Vocabulary: Root Words", 
+        readTime: "30m", 
+        summary: "Etymology hacks.", 
+        keyPoints: ["Mal = Bad (Malice).", "Bene = Good (Benefit).", "Chron = Time (Chronology)."], 
+        proTip: 'Negative prefix usually means negative answer choice.' 
+    }
+  ],
+  [Subject.Math]: [
+    { 
+        title: "Percentages & Fractions", 
+        readTime: "20m", 
+        summary: "Foundation of arithmetic.", 
+        keyPoints: ["1/2 = 50%", "1/3 = 33.33%", "1/4 = 25%", "1/5 = 20%"], 
+        proTip: 'Memorize fractions up to 1/20 for speed.' 
+    },
+    { 
+        title: "Profit, Loss & Discount", 
+        readTime: "25m", 
+        summary: "Commercial math basics.", 
+        keyPoints: ["Profit = SP - CP", "Profit % = (Profit/CP)*100", "Discount is always on MP."], 
+        proTip: 'Assume CP = 100 for easy calculation.' 
+    },
+    {
+        title: "Time, Speed & Distance",
+        readTime: "25m",
+        summary: "Relationship between D, S, T.",
+        keyPoints: ["D = S x T", "Relative Speed (Opposite) = S1 + S2", "Relative Speed (Same) = S1 - S2"],
+        proTip: 'Convert km/hr to m/s by multiplying with 5/18.'
+    }
+  ],
 };
 
 const flashcardsData = [
@@ -65,6 +264,10 @@ const flashcardsData = [
   { id: 2, type: 'Case', front: 'Kesavananda Bharati', back: 'Basic Structure Doctrine.' },
   { id: 3, type: 'Maxim', front: 'Audi Alteram Partem', back: 'No one should be condemned unheard.' },
   { id: 4, type: 'Maxim', front: 'Actus Non Facit Reum Nisi Mens Sit Rea', back: 'The act itself does not constitute guilt unless done with a guilty mind.' },
+  { id: 5, type: 'Maxim', front: 'Ubi Jus Ibi Remedium', back: 'Where there is a right, there is a remedy.' },
+  { id: 6, type: 'Case', front: 'Shah Bano Case', back: 'Maintenance rights for Muslim women.' },
+  { id: 7, type: 'Maxim', front: 'Res Ipsa Loquitur', back: 'The thing speaks for itself (Negligence).' },
+  { id: 8, type: 'Case', front: 'Minerva Mills v Union of India', back: 'Judicial Review is part of Basic Structure.' }
 ];
 
 // --- Sub-Components ---
@@ -159,8 +362,8 @@ const MatchGame: React.FC<{ pairs: typeof MATCH_PAIRS, onClose: () => void }> = 
 
   return (
     <div className="fixed inset-0 z-50 bg-indigo-900/95 flex flex-col items-center justify-center p-4 backdrop-blur-md animate-in fade-in">
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between mb-6">
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
+        <div className="flex justify-between mb-6 sticky top-0 bg-white dark:bg-gray-800 pb-2 z-10">
           <h3 className="font-bold text-lg text-gray-800 dark:text-white">Match the Terms</h3>
           <button onClick={onClose} className="text-gray-500 hover:text-red-500 font-bold">Exit</button>
         </div>
@@ -456,28 +659,47 @@ const StudyHub: React.FC = () => {
       {explainModalData && <ExplainModal concept={explainModalData.concept} subject={explainModalData.subject} onClose={() => setExplainModalData(null)} />}
       {quizModalData && <TopicQuizModal topic={quizModalData.topic} subject={quizModalData.subject} onClose={() => setQuizModalData(null)} />}
 
-      <header className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Study Hub</h2>
-          <p className="text-gray-500 dark:text-gray-400">Master concepts with AI support.</p>
-        </div>
-        <div className="flex bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-auto items-center">
-          {['materials', 'flashcards', 'plan'].map((tab) => (
-              <button 
-                key={tab}
-                onClick={() => setActiveTab(tab as any)} 
-                className={`px-4 py-2 rounded-md text-sm font-medium capitalize whitespace-nowrap transition-all ${activeTab === tab ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-              >
-                  {tab === 'plan' ? 'Rank 1 Plan' : tab}
-              </button>
-          ))}
-          <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-2"></div>
+      <header className="flex flex-col gap-6 mb-6 shrink-0">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Study Hub</h2>
+            <p className="text-gray-500 dark:text-gray-400">Master concepts with AI support.</p>
+          </div>
           <button
             onClick={() => setShowQuickBytes(true)}
-            className="px-3 py-1.5 rounded-md text-sm font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-sm flex items-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap"
+            className="px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20 flex items-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap"
           >
-            <Zap className="w-4 h-4" /> <span className="hidden md:inline">Quick Bytes</span>
+            <Zap className="w-4 h-4" /> Quick Bytes
           </button>
+        </div>
+        
+        <div className="border-b border-gray-200 dark:border-gray-700">
+            <nav className="-mb-px flex space-x-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
+            {[
+                { id: 'materials', label: 'Study Materials', icon: BookOpen },
+                { id: 'flashcards', label: 'Flashcards', icon: RotateCw },
+                { id: 'plan', label: 'Rank 1 Plan', icon: Target }
+            ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        className={`
+                        group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-all whitespace-nowrap
+                        ${isActive
+                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600'
+                        }
+                        `}
+                    >
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                        {tab.label}
+                    </button>
+                );
+            })}
+            </nav>
         </div>
       </header>
 
