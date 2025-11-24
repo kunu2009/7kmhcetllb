@@ -91,6 +91,20 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         proTip: 'Memorize the writs: Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto.' 
     },
+    {
+        title: "Indian Constitution: DPSP & Duties",
+        readTime: "25m",
+        summary: "Directive Principles of State Policy (Part IV) and Fundamental Duties (Part IVA). DPSPs are non-justiciable guidelines for the State.",
+        keyPoints: [
+            "Art 39A: Equal Justice & Free Legal Aid.",
+            "Art 44: Uniform Civil Code (UCC).",
+            "Art 51A: Fundamental Duties added by 42nd Amendment (Swaran Singh Committee)."
+        ],
+        casesOrExamples: [
+            {title: 'Minerva Mills Case', desc: 'Harmony between FR and DPSP is essential.'}
+        ],
+        proTip: 'DPSPs are borrowed from the Irish Constitution.'
+    },
     { 
         title: "Law of Contracts: Essentials", 
         readTime: "25m", 
@@ -103,9 +117,24 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         casesOrExamples: [
             {title: 'Carlill v Carbolic Smoke Ball Co', desc: 'General Offer can be accepted by performance.'},
-            {title: 'Mohori Bibee v Dharmodas Ghose', desc: 'Minors agreement is void ab initio.'}
+            {title: 'Mohori Bibee v Dharmodas Ghose', desc: 'Minors agreement is void ab initio.'},
+            {title: 'Harvey v Facey', desc: 'Quotation of price is NOT an offer.'}
         ], 
         proTip: 'Silence does not amount to acceptance (Felthouse v Bindley).' 
+    },
+    { 
+        title: "Law of Contracts: Void vs Voidable", 
+        readTime: "20m", 
+        summary: "Distinguishing between types of contracts based on enforceability.", 
+        keyPoints: [
+            "Void Contract: Ceases to be enforceable by law (e.g., War breaks out).",
+            "Voidable Contract: Enforceable at the option of one party (e.g., Consent obtained by coercion).",
+            "Void Ab Initio: Void from the very beginning (e.g., Minor's contract)."
+        ], 
+        casesOrExamples: [
+            {title: 'Balfour v Balfour', desc: 'Domestic agreements are not contracts (Lack of legal intention).'}
+        ],
+        proTip: 'Wagering agreements are Void, but Collateral agreements to them are Valid.'
     },
     { 
         title: "Criminal Law: General Exceptions", 
@@ -122,6 +151,21 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         proTip: 'Child under 7 years is Doli Incapax (incapable of crime).' 
     },
+    {
+        title: "Criminal Law: Homicide vs Murder",
+        readTime: "30m",
+        summary: "Distinction between Culpable Homicide (Sec 299) and Murder (Sec 300) in IPC.",
+        keyPoints: [
+            "All murders are culpable homicide, but not all culpable homicides are murder.",
+            "Murder: Intention to cause death is clear and immediate.",
+            "Culpable Homicide not amounting to Murder: Knowledge is present, but intent might be lesser.",
+            "Sec 302: Punishment for Murder."
+        ],
+        casesOrExamples: [
+            {title: 'Virsa Singh v State of Punjab', desc: 'Intention to cause bodily injury sufficient to cause death.'}
+        ],
+        proTip: 'Grave and sudden provocation reduces Murder to Culpable Homicide.'
+    },
     { 
         title: "Family Law: Hindu Marriage Act", 
         readTime: "15m", 
@@ -134,6 +178,17 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         proTip: 'Marriage registration is now compulsory in most states but non-registration does not invalidate it.' 
     },
+    {
+        title: "Intellectual Property Rights",
+        readTime: "15m",
+        summary: "Copyright, Patents, and Trademarks basics.",
+        keyPoints: [
+            "Copyright: Literary, artistic works (Lifetime + 60 years).",
+            "Patent: Inventions (20 years).",
+            "Trademark: Brand logo/name (Renewable every 10 years)."
+        ],
+        proTip: 'Ideas cannot be copyrighted, only the expression of ideas can be.'
+    }
   ],
   [Subject.GK]: [
     { 
@@ -149,6 +204,18 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         proTip: 'Remember Chronology: Non-Cooperation -> Civil Disobedience -> Quit India.' 
     },
+    {
+        title: "Ancient History: Indus & Vedic",
+        readTime: "20m",
+        summary: "The cradle of Indian civilization.",
+        keyPoints: [
+            "Indus Valley: Urban planning, Grid system, Harappa & Mohenjo Daro.",
+            "Vedic Age: Rig Veda (Oldest), Caste system origins.",
+            "Buddhism: 4 Noble Truths, 8-fold path.",
+            "Jainism: Ahimsa (Non-violence)."
+        ],
+        proTip: 'Harappa was discovered by Dayaram Sahni in 1921.'
+    },
     { 
         title: "Geography: Indian Physiography", 
         readTime: "20m", 
@@ -160,6 +227,19 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         ], 
         proTip: 'Godavari is known as Dakshin Ganga.' 
     },
+    {
+        title: "Geography: Solar System",
+        readTime: "15m",
+        summary: "Planetary facts.",
+        keyPoints: [
+            "Mercury: Smallest.",
+            "Venus: Hottest & Brightest (Morning Star).",
+            "Mars: Red Planet.",
+            "Jupiter: Largest.",
+            "Saturn: Ringed planet."
+        ],
+        proTip: 'Venus rotates East to West (Retrograde), unlike Earth.'
+    },
     { 
         title: "International Organizations", 
         readTime: "15m", 
@@ -168,15 +248,47 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
             "UN: New York.", 
             "ICJ: The Hague, Netherlands.",
             "WTO/WHO/ILO: Geneva, Switzerland.",
-            "UNESCO: Paris."
+            "UNESCO: Paris.",
+            "SAARC: Kathmandu, Nepal."
         ], 
         proTip: 'Most organizations ending in "Organization" and starting with "World" are in Geneva.' 
+    },
+    {
+        title: "Indian Economy Basics",
+        readTime: "25m",
+        summary: "GDP, Banking, and Planning.",
+        keyPoints: [
+            "RBI: Central Bank, established 1935. Controls Monetary Policy.",
+            "Repo Rate: Rate at which RBI lends to banks.",
+            "GST: Indirect tax introduced by 101st Amendment.",
+            "NITI Aayog replaced Planning Commission."
+        ],
+        proTip: 'Monetary Policy Committee (MPC) decides interest rates.'
     },
     { 
         title: "Important Days", 
         readTime: "10m", 
         summary: "Crucial dates often asked in exams.", 
-        keyPoints: ["Jan 26: Republic Day", "Nov 26: Constitution Day", "Dec 10: Human Rights Day", "June 5: Environment Day"] 
+        keyPoints: [
+            "Jan 26: Republic Day", 
+            "Feb 28: National Science Day",
+            "June 5: Environment Day",
+            "June 21: Yoga Day",
+            "Nov 26: Constitution Day", 
+            "Dec 10: Human Rights Day"
+        ] 
+    },
+    {
+        title: "Awards & Honours",
+        readTime: "15m",
+        summary: "Highest Civilian and Gallantry awards.",
+        keyPoints: [
+            "Bharat Ratna: Highest Civilian Award.",
+            "Padma Vibhushan > Padma Bhushan > Padma Shri.",
+            "Param Vir Chakra: Highest Wartime Gallantry Award.",
+            "Dadasaheb Phalke Award: Cinema."
+        ],
+        proTip: 'First Bharat Ratna recipients: C. Rajagopalachari, S. Radhakrishnan, CV Raman.'
     }
   ],
   [Subject.LogicalReasoning]: [
@@ -208,6 +320,40 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         summary: "Solving movement based problems.",
         keyPoints: ["NEWS: North, East, West, South.", "Right turn from North = East.", "Pythagoras theorem for shortest distance."],
         proTip: 'Always draw a compass (+) before starting.'
+    },
+    {
+        title: "Seating Arrangement",
+        readTime: "25m",
+        summary: "Linear and Circular arrangements.",
+        keyPoints: [
+            "Linear: Facing North (Left is Left). Facing South (Left is Right).",
+            "Circular: Facing Center (Right is Anti-clockwise).",
+            "Always fix the definite information first."
+        ],
+        proTip: 'If direction is not mentioned in circular, assume facing center.'
+    },
+    {
+        title: "Critical Reasoning: Statement & Assumption",
+        readTime: "20m",
+        summary: "Identifying implicit assumptions.",
+        keyPoints: [
+            "Assumption is something taken for granted.",
+            "It must be implicit, not explicit.",
+            "Avoid extreme words like 'only', 'all', 'never'."
+        ],
+        proTip: 'The statement is always TRUE. Do not question the facts.'
+    },
+    {
+        title: "Number Series",
+        readTime: "20m",
+        summary: "Finding the missing number.",
+        keyPoints: [
+            "Look for differences between numbers.",
+            "Check for squares/cubes.",
+            "Check for multiplication + addition (x2 +1).",
+            "Prime number series."
+        ],
+        proTip: 'If the series grows slowly, it is addition. If fast, it is multiplication.'
     }
   ],
   [Subject.English]: [
@@ -218,6 +364,17 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         keyPoints: ["Singular subject -> Singular verb.", "Everyone/Anyone -> Singular verb.", "Neither/Nor -> Verb agrees with nearest subject."], 
         casesOrExamples: [{title: 'Proximity Rule', desc: 'Neither the teacher nor the students WERE present.'}],
         proTip: '"One of the boys IS coming" (not are).' 
+    },
+    {
+        title: "Grammar: Tenses",
+        readTime: "25m",
+        summary: "Correct usage of time in sentences.",
+        keyPoints: [
+            "Simple Present: Habitual action.",
+            "Present Perfect: Action just finished (Has/Have + V3).",
+            "Past Perfect: Action happened before another past action (Had + V3)."
+        ],
+        proTip: 'When two actions happen in the past, the earlier one takes Past Perfect.'
     },
     { 
         title: "Reading Comprehension Strategy", 
@@ -230,8 +387,32 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         title: "Vocabulary: Root Words", 
         readTime: "30m", 
         summary: "Etymology hacks.", 
-        keyPoints: ["Mal = Bad (Malice).", "Bene = Good (Benefit).", "Chron = Time (Chronology)."], 
+        keyPoints: ["Mal = Bad (Malice).", "Bene = Good (Benefit).", "Chron = Time (Chronology).", "Logy = Study of."], 
         proTip: 'Negative prefix usually means negative answer choice.' 
+    },
+    {
+        title: "Idioms & Phrases",
+        readTime: "20m",
+        summary: "Common figurative expressions.",
+        keyPoints: [
+            "Bolt from the blue: Unexpected shock.",
+            "Burning the midnight oil: Working late.",
+            "Apple of discord: Cause of quarrel.",
+            "Break the ice: Start conversation."
+        ],
+        proTip: 'Visualize the literal meaning to guess the metaphorical one.'
+    },
+    {
+        title: "Active & Passive Voice",
+        readTime: "15m",
+        summary: "Changing the focus of the sentence.",
+        keyPoints: [
+            "Active: Subject does the action.",
+            "Passive: Action is done to the subject.",
+            "Tense does NOT change.",
+            "Subject and Object swap places."
+        ],
+        proTip: 'Universal truths usually remain in simple present.'
     }
   ],
   [Subject.Math]: [
@@ -239,7 +420,7 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         title: "Percentages & Fractions", 
         readTime: "20m", 
         summary: "Foundation of arithmetic.", 
-        keyPoints: ["1/2 = 50%", "1/3 = 33.33%", "1/4 = 25%", "1/5 = 20%"], 
+        keyPoints: ["1/2 = 50%", "1/3 = 33.33%", "1/4 = 25%", "1/5 = 20%", "1/8 = 12.5%"], 
         proTip: 'Memorize fractions up to 1/20 for speed.' 
     },
     { 
@@ -255,6 +436,38 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
         summary: "Relationship between D, S, T.",
         keyPoints: ["D = S x T", "Relative Speed (Opposite) = S1 + S2", "Relative Speed (Same) = S1 - S2"],
         proTip: 'Convert km/hr to m/s by multiplying with 5/18.'
+    },
+    {
+        title: "Simple & Compound Interest",
+        readTime: "20m",
+        summary: "Money growth over time.",
+        keyPoints: [
+            "SI = (P * R * T) / 100",
+            "CI = P(1 + R/100)^n - P",
+            "Difference between CI and SI for 2 years = P(R/100)^2"
+        ],
+        proTip: 'For CI, use the successive percentage method (x + y + xy/100).'
+    },
+    {
+        title: "Averages",
+        readTime: "15m",
+        summary: "Mean value of data.",
+        keyPoints: [
+            "Average = Sum of observations / Number of observations.",
+            "If a person joins and avg increases, they weigh more than the avg."
+        ],
+        proTip: 'Use deviation method for faster calculation.'
+    },
+    {
+        title: "Ratio & Proportion",
+        readTime: "15m",
+        summary: "Comparison of quantities.",
+        keyPoints: [
+            "a:b = c:d => ad = bc",
+            "Mean proportional of a and b is sqrt(ab).",
+            "Third proportional to a and b is b^2/a."
+        ],
+        proTip: 'If A:B = 2:3 and B:C = 4:5, multiply to make B common (Multiply first by 4, second by 3).'
     }
   ],
 };
@@ -768,7 +981,7 @@ const StudyHub: React.FC = () => {
                         const noteId = `${selectedSubject}-${index}`;
                         return (
                         <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 dark:border-indigo-800 shadow-lg bg-white dark:bg-gray-800 ring-1 ring-indigo-50 dark:ring-indigo-900/30' : 'border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 hover:border-indigo-200'}`}>
-                        <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-5 text-left">
+                        <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-5 text-left group">
                             <div className="flex items-center gap-4">
                             <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'}`}>{index + 1}</span>
                             <div>
@@ -776,7 +989,24 @@ const StudyHub: React.FC = () => {
                                 <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {topic.readTime} Read</p>
                             </div>
                             </div>
-                            {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                            
+                            <div className="flex items-center gap-2">
+                                {selectedSubject === Subject.LegalAptitude && (
+                                    <div 
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setExplainModalData({ concept: topic.title, subject: selectedSubject });
+                                        }}
+                                        className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all mr-2 z-10"
+                                    >
+                                        <Sparkles className="w-3 h-3" />
+                                        Explain Concept
+                                    </div>
+                                )}
+                                {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                            </div>
                         </button>
 
                         {expandedTopicIndex === index && (
@@ -788,7 +1018,7 @@ const StudyHub: React.FC = () => {
                                         onClick={() => setExplainModalData({ concept: topic.title, subject: selectedSubject })}
                                         className="flex-shrink-0 bg-white dark:bg-gray-700 shadow-sm border border-indigo-100 dark:border-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-1 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
                                     >
-                                        <Sparkles className="w-3 h-3" /> Explain with AI
+                                        <Sparkles className="w-3 h-3" /> Explain Concept
                                     </button>
                                  </div>
                             </div>
@@ -973,4 +1203,3 @@ const StudyHub: React.FC = () => {
 };
 
 export default StudyHub;
-  
