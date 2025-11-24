@@ -307,7 +307,7 @@ const QuickBytesView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 "{byte.text}"
               </p>
               <div className="w-16 h-1.5 bg-white/40 rounded-full mx-auto mb-6"></div>
-               <div className="bg-black/20 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-widest text-white/80">
+               <div className="bg-black/20 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider text-white/80">
                 Fact {i + 1} of {QUICK_BYTES.length}
               </div>
             </div>
@@ -665,12 +665,6 @@ const StudyHub: React.FC = () => {
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Study Hub</h2>
             <p className="text-gray-500 dark:text-gray-400">Master concepts with AI support.</p>
           </div>
-          <button
-            onClick={() => setShowQuickBytes(true)}
-            className="px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20 flex items-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap"
-          >
-            <Zap className="w-4 h-4" /> Quick Bytes
-          </button>
         </div>
         
         <div className="border-b border-gray-200 dark:border-gray-700">
@@ -727,17 +721,27 @@ const StudyHub: React.FC = () => {
             
             {/* Sticky Search Header */}
             <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 z-10">
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400" />
+                <div className="flex gap-3">
+                    <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder={`Search topics in ${selectedSubject}...`}
+                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
+                        />
                     </div>
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={`Search topics in ${selectedSubject}...`}
-                        className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
-                    />
+                    <button
+                        onClick={() => setShowQuickBytes(true)}
+                        className="flex-shrink-0 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white p-3 rounded-xl shadow-lg shadow-pink-500/20 transition-all flex items-center gap-2 font-bold"
+                        title="Open Quick Bytes"
+                    >
+                        <Zap className="w-5 h-5" />
+                        <span className="hidden sm:inline">Quick Bytes</span>
+                    </button>
                 </div>
             </div>
 
@@ -829,9 +833,6 @@ const StudyHub: React.FC = () => {
                             )}
 
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-gray-100 dark:border-gray-700 pt-5">
-                                <button onClick={() => setShowQuickBytes(true)} className="bg-gray-50 hover:bg-white border hover:border-pink-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
-                                    <Smartphone className="w-5 h-5 text-pink-500 group-hover:scale-110 transition-transform" /> Quick Bytes
-                                </button>
                                 <button onClick={() => setShowMatchGame(true)} className="bg-gray-50 hover:bg-white border hover:border-indigo-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
                                     <Gamepad2 className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" /> Match Terms
                                 </button>
@@ -972,3 +973,4 @@ const StudyHub: React.FC = () => {
 };
 
 export default StudyHub;
+  
