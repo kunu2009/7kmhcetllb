@@ -18,7 +18,10 @@ import {
   Share2,
   Bookmark,
   ExternalLink,
-  Bot
+  Bot,
+  Gavel,
+  Scale,
+  ShieldAlert
 } from 'lucide-react';
 import { Subject } from '../types';
 import { 
@@ -477,6 +480,46 @@ const StudyHub: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
+      
+      {/* Quick Access - Legal Aptitude */}
+      <div className="mb-2">
+        <div className="flex items-center gap-2 mb-3">
+           <Gavel className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: Legal Essentials</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+           <button
+             onClick={() => {
+                const t = STUDY_DATA.find(i => i.id === 'la-1');
+                if(t) setSelectedTopic(t);
+             }}
+             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+           >
+             <Scale className="w-3.5 h-3.5" />
+             Constitution: Preamble
+           </button>
+           <button
+             onClick={() => {
+                const t = STUDY_DATA.find(i => i.id === 'la-2');
+                if(t) setSelectedTopic(t);
+             }}
+             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+           >
+             <ShieldAlert className="w-3.5 h-3.5" />
+             Torts: Vicarious Liability
+           </button>
+           <button
+             onClick={() => {
+                const t = STUDY_DATA.find(i => i.id === 'la-3');
+                if(t) setSelectedTopic(t);
+             }}
+             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+           >
+             <Gavel className="w-3.5 h-3.5" />
+             IPC: General Exceptions
+           </button>
+        </div>
       </div>
 
       {/* Topics Grid */}
