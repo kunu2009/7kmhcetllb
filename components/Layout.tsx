@@ -24,6 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(true);
 
   // Initialize Theme
   useEffect(() => {
@@ -126,7 +127,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* --- MOBILE RIGHT SIDEBAR (Right) --- */}
-      <aside className="md:hidden fixed top-0 right-0 h-full w-16 bg-indigo-900 dark:bg-gray-950 z-50 flex flex-col items-center py-6 shadow-2xl border-l border-indigo-800 dark:border-gray-800">
+      <aside 
+        className={`md:hidden fixed top-0 right-0 h-full w-16 bg-indigo-900 dark:bg-gray-950 z-50 flex flex-col items-center py-6 shadow-2xl border-l border-indigo-800 dark:border-gray-800 transition-transform duration-300 ease-in-out ${isMobileOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
         <div className="mb-8">
            <GraduationCap className="w-8 h-8 text-yellow-400" />
         </div>
@@ -151,18 +154,36 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           })}
         </nav>
 
-        <div className="mt-auto flex flex-col gap-4">
+        <div className="mt-auto flex flex-col gap-4 w-full px-2">
            <button 
             onClick={toggleTheme}
-            className="p-3 rounded-xl text-indigo-300 hover:text-white bg-indigo-800 dark:bg-gray-800"
+            className="p-3 rounded-xl text-indigo-300 hover:text-white bg-indigo-800 dark:bg-gray-800 flex justify-center"
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+
+          <button 
+            onClick={() => setIsMobileOpen(false)}
+            className="p-3 rounded-xl text-indigo-300 hover:text-white bg-indigo-800 dark:bg-gray-800 flex justify-center"
+          >
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </aside>
 
+      {/* Floating Re-open Button for Mobile */}
+      {!isMobileOpen && (
+        <button 
+          onClick={() => setIsMobileOpen(true)}
+          className="md:hidden fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all animate-in fade-in zoom-in"
+          aria-label="Open Menu"
+        >
+           <Menu className="w-6 h-6" />
+        </button>
+      )}
+
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 overflow-hidden flex flex-col transition-all duration-300 mr-16 md:mr-0">
+      <main className={`flex-1 overflow-hidden flex flex-col transition-all duration-300 ${isMobileOpen ? 'mr-16' : 'mr-0'} md:mr-0`}>
         {/* Mobile Header Title */}
         <div className="md:hidden p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center gap-3 shadow-sm z-10">
             <GraduationCap className="w-6 h-6 text-indigo-600 dark:text-yellow-400" />
