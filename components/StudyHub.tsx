@@ -4,14 +4,16 @@ import {
   BookOpen, Layers, Zap, Brain, ChevronLeft, ChevronRight, 
   X, Star, Share2, Bookmark, CheckCircle2, RotateCw, 
   Trophy, ArrowRight, PlayCircle, Clock, Filter, Search,
-  GraduationCap, Smartphone, HelpCircle, Lightbulb
+  GraduationCap, Smartphone, HelpCircle, Lightbulb,
+  Globe, Calendar, ExternalLink, Newspaper
 } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
+import { fetchCurrentAffairs, SearchResult, Source } from '../services/geminiService';
 
 // --- Types ---
 
 type CourseType = '5-Year' | '3-Year';
-type ViewMode = 'learn' | 'reels' | 'cards' | 'quiz';
+type ViewMode = 'learn' | 'reels' | 'cards' | 'quiz' | 'archive';
 
 interface StudyTopic {
   id: string;
@@ -530,6 +532,10 @@ const QUIZZES: StaticQuiz[] = [
   }
 ];
 
+// --- ARCHIVE CONSTANTS ---
+const YEARS = Array.from({length: 12}, (_, i) => 2025 - i); // 2025 to 2014
+const ARCHIVE_TOPICS = ["Major Events", "Awards & Honours", "Sports", "Government Schemes", "International Relations", "Legal Developments"];
+
 // --- COMPONENTS ---
 
 const StudyHub = () => {
@@ -549,6 +555,12 @@ const StudyHub = () => {
   // Flashcard State
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Archive State
+  const [selectedYear, setSelectedYear] = useState<number>(2025);
+  const [archiveSearch, setArchiveSearch] = useState<string>('');
+  const [archiveResult, setArchiveResult] = useState<SearchResult | null>(null);
+  const [archiveLoading, setArchiveLoading] = useState(false);
 
   const availableSubjects = course === '5-Year' ? SUBJECTS_5YR : SUBJECTS_3YR;
 
@@ -579,6 +591,17 @@ const StudyHub = () => {
   const resetQuiz = () => {
     setActiveQuiz(null);
     setQuizState({idx: 0, score: 0, finished: false, selected: null});
+  };
+
+  const handleArchiveSearch = async (topic: string) => {
+    setArchiveLoading(true);
+    setArchiveResult(null);
+    setArchiveSearch(topic);
+    
+    // Simulate navigation/loading delay for effect then fetch
+    const result = await fetchCurrentAffairs(selectedYear.toString(), topic);
+    setArchiveResult(result);
+    setArchiveLoading(false);
   };
 
   return (
@@ -820,6 +843,105 @@ const StudyHub = () => {
           </div>
         )}
 
+        {/* VIEW: ARCHIVE (Current Affairs 2014-2025) */}
+        {activeTab === 'archive' && (
+          <div className="h-full flex flex-col animate-in fade-in bg-gray-50 dark:bg-gray-900">
+             <div className="p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <Globe className="w-5 h-5 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">GK Time Machine</h2>
+                </div>
+                {/* Year Selector */}
+                <div className="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+                  {YEARS.map(year => (
+                    <button
+                      key={year}
+                      onClick={() => { setSelectedYear(year); setArchiveResult(null); }}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
+                        selectedYear === year 
+                        ? 'bg-indigo-600 text-white shadow-md scale-105' 
+                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+             </div>
+
+             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar pb-24">
+                {!archiveResult && !archiveLoading && (
+                   <div className="grid grid-cols-2 gap-4">
+                      {ARCHIVE_TOPICS.map((topic) => (
+                        <button
+                          key={topic}
+                          onClick={() => handleArchiveSearch(topic)}
+                          className="flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-indigo-500 hover:shadow-md transition-all group"
+                        >
+                           <div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                              <Newspaper className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                           </div>
+                           <span className="font-bold text-gray-700 dark:text-gray-200 text-center">{topic}</span>
+                           <span className="text-xs text-gray-400 mt-1">{selectedYear}</span>
+                        </button>
+                      ))}
+                   </div>
+                )}
+
+                {archiveLoading && (
+                   <div className="flex flex-col items-center justify-center h-64 text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
+                      <p className="text-gray-600 dark:text-gray-300 font-medium">Searching {selectedYear} Archives...</p>
+                      <p className="text-xs text-gray-400 mt-2">Powered by Google Search Grounding</p>
+                   </div>
+                )}
+
+                {archiveResult && (
+                  <div className="space-y-6 animate-in slide-in-from-bottom duration-300">
+                     <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                           <Calendar className="w-5 h-5 text-indigo-500" />
+                           {archiveSearch} ({selectedYear})
+                        </h3>
+                        <button onClick={() => setArchiveResult(null)} className="text-sm text-indigo-600 hover:underline">Change Topic</button>
+                     </div>
+
+                     <div className="prose dark:prose-invert max-w-none bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="whitespace-pre-wrap leading-relaxed">{archiveResult.text}</div>
+                     </div>
+
+                     {/* Source Cards */}
+                     {archiveResult.sources && archiveResult.sources.length > 0 && (
+                       <div className="mt-6">
+                          <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">Verified Sources</h4>
+                          <div className="grid gap-3">
+                             {archiveResult.sources.slice(0, 3).map((source, idx) => (
+                               <a 
+                                 key={idx} 
+                                 href={source.uri} 
+                                 target="_blank" 
+                                 rel="noopener noreferrer"
+                                 className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors border border-blue-100 dark:border-blue-800 group"
+                               >
+                                  <div className="mt-1 bg-white dark:bg-gray-800 p-1.5 rounded-lg shadow-sm">
+                                    <Globe className="w-4 h-4 text-blue-600" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                     <p className="font-bold text-sm text-blue-900 dark:text-blue-200 truncate group-hover:text-blue-700">{source.title}</p>
+                                     <p className="text-xs text-blue-600/70 dark:text-blue-400 truncate">{source.uri}</p>
+                                  </div>
+                                  <ExternalLink className="w-4 h-4 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                               </a>
+                             ))}
+                          </div>
+                       </div>
+                     )}
+                  </div>
+                )}
+             </div>
+          </div>
+        )}
+
         {/* VIEW: FLASHCARDS (Overhauled) */}
         {activeTab === 'cards' && (
            <div className="h-full flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-800 animate-in fade-in">
@@ -982,6 +1104,7 @@ const StudyHub = () => {
       <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-2 flex justify-between items-center z-30 safe-area-bottom shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
          {[
            { id: 'learn', label: 'Learn', icon: BookOpen },
+           { id: 'archive', label: 'Archive', icon: Calendar },
            { id: 'reels', label: 'Reels', icon: Smartphone },
            { id: 'cards', label: 'Cards', icon: Layers },
            { id: 'quiz', label: 'Quiz', icon: Trophy }

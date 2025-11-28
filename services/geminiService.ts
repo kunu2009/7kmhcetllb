@@ -167,3 +167,58 @@ export const generateStudyPlan = async (weakAreas?: string, hoursPerDay?: string
     return "Error generating plan.";
   }
 };
+
+/**
+ * Searches for Current Affairs using Google Search Grounding
+ */
+export interface Source {
+  title: string;
+  uri: string;
+}
+
+export interface SearchResult {
+  text: string;
+  sources: Source[];
+}
+
+export const fetchCurrentAffairs = async (year: string, topic: string): Promise<SearchResult> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: `Find detailed Current Affairs and General Knowledge facts for the year ${year} specifically regarding "${topic}". 
+      
+      Focus on:
+      1. Major Events
+      2. Winners/Appointments
+      3. Legal Significance (if any)
+      4. Key Dates
+      
+      Summarize the key points in a concise, bulleted manner suitable for exam revision.`,
+      config: {
+        tools: [{ googleSearch: {} }]
+      }
+    });
+
+    const text = response.text || "No data found.";
+    
+    // Extract sources from grounding metadata
+    const sources: Source[] = [];
+    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+    
+    if (chunks) {
+      chunks.forEach((chunk: any) => {
+        if (chunk.web) {
+          sources.push({
+            title: chunk.web.title,
+            uri: chunk.web.uri
+          });
+        }
+      });
+    }
+
+    return { text, sources };
+  } catch (error) {
+    console.error("Gemini API Search Error:", error);
+    return { text: "Error retrieving current affairs. Please check your internet connection.", sources: [] };
+  }
+};
