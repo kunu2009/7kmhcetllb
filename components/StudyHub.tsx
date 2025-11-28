@@ -57,7 +57,7 @@ const SUBJECTS_5YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasonin
 const SUBJECTS_3YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English];
 
 const STATIC_TOPICS: StudyTopic[] = [
-  // LEGAL APTITUDE
+  // --- LEGAL APTITUDE ---
   {
     id: 'la-1',
     title: 'Law of Torts: Basics',
@@ -137,7 +137,69 @@ const STATIC_TOPICS: StudyTopic[] = [
       ]
     }
   },
-  // GK
+  {
+    id: 'la-5',
+    title: 'Fundamental Rights (Art 12-35)',
+    subject: Subject.LegalAptitude,
+    readTime: '25m',
+    difficulty: 'Hard',
+    summary: 'Magna Carta of India. Detailed look at Articles 14, 19, and 21.',
+    content: {
+      intro: 'Part III of the Constitution deals with Fundamental Rights. These are justiciable in nature.',
+      keyPoints: [
+        'Right to Equality (Art 14-18).',
+        'Right to Freedom (Art 19-22).',
+        'Right against Exploitation (Art 23-24).',
+        'Right to Freedom of Religion (Art 25-28).',
+        'Cultural and Educational Rights (Art 29-30).',
+        'Right to Constitutional Remedies (Art 32) - Heart and Soul of Constitution.'
+      ],
+      caseLaws: [
+        { name: 'Maneka Gandhi v Union of India', ruling: 'Expanded Art 21. "Procedure established by law" must be just, fair, and reasonable (Due Process).' },
+        { name: 'Justice K.S. Puttaswamy v Union of India', ruling: 'Right to Privacy is a Fundamental Right under Art 21.' }
+      ]
+    }
+  },
+  {
+    id: 'la-6',
+    title: 'Criminal Law: General Exceptions',
+    subject: Subject.LegalAptitude,
+    readTime: '18m',
+    difficulty: 'Medium',
+    summary: 'When an act is NOT a crime. IPC Sections 76-106.',
+    content: {
+      intro: 'Even if the Actus Reus and Mens Rea exist, the accused may be acquitted if the act falls under General Exceptions (Chapter IV IPC).',
+      keyPoints: [
+        'Mistake of Fact (S. 76, 79): Valid defense (Ignorantia Facti Excusat).',
+        'Mistake of Law: NOT a defense (Ignorantia Juris Non Excusat).',
+        'Accident (S. 80): Act done without criminal intention.',
+        'Infancy (S. 82): Child under 7 years (Doli Incapax - Incapable of crime).',
+        'Private Defense (S. 96-106): Right to protect body and property.'
+      ],
+      statutes: [
+        { section: 'Section 84', desc: 'Act of a person of unsound mind (McNaghten Rules).' },
+        { section: 'Section 97', desc: 'Right of private defense of body and property.' }
+      ]
+    }
+  },
+  {
+    id: 'la-7',
+    title: 'Directive Principles (DPSP)',
+    subject: Subject.LegalAptitude,
+    readTime: '15m',
+    difficulty: 'Easy',
+    summary: 'Guidelines for the State. Non-justiciable but fundamental in governance.',
+    content: {
+      intro: 'Part IV (Art 36-51). Borrowed from Ireland. They aim to establish a Welfare State.',
+      keyPoints: [
+        'Socialist Principles: Art 39 (Equal pay), Art 41 (Right to work).',
+        'Gandhian Principles: Art 40 (Village Panchayats), Art 44 (Uniform Civil Code).',
+        'Liberal-Intellectual: Art 50 (Separation of Judiciary from Executive).'
+      ],
+      example: 'Article 44 (Uniform Civil Code) is a DPSP, meaning the state should try to implement it, but citizens cannot go to court demanding it immediately.'
+    }
+  },
+  // --- GK ---
   {
     id: 'gk-1',
     title: 'Indian History: 1857 Revolt',
@@ -176,7 +238,64 @@ const STATIC_TOPICS: StudyTopic[] = [
       ]
     }
   },
-  // LOGIC
+  {
+    id: 'gk-3',
+    title: 'International Organizations',
+    subject: Subject.GK,
+    readTime: '12m',
+    difficulty: 'Medium',
+    summary: 'UN, WTO, IMF, World Bank - HQs and purposes.',
+    content: {
+      intro: 'Knowledge of international bodies is crucial for the GK section.',
+      keyPoints: [
+        'United Nations (UN): HQ New York. Founded 1945.',
+        'International Court of Justice (ICJ): HQ The Hague, Netherlands.',
+        'UNESCO: HQ Paris, France.',
+        'WTO (World Trade Org): HQ Geneva, Switzerland.',
+        'IMF & World Bank: HQ Washington D.C. (Bretton Woods Twins).'
+      ]
+    }
+  },
+  {
+    id: 'gk-4',
+    title: 'Solar System Basics',
+    subject: Subject.GK,
+    readTime: '10m',
+    difficulty: 'Easy',
+    summary: 'Planets, Satellites, and Important Facts.',
+    content: {
+      intro: 'Our solar system consists of the Sun and 8 planets.',
+      keyPoints: [
+        'Mercury: Smallest, closest to Sun.',
+        'Venus: Hottest planet, Morning/Evening Star.',
+        'Mars: Red Planet (Iron Oxide).',
+        'Jupiter: Largest planet.',
+        'Saturn: Planet with rings.',
+        'Ganymede: Largest satellite (Jupiter).',
+        'Titan: Satellite of Saturn.'
+      ]
+    }
+  },
+  {
+    id: 'gk-5',
+    title: 'Indian Freedom Struggle (1915-1947)',
+    subject: Subject.GK,
+    readTime: '20m',
+    difficulty: 'Hard',
+    summary: 'Gandhian Era timeline.',
+    content: {
+      intro: 'The return of Mahatma Gandhi in 1915 marked the beginning of mass movements.',
+      keyPoints: [
+        '1917: Champaran Satyagraha (First Civil Disobedience).',
+        '1919: Jallianwala Bagh Massacre.',
+        '1920: Non-Cooperation Movement.',
+        '1930: Dandi March (Salt Satyagraha).',
+        '1942: Quit India Movement ("Do or Die").',
+        '1947: Mountbatten Plan and Independence.'
+      ]
+    }
+  },
+  // --- LOGICAL REASONING ---
   {
     id: 'lr-1',
     title: 'Syllogisms',
@@ -195,7 +314,44 @@ const STATIC_TOPICS: StudyTopic[] = [
       example: 'Statements: All Cats are Dogs. All Dogs are Birds.\nConclusion: All Cats are Birds (True).'
     }
   },
-  // ENGLISH
+  {
+    id: 'lr-2',
+    title: 'Blood Relations',
+    subject: Subject.LogicalReasoning,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'Solving family tree puzzles.',
+    content: {
+      intro: 'Identify relationships based on generations and gender.',
+      keyPoints: [
+        'Use (+) for Male and (-) for Female.',
+        'Horizontal line (-) for siblings.',
+        'Double line (=) for married couples.',
+        'Vertical line (|) for generations.',
+        'Paternal: Father\'s side. Maternal: Mother\'s side.'
+      ],
+      example: 'A is the brother of B. B is the daughter of C. Conclusion: A is the son of C.'
+    }
+  },
+  {
+    id: 'lr-3',
+    title: 'Direction Sense',
+    subject: Subject.LogicalReasoning,
+    readTime: '12m',
+    difficulty: 'Easy',
+    summary: 'North, South, East, West navigation.',
+    content: {
+      intro: 'Always draw a compass reference before solving.',
+      keyPoints: [
+        'NEWS: North (Up), East (Right), West (Left), South (Down).',
+        'Right Turn = Clockwise 90 degrees.',
+        'Left Turn = Anti-clockwise 90 degrees.',
+        'Shadows: At sunrise, shadow falls West. At sunset, shadow falls East.'
+      ],
+      example: 'A man walks 3km North, then 4km East. Shortest distance from start? Use Pythagoras: √(3² + 4²) = 5km.'
+    }
+  },
+  // --- ENGLISH ---
   {
     id: 'eng-1',
     title: 'Common Legal Idioms',
@@ -210,8 +366,70 @@ const STATIC_TOPICS: StudyTopic[] = [
         'Mala Fide: In bad faith.',
         'Prima Facie: On the face of it.',
         'Sub Judice: Under judicial consideration.',
-        'Ultra Vires: Beyond powers.'
+        'Ultra Vires: Beyond powers.',
+        'Locus Standi: Right to be heard in court.'
       ]
+    }
+  },
+  {
+    id: 'eng-2',
+    title: 'Subject-Verb Agreement',
+    subject: Subject.English,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'Rules for matching singular/plural subjects with verbs.',
+    content: {
+      intro: 'The verb must agree with the subject in number and person.',
+      keyPoints: [
+        'Rule 1: Two subjects joined by "and" take a plural verb. (Ram and Shyam are...)',
+        'Rule 2: If joined by "or", "nor", "either...or", the verb agrees with the closer subject. (Neither the captain nor the players WERE playing).',
+        'Rule 3: Collective nouns (Jury, Committee) take singular verb if acting as one unit.'
+      ],
+      example: 'Incorrect: The list of items are on the desk. Correct: The list of items IS on the desk (Subject is "List", not "Items").'
+    }
+  },
+  // --- MATH ---
+  {
+    id: 'math-1',
+    title: 'Percentage Hacks',
+    subject: Subject.Math,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'Fraction to Percentage conversions for speed.',
+    content: {
+      intro: 'Memorizing fraction values saves huge time in DI and Arithmetic.',
+      keyPoints: [
+        '1/2 = 50%',
+        '1/3 = 33.33%',
+        '1/4 = 25%',
+        '1/5 = 20%',
+        '1/6 = 16.66%',
+        '1/7 = 14.28%',
+        '1/8 = 12.5%',
+        '1/9 = 11.11%',
+        '1/10 = 10%',
+        '1/11 = 9.09%'
+      ],
+      example: 'What is 16.66% of 360? Instead of calculating, just divide 360 by 6 = 60.'
+    }
+  },
+  {
+    id: 'math-2',
+    title: 'Profit and Loss',
+    subject: Subject.Math,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'CP, SP, Profit%, Loss% formulas.',
+    content: {
+      intro: 'Fundamental concept for commercial maths.',
+      keyPoints: [
+        'Profit = SP - CP',
+        'Loss = CP - SP',
+        'Profit % = (Profit / CP) * 100',
+        'Loss % = (Loss / CP) * 100',
+        'Always calculate % on Cost Price (CP) unless specified.'
+      ],
+      example: 'A sells an item worth 100 at 20% profit. SP = 120. If he gives 10% discount on marked price (MP) of 150, SP = 135.'
     }
   }
 ];
@@ -225,6 +443,11 @@ const REELS_DATA: Reel[] = [
   { id: 'r6', type: 'Fact', text: 'Constitution Day', subText: 'Celebrated on 26th November. Adopted in 1949.', color: 'bg-gradient-to-br from-red-500 to-pink-600' },
   { id: 'r7', type: 'Tip', text: 'Math Speed', subText: 'To multiply by 5: Divide by 2 and move decimal/add zero. (e.g. 48 * 5 = 240)', color: 'bg-gradient-to-br from-gray-700 to-gray-900' },
   { id: 'r8', type: 'Maxim', text: 'Res Ipsa Loquitur', subText: 'The thing speaks for itself. Used in accidents where negligence is obvious.', color: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
+  { id: 'r9', type: 'Fact', text: 'Article 32', subText: 'Dr. Ambedkar called it the "Heart and Soul" of the Constitution.', color: 'bg-gradient-to-br from-violet-500 to-purple-600' },
+  { id: 'r10', type: 'Tip', text: 'Coding Decoding', subText: 'Remember EJOTY: E=5, J=10, O=15, T=20, Y=25 for alphabet positions.', color: 'bg-gradient-to-br from-orange-500 to-amber-600' },
+  { id: 'r11', type: 'Case', text: 'Balfour v Balfour', subText: 'Domestic agreements are usually NOT legally binding contracts.', color: 'bg-gradient-to-br from-teal-500 to-green-600' },
+  { id: 'r12', type: 'Maxim', text: 'Nemo Judex In Causa Sua', subText: 'No one should be a judge in their own cause (Rule against Bias).', color: 'bg-gradient-to-br from-rose-500 to-red-600' },
+  { id: 'r13', type: 'Fact', text: 'Highest Law Officer', subText: 'Attorney General of India (Article 76).', color: 'bg-gradient-to-br from-blue-600 to-indigo-800' }
 ];
 
 const QUIZZES: StaticQuiz[] = [
@@ -415,6 +638,20 @@ const StudyHub = () => {
                       </div>
                    </div>
                  )}
+
+                 {readTopic.content.statutes && (
+                    <div className="my-6">
+                        <h4 className="text-sm font-bold uppercase tracking-wider text-indigo-500 mb-3">Important Sections</h4>
+                        <div className="grid grid-cols-1 gap-2">
+                        {readTopic.content.statutes.map((st, i) => (
+                            <div key={i} className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                                <span className="font-bold text-indigo-700 dark:text-indigo-300">{st.section}</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">{st.desc}</span>
+                            </div>
+                        ))}
+                        </div>
+                    </div>
+                )}
 
                  {readTopic.content.example && (
                    <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-sm text-yellow-800 dark:text-yellow-200">
