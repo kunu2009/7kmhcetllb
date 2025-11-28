@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Subject } from '../types';
 import { 
   BookOpen, Layers, Zap, Brain, ChevronLeft, ChevronRight, 
   X, Star, Share2, Bookmark, CheckCircle2, RotateCw, 
   Trophy, ArrowRight, PlayCircle, Clock, Filter, Search,
-  GraduationCap, Smartphone
+  GraduationCap, Smartphone, HelpCircle, Lightbulb
 } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 
@@ -39,6 +38,14 @@ interface Reel {
   icon?: any;
 }
 
+interface Flashcard {
+  id: string;
+  subject: Subject;
+  question: string;
+  answer: string;
+  detail?: string;
+}
+
 interface StaticQuiz {
   id: string;
   subject: Subject;
@@ -55,6 +62,35 @@ interface StaticQuiz {
 
 const SUBJECTS_5YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math];
 const SUBJECTS_3YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English];
+
+const FLASHCARDS_DATA: Flashcard[] = [
+    // LEGAL
+    { id: 'f1', subject: Subject.LegalAptitude, question: 'Res Judicata', answer: 'A matter already judged.', detail: 'Section 11 of CPC. Once a court has decided a case, the same parties cannot file the same case again.' },
+    { id: 'f2', subject: Subject.LegalAptitude, question: 'Mens Rea', answer: 'Guilty Mind / Criminal Intent.', detail: 'Essential for a crime. Actus Reus + Mens Rea = Crime.' },
+    { id: 'f3', subject: Subject.LegalAptitude, question: 'Locus Standi', answer: 'The right to be heard in court.', detail: 'Traditionally, only the aggrieved person could approach court. PIL (Public Interest Litigation) relaxed this rule.' },
+    { id: 'f4', subject: Subject.LegalAptitude, question: 'Caveat Emptor', answer: 'Let the buyer beware.', detail: 'The buyer is responsible for checking the quality of goods before purchase.' },
+    { id: 'f5', subject: Subject.LegalAptitude, question: 'Void Contract', answer: 'A contract that is not enforceable by law.', detail: 'It is void from the beginning (Void ab initio), e.g., agreement with a minor.' },
+    { id: 'f6', subject: Subject.LegalAptitude, question: 'Habeas Corpus', answer: 'To have the body.', detail: 'A writ issued to produce a person detained illegally before the court.' },
+    { id: 'f7', subject: Subject.LegalAptitude, question: 'Force Majeure', answer: 'Act of God / Unforeseeable circumstances.', detail: 'A clause in contracts that frees parties from liability when an extraordinary event prevents performance.' },
+    
+    // CONSTITUTION
+    { id: 'f8', subject: Subject.LegalAptitude, question: 'Article 14', answer: 'Equality before Law.', detail: 'Ensures equal protection of laws within the territory of India.' },
+    { id: 'f9', subject: Subject.LegalAptitude, question: 'Schedule 8', answer: 'Official Languages.', detail: 'Lists the 22 recognized official languages of India.' },
+    { id: 'f10', subject: Subject.LegalAptitude, question: 'Article 368', answer: 'Amendment of Constitution.', detail: 'Gives Parliament the power to amend the Constitution.' },
+
+    // GK
+    { id: 'f11', subject: Subject.GK, question: 'Satyameva Jayate Source', answer: 'Mundaka Upanishad', detail: 'The national motto of India, meaning "Truth Alone Triumphs".' },
+    { id: 'f12', subject: Subject.GK, question: 'First Viceroy of India', answer: 'Lord Canning', detail: 'Appointed after the 1857 Revolt under the Govt of India Act, 1858.' },
+    { id: 'f13', subject: Subject.GK, question: 'Longest River in World', answer: 'Nile', detail: 'Located in Africa. The longest river in India is Ganga.' },
+
+    // LOGIC
+    { id: 'f14', subject: Subject.LogicalReasoning, question: 'Clock: Hands Coincide', answer: '11 times in 12 hours.', detail: 'In 24 hours, they coincide 22 times.' },
+    { id: 'f15', subject: Subject.LogicalReasoning, question: 'Leap Year Rule', answer: 'Divisible by 4 (except centuries unless div by 400).', detail: '1900 was NOT a leap year. 2000 WAS a leap year.' },
+    
+    // ENGLISH
+    { id: 'f16', subject: Subject.English, question: 'Synonym: Candid', answer: 'Frank, Honest, Open.', detail: 'Antonym: Secretive, Evasive.' },
+    { id: 'f17', subject: Subject.English, question: 'Idiom: White Elephant', answer: 'Expensive but useless possession.', detail: 'Derived from kings of Siam giving white elephants to courtiers to ruin them with maintenance costs.' },
+];
 
 const STATIC_TOPICS: StudyTopic[] = [
   // --- LEGAL APTITUDE ---
@@ -447,7 +483,9 @@ const REELS_DATA: Reel[] = [
   { id: 'r10', type: 'Tip', text: 'Coding Decoding', subText: 'Remember EJOTY: E=5, J=10, O=15, T=20, Y=25 for alphabet positions.', color: 'bg-gradient-to-br from-orange-500 to-amber-600' },
   { id: 'r11', type: 'Case', text: 'Balfour v Balfour', subText: 'Domestic agreements are usually NOT legally binding contracts.', color: 'bg-gradient-to-br from-teal-500 to-green-600' },
   { id: 'r12', type: 'Maxim', text: 'Nemo Judex In Causa Sua', subText: 'No one should be a judge in their own cause (Rule against Bias).', color: 'bg-gradient-to-br from-rose-500 to-red-600' },
-  { id: 'r13', type: 'Fact', text: 'Highest Law Officer', subText: 'Attorney General of India (Article 76).', color: 'bg-gradient-to-br from-blue-600 to-indigo-800' }
+  { id: 'r13', type: 'Fact', text: 'Highest Law Officer', subText: 'Attorney General of India (Article 76).', color: 'bg-gradient-to-br from-blue-600 to-indigo-800' },
+  { id: 'r14', type: 'Fact', text: 'Zero Hour', subText: 'Time gap between Question Hour and Agenda. Starts at 12 noon.', color: 'bg-gradient-to-br from-fuchsia-600 to-purple-800' },
+  { id: 'r15', type: 'Tip', text: 'Square of 5', subText: 'Ends in 25. First digits = n*(n+1). Ex: 35^2 -> 3*4=12 -> 1225.', color: 'bg-gradient-to-br from-cyan-600 to-blue-800' }
 ];
 
 const QUIZZES: StaticQuiz[] = [
@@ -467,7 +505,27 @@ const QUIZZES: StaticQuiz[] = [
     title: 'Indian Polity Mix',
     questions: [
       { q: 'Who appoints the Governor of a State?', options: ['Chief Minister', 'President', 'Prime Minister', 'Chief Justice'], correct: 1, explanation: 'The President appoints the Governor under Article 155.' },
-      { q: 'Financial Emergency is under which Article?', options: ['Article 352', 'Article 356', 'Article 360', 'Article 370'], correct: 2, explanation: 'Art 360 deals with Financial Emergency. It has never been imposed in India.' }
+      { q: 'Financial Emergency is under which Article?', options: ['Article 352', 'Article 356', 'Article 360', 'Article 370'], correct: 2, explanation: 'Art 360 deals with Financial Emergency. It has never been imposed in India.' },
+      { q: 'Who is the Chairman of Rajya Sabha?', options: ['President', 'Vice President', 'PM', 'Speaker'], correct: 1, explanation: 'The Vice President is the ex-officio Chairman of the Rajya Sabha.' }
+    ]
+  },
+  {
+    id: 'q3',
+    subject: Subject.LogicalReasoning,
+    title: 'Coding-Decoding',
+    questions: [
+      { q: 'If CAT is written as DBU, how is DOG written?', options: ['EPH', 'EPF', 'FPH', 'EOG'], correct: 0, explanation: 'C+1=D, A+1=B, T+1=U. So D+1=E, O+1=P, G+1=H.' },
+      { q: 'If RED is 27, what is BLUE?', options: ['40', '48', '36', '50'], correct: 0, explanation: 'R(18)+E(5)+D(4) = 27. B(2)+L(12)+U(21)+E(5) = 40.' },
+      { q: 'Odd one out: 3, 5, 7, 9, 11', options: ['5', '7', '9', '11'], correct: 2, explanation: '9 is not a prime number (divisible by 3). Others are primes.' }
+    ]
+  },
+  {
+    id: 'q4',
+    subject: Subject.English,
+    title: 'Vocab Blast',
+    questions: [
+      { q: 'Synonym of "Benevolent"', options: ['Cruel', 'Kind', 'Rich', 'Poor'], correct: 1, explanation: 'Benevolent means well meaning and kindly.' },
+      { q: 'Antonym of "Ambiguous"', options: ['Vague', 'Clear', 'Strange', 'Dark'], correct: 1, explanation: 'Ambiguous means unclear. Clear is the opposite.' }
     ]
   }
 ];
@@ -479,6 +537,7 @@ const StudyHub = () => {
   const [activeTab, setActiveTab] = useState<ViewMode>('learn');
   const [activeSubject, setActiveSubject] = useState<Subject>(Subject.LegalAptitude);
   const [readTopic, setReadTopic] = useState<StudyTopic | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Reels State
   const reelsRef = useRef<HTMLDivElement>(null);
@@ -494,7 +553,14 @@ const StudyHub = () => {
   const availableSubjects = course === '5-Year' ? SUBJECTS_5YR : SUBJECTS_3YR;
 
   // Filter topics based on course and active subject
-  const filteredTopics = STATIC_TOPICS.filter(t => t.subject === activeSubject);
+  const filteredTopics = STATIC_TOPICS
+    .filter(t => t.subject === activeSubject)
+    .filter(t => 
+      searchTerm === '' || 
+      t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      t.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      t.content.keyPoints.some(kp => kp.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
   const handleQuizOption = (optIdx: number) => {
     if (quizState.selected !== null) return;
@@ -516,7 +582,7 @@ const StudyHub = () => {
   };
 
   return (
-    <div className="relative h-[calc(100vh-6rem)] md:h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden md:rounded-2xl shadow-xl md:border border-gray-200 dark:border-gray-800">
+    <div className="relative h-[calc(100vh-6rem)] md:h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden md:rounded-2xl shadow-xl md:border border-gray-200 dark:border-gray-800 transition-all duration-300">
       
       {/* --- TOP BAR: Course Selector --- */}
       <div className="flex-shrink-0 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 z-10">
@@ -524,7 +590,7 @@ const StudyHub = () => {
            <div className="bg-indigo-600 p-1.5 rounded-lg">
              <GraduationCap className="w-5 h-5 text-white" />
            </div>
-           <span className="font-bold text-gray-800 dark:text-white">MHCET Hub</span>
+           <span className="font-bold text-gray-800 dark:text-white hidden sm:block">MHCET Hub</span>
         </div>
         <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
           {(['5-Year', '3-Year'] as CourseType[]).map((c) => (
@@ -545,8 +611,32 @@ const StudyHub = () => {
         {/* VIEW: LEARN (Library) */}
         {activeTab === 'learn' && !readTopic && (
           <div className="h-full flex flex-col animate-in fade-in">
+             {/* Search Bar */}
+             <div className="p-4 pb-2">
+               <div className="flex gap-2">
+                 <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Search topics, summaries..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-gray-800 pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                 </div>
+                 {/* Quick Bytes Access */}
+                 <button 
+                  onClick={() => setActiveTab('reels')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 rounded-xl transition-colors shadow-sm flex items-center gap-2"
+                  title="Open Quick Bytes"
+                 >
+                   <PlayCircle className="w-5 h-5" />
+                 </button>
+               </div>
+             </div>
+
              {/* Subject Tabs */}
-             <div className="flex overflow-x-auto p-4 gap-3 no-scrollbar border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900">
+             <div className="flex overflow-x-auto p-4 pt-2 gap-3 no-scrollbar border-b border-gray-50 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10">
                {availableSubjects.map((sub) => (
                  <button
                   key={sub}
@@ -563,7 +653,7 @@ const StudyHub = () => {
              </div>
 
              {/* Topic List */}
-             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20 custom-scrollbar">
                <div className="flex justify-between items-center mb-2">
                   <h2 className="text-xl font-bold text-gray-800 dark:text-white">{activeSubject}</h2>
                   <span className="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">{filteredTopics.length} Topics</span>
@@ -571,15 +661,15 @@ const StudyHub = () => {
                
                {filteredTopics.length === 0 ? (
                  <div className="text-center py-10 text-gray-400">
-                   <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                   <p>Content coming soon for this section.</p>
+                   <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                   <p>{searchTerm ? 'No matches found.' : 'Content coming soon for this section.'}</p>
                  </div>
                ) : (
                  filteredTopics.map((topic) => (
                    <div 
                     key={topic.id}
                     onClick={() => setReadTopic(topic)}
-                    className="group bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden"
+                    className="group bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden hover:shadow-md"
                    >
                       <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500 group-hover:bg-indigo-400 transition-colors"></div>
                       <div className="flex justify-between items-start mb-2 pl-2">
@@ -590,9 +680,18 @@ const StudyHub = () => {
                         }`}>{topic.difficulty}</span>
                       </div>
                       <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 pl-2 mb-3">{topic.summary}</p>
+                      
+                      {topic.subject === Subject.LegalAptitude && (
+                        <div className="pl-2 mb-3">
+                           <button className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-lg flex items-center gap-2 font-semibold">
+                              <Brain className="w-3 h-3" /> Explain Concept
+                           </button>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-4 pl-2 text-xs text-gray-400">
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {topic.readTime}</span>
-                        <span className="flex items-center gap-1 text-indigo-500 font-medium">Read Now <ArrowRight className="w-3 h-3" /></span>
+                        <span className="flex items-center gap-1 text-indigo-500 font-medium group-hover:translate-x-1 transition-transform">Read Now <ArrowRight className="w-3 h-3" /></span>
                       </div>
                    </div>
                  ))
@@ -609,7 +708,7 @@ const StudyHub = () => {
                <h3 className="font-bold text-gray-800 dark:text-white truncate flex-1">{readTopic.title}</h3>
                <button className="text-indigo-600"><Bookmark className="w-5 h-5" /></button>
             </div>
-            <div className="flex-1 overflow-y-auto p-5 pb-24">
+            <div className="flex-1 overflow-y-auto p-5 pb-24 custom-scrollbar">
                <div className="prose dark:prose-invert max-w-none">
                  <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-6 font-medium">{readTopic.content.intro}</p>
                  
@@ -661,9 +760,12 @@ const StudyHub = () => {
                  )}
                </div>
                
-               <div className="mt-12 flex justify-center">
+               <div className="mt-12 flex justify-center gap-3">
+                 <button onClick={() => setActiveTab('quiz')} className="flex items-center gap-2 bg-white text-indigo-600 border border-indigo-200 px-6 py-3 rounded-full font-bold shadow-sm hover:bg-gray-50">
+                    <Zap className="w-5 h-5" /> Take Quiz
+                 </button>
                  <button onClick={() => setReadTopic(null)} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-transform active:scale-95">
-                   <CheckCircle2 className="w-5 h-5" /> Mark as Read
+                   <CheckCircle2 className="w-5 h-5" /> Done
                  </button>
                </div>
             </div>
@@ -676,12 +778,17 @@ const StudyHub = () => {
             ref={reelsRef}
             className="absolute inset-0 bg-black overflow-y-auto snap-y snap-mandatory no-scrollbar"
           >
+            <div className="fixed top-4 left-4 z-20">
+                <div className="bg-black/40 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
+                    Quick Bytes
+                </div>
+            </div>
             {REELS_DATA.map((reel) => (
               <div key={reel.id} className={`w-full h-full snap-start relative flex flex-col items-center justify-center p-8 text-center ${reel.color}`}>
                  <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"></div>
                  
                  <div className="relative z-10 max-w-md animate-in zoom-in duration-500">
-                    <span className="inline-block px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-xs uppercase tracking-widest mb-6 border border-white/30">
+                    <span className="inline-block px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-xs uppercase tracking-widest mb-6 border border-white/30 shadow-xl">
                       {reel.type}
                     </span>
                     <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight drop-shadow-lg font-serif">
@@ -694,7 +801,7 @@ const StudyHub = () => {
                  </div>
 
                  {/* Reel Actions */}
-                 <div className="absolute right-4 bottom-20 flex flex-col gap-6 z-20">
+                 <div className="absolute right-4 bottom-24 flex flex-col gap-6 z-20">
                     <button className="flex flex-col items-center gap-1 text-white opacity-80 hover:opacity-100 transition-opacity">
                        <div className="p-3 bg-white/10 rounded-full backdrop-blur-md"><Star className="w-6 h-6" /></div>
                        <span className="text-[10px] font-bold">Save</span>
@@ -705,7 +812,7 @@ const StudyHub = () => {
                     </button>
                  </div>
                  
-                 <div className="absolute bottom-6 left-0 w-full text-center">
+                 <div className="absolute bottom-6 left-0 w-full text-center flex flex-col items-center gap-2">
                     <p className="text-white/40 text-xs animate-bounce">Swipe for more</p>
                  </div>
               </div>
@@ -713,30 +820,62 @@ const StudyHub = () => {
           </div>
         )}
 
-        {/* VIEW: FLASHCARDS */}
+        {/* VIEW: FLASHCARDS (Overhauled) */}
         {activeTab === 'cards' && (
            <div className="h-full flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-800 animate-in fade-in">
+              <div className="flex items-center justify-between w-full max-w-md mb-4">
+                 <span className="text-sm font-bold text-gray-500 dark:text-gray-400">
+                    Card {cardIndex + 1} of {FLASHCARDS_DATA.length}
+                 </span>
+                 <span className="text-xs font-bold bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded">
+                    {FLASHCARDS_DATA[cardIndex].subject}
+                 </span>
+              </div>
+              
               <div className="w-full max-w-md h-[400px] perspective-1000 relative group cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
                  <div className={`w-full h-full transition-all duration-500 preserve-3d relative ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
-                    {/* Front */}
-                    <div className="absolute inset-0 backface-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border-2 border-indigo-100 dark:border-gray-700 flex flex-col items-center justify-center p-8 text-center">
-                       <span className="absolute top-6 right-6 text-xs font-bold text-gray-400">Card {cardIndex + 1}/{REELS_DATA.length}</span>
-                       <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold uppercase mb-6">{REELS_DATA[cardIndex].type}</span>
-                       <h3 className="text-2xl font-bold text-gray-800 dark:text-white leading-relaxed">{REELS_DATA[cardIndex].text}</h3>
-                       <p className="absolute bottom-6 text-gray-400 text-xs flex items-center gap-2"><RotateCw className="w-3 h-3" /> Tap to flip</p>
+                    
+                    {/* Front: Question/Term */}
+                    <div className="absolute inset-0 backface-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center p-8 text-center">
+                       <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-full">
+                          <HelpCircle className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                       </div>
+                       <h3 className="text-2xl font-bold text-gray-800 dark:text-white leading-tight">
+                         {FLASHCARDS_DATA[cardIndex].question}
+                       </h3>
+                       <p className="absolute bottom-6 text-gray-400 text-xs flex items-center gap-2 animate-pulse">
+                         <RotateCw className="w-3 h-3" /> Tap to reveal answer
+                       </p>
                     </div>
-                    {/* Back */}
-                    <div className="absolute inset-0 backface-hidden bg-indigo-600 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 text-center" style={{ transform: 'rotateY(180deg)' }}>
-                       <p className="text-xl text-white font-medium leading-relaxed">{REELS_DATA[cardIndex].subText}</p>
+
+                    {/* Back: Answer/Explanation */}
+                    <div className="absolute inset-0 backface-hidden bg-indigo-600 rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 text-center text-white" style={{ transform: 'rotateY(180deg)' }}>
+                       <div className="mb-4 p-3 bg-white/20 rounded-full backdrop-blur-sm">
+                          <Lightbulb className="w-6 h-6 text-yellow-300" />
+                       </div>
+                       <h3 className="text-xl font-bold mb-4">
+                         {FLASHCARDS_DATA[cardIndex].answer}
+                       </h3>
+                       {FLASHCARDS_DATA[cardIndex].detail && (
+                         <p className="text-sm text-indigo-100 leading-relaxed border-t border-indigo-400 pt-4 mt-2">
+                           {FLASHCARDS_DATA[cardIndex].detail}
+                         </p>
+                       )}
                     </div>
                  </div>
               </div>
 
-              <div className="flex gap-4 mt-8">
-                 <button onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => prev > 0 ? prev - 1 : REELS_DATA.length - 1), 200) }} className="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg text-indigo-600 dark:text-white hover:scale-110 transition-transform">
+              <div className="flex gap-6 mt-8">
+                 <button 
+                  onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => prev > 0 ? prev - 1 : FLASHCARDS_DATA.length - 1), 200) }} 
+                  className="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg text-gray-600 dark:text-white hover:scale-110 transition-transform border border-gray-200 dark:border-gray-600"
+                 >
                     <ChevronLeft className="w-6 h-6" />
                  </button>
-                 <button onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => (prev + 1) % REELS_DATA.length), 200) }} className="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg text-indigo-600 dark:text-white hover:scale-110 transition-transform">
+                 <button 
+                  onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => (prev + 1) % FLASHCARDS_DATA.length), 200) }} 
+                  className="p-4 bg-indigo-600 rounded-full shadow-lg shadow-indigo-500/30 text-white hover:scale-110 transition-transform"
+                 >
                     <ChevronRight className="w-6 h-6" />
                  </button>
               </div>
@@ -745,17 +884,17 @@ const StudyHub = () => {
 
         {/* VIEW: QUIZ */}
         {activeTab === 'quiz' && (
-          <div className="h-full flex flex-col p-4 animate-in fade-in">
+          <div className="h-full flex flex-col p-4 animate-in fade-in custom-scrollbar overflow-y-auto pb-20">
              {!activeQuiz ? (
-               <div className="grid gap-4">
+               <div className="grid gap-4 pb-20">
                  {QUIZZES.map(q => (
                    <button 
                     key={q.id}
                     onClick={() => setActiveQuiz(q)}
-                    className="flex items-center justify-between p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:border-indigo-500 transition-colors text-left"
+                    className="flex items-center justify-between p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:border-indigo-500 transition-all text-left group"
                    >
                      <div className="flex items-center gap-4">
-                        <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
+                        <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-full text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                           <Brain className="w-6 h-6" />
                         </div>
                         <div>
@@ -763,15 +902,21 @@ const StudyHub = () => {
                            <p className="text-sm text-gray-500 dark:text-gray-400">{q.questions.length} Questions • {q.subject}</p>
                         </div>
                      </div>
-                     <ChevronRight className="w-5 h-5 text-gray-400" />
+                     <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
                    </button>
                  ))}
+                 
+                 <div className="text-center mt-8 text-gray-400 text-sm">
+                    More quizzes added weekly.
+                 </div>
                </div>
              ) : activeQuiz && !quizState.finished ? (
                 <div className="flex-1 flex flex-col max-w-xl mx-auto w-full">
                    <div className="flex justify-between items-center mb-8">
                       <button onClick={resetQuiz}><X className="w-6 h-6 text-gray-400" /></button>
-                      <span className="font-bold text-indigo-600">{quizState.idx + 1}/{activeQuiz.questions.length}</span>
+                      <span className="font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-full text-sm">
+                        Question {quizState.idx + 1} / {activeQuiz.questions.length}
+                      </span>
                    </div>
                    
                    <div className="flex-1">
@@ -815,15 +960,18 @@ const StudyHub = () => {
                     disabled={quizState.selected === null}
                     className="mt-6 w-full py-4 bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg"
                    >
-                     {quizState.idx === activeQuiz.questions.length - 1 ? 'Finish' : 'Next Question'}
+                     {quizState.idx === activeQuiz.questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
                    </button>
                 </div>
              ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center">
-                   <Trophy className="w-24 h-24 text-yellow-400 mb-6" />
+                   <Trophy className="w-24 h-24 text-yellow-400 mb-6 animate-bounce" />
                    <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Quiz Complete!</h2>
                    <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">You scored {quizState.score} out of {activeQuiz.questions.length}</p>
-                   <button onClick={resetQuiz} className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">Back to Quizzes</button>
+                   <div className="flex gap-4">
+                     <button onClick={() => { setQuizState({idx: 0, score: 0, finished: false, selected: null}) }} className="bg-white text-indigo-600 border border-indigo-200 px-6 py-3 rounded-full font-bold shadow-sm">Retry</button>
+                     <button onClick={resetQuiz} className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">New Quiz</button>
+                   </div>
                 </div>
              )}
           </div>
@@ -831,10 +979,10 @@ const StudyHub = () => {
       </div>
 
       {/* --- BOTTOM NAVIGATION BAR --- */}
-      <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-2 flex justify-between items-center z-10 safe-area-bottom">
+      <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-2 flex justify-between items-center z-30 safe-area-bottom shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
          {[
            { id: 'learn', label: 'Learn', icon: BookOpen },
-           { id: 'reels', label: 'Reels', icon: PlayCircle },
+           { id: 'reels', label: 'Reels', icon: Smartphone },
            { id: 'cards', label: 'Cards', icon: Layers },
            { id: 'quiz', label: 'Quiz', icon: Trophy }
          ].map((nav) => (
