@@ -2,1253 +2,618 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Subject } from '../types';
 import { 
-  Book, Scale, Globe, Brain, PenTool, Calculator, PlayCircle, Calendar, Sparkles, RefreshCw, Layers, RotateCw, 
-  ChevronLeft, ChevronRight, Lightbulb, Clock, AlertCircle, ChevronDown, ChevronUp, Landmark, BookOpen, Target, 
-  Star, Gamepad2, Smartphone, Check, Save, PenLine, X, GraduationCap, Zap, Search, MessageCircle, Users, Ear 
+  BookOpen, Layers, Zap, Brain, ChevronLeft, ChevronRight, 
+  X, Star, Share2, Bookmark, CheckCircle2, RotateCw, 
+  Trophy, ArrowRight, PlayCircle, Clock, Filter, Search,
+  GraduationCap, Smartphone
 } from 'lucide-react';
-import { generateStudyPlan, explainConcept, generateTopicQuiz } from '../services/geminiService';
 import { useProgress } from '../context/ProgressContext';
 
-// --- Types & Data ---
-interface QuizQuestion {
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
+// --- Types ---
 
-interface DetailedTopic {
+type CourseType = '5-Year' | '3-Year';
+type ViewMode = 'learn' | 'reels' | 'cards' | 'quiz';
+
+interface StudyTopic {
+  id: string;
   title: string;
+  subject: Subject;
   readTime: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
   summary: string;
-  keyPoints: string[];
-  casesOrExamples?: { title: string; desc: string }[];
-  proTip?: string;
-  quickBytes?: { text: string, color: string }[];
-  matchPairs?: { id: string, left: string, right: string }[];
-  quiz?: QuizQuestion[];
+  content: {
+    intro: string;
+    keyPoints: string[];
+    caseLaws?: { name: string; ruling: string }[];
+    statutes?: { section: string; desc: string }[];
+    example?: string;
+  };
 }
 
-const GavelIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 13-7.5 7.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L11 10"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>;
+interface Reel {
+  id: string;
+  type: 'Maxim' | 'Fact' | 'Tip' | 'Case';
+  text: string;
+  subText: string;
+  color: string;
+  icon?: any;
+}
 
-const QUICK_BYTES = [
-  { text: "Tort is a civil wrong. Remedy: Unliquidated Damages.", color: "from-pink-500 to-rose-500", icon: Scale },
-  { text: "Strict Liability: No need to prove negligence. (Rylands v Fletcher)", color: "from-purple-500 to-indigo-500", icon: AlertCircle },
-  { text: "Defamation needs Publication to a third party.", color: "from-blue-500 to-cyan-500", icon: MessageCircle },
-  { text: "Vicarious Liability: Master liable for Servant's acts.", color: "from-emerald-500 to-teal-500", icon: Users },
-  { text: "Res Judicata: A matter once decided cannot be heard again.", color: "from-orange-500 to-red-500", icon: GavelIcon },
-  { text: "Audi Alteram Partem: No one should be condemned unheard.", color: "from-teal-500 to-green-500", icon: Ear },
-  { text: "Quid Pro Quo: Something for Something (Consideration).", color: "from-indigo-500 to-blue-600", icon: Scale },
-  { text: "Ignorantia Juris Non Excusat: Mistake of Law is NO excuse.", color: "from-red-500 to-pink-600", icon: AlertCircle },
-  { text: "Caveat Emptor: Let the buyer beware.", color: "from-yellow-500 to-orange-500", icon: Book }
-];
+interface StaticQuiz {
+  id: string;
+  subject: Subject;
+  title: string;
+  questions: {
+    q: string;
+    options: string[];
+    correct: number;
+    explanation: string;
+  }[];
+}
 
-const MATCH_PAIRS = [
-    { id: '1', left: 'Damnum Sine Injuria', right: 'Damage without Legal Injury' },
-    { id: '2', left: 'Injuria Sine Damno', right: 'Injury without Damage' },
-    { id: '3', left: 'Volenti Non Fit Injuria', right: 'Defense of Consent' },
-    { id: '4', left: 'Res Ipsa Loquitur', right: 'Things speak for themselves' },
-    { id: '5', left: 'Actus Reus', right: 'Guilty Act' },
-    { id: '6', left: 'Mens Rea', right: 'Guilty Mind' },
-    { id: '7', left: 'Locus Standi', right: 'Right to appear/be heard' },
-    { id: '8', left: 'Force Majeure', right: 'Unforeseeable Circumstances' }
-];
+// --- MASSIVE STATIC DATA ---
 
-const subjects = [
-  { id: Subject.LegalAptitude, icon: Scale, color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', desc: 'Constitution, Torts, Contracts, Crimes' },
-  { id: Subject.GK, icon: Globe, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30', desc: 'History, Geography, Current Affairs' },
-  { id: Subject.LogicalReasoning, icon: Brain, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30', desc: 'Analogies, Coding, Blood Relations' },
-  { id: Subject.English, icon: PenTool, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30', desc: 'Vocabulary, Grammar, Comprehension' },
-  { id: Subject.Math, icon: Calculator, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30', desc: 'Basic Arithmetic, Percentages, Profit & Loss' },
-];
+const SUBJECTS_5YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math];
+const SUBJECTS_3YR = [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English];
 
-// Expanded Content Library
-const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
-  [Subject.LegalAptitude]: [
-    { 
-        title: "Law of Torts: Nature & Defenses", 
-        readTime: "20m", 
-        summary: "Tort is a civil wrong for which the remedy is a common law action for unliquidated damages. It differs from crime and contract breach.", 
-        keyPoints: [
-            "Damnum Sine Injuria: Damage without legal injury is NOT actionable (Gloucester Grammar School Case).",
-            "Injuria Sine Damnum: Legal injury without damage IS actionable (Ashby v White).",
-            "Volenti Non Fit Injuria: Defense of consent.",
-            "Vis Major: Act of God."
-        ], 
-        casesOrExamples: [
-            {title: 'Donoghue v Stevenson', desc: 'Established the "Neighbor Principle" in negligence.'}, 
-            {title: 'Rylands v Fletcher', desc: 'Established the rule of Strict Liability.'},
-            {title: 'MC Mehta v Union of India', desc: 'Established Absolute Liability in India (Oleum Gas Leak case).'}
-        ], 
-        proTip: 'Always check if there is a legal injury. No legal injury = No Tort (usually), unless it is Strict Liability.' 
-    },
-    { 
-        title: "Indian Constitution: Fundamental Rights", 
-        readTime: "35m", 
-        summary: "Fundamental Rights (Part III, Art 12-35) are the Magna Carta of India. They are justiciable and enforceable via Art 32 & 226.", 
-        keyPoints: [
-            "Right to Equality (Art 14-18).", 
-            "Right to Freedom (Art 19-22).",
-            "Right against Exploitation (Art 23-24).",
-            "Right to Constitutional Remedies (Art 32) - The 'Heart and Soul' (Ambedkar)."
-        ], 
-        casesOrExamples: [
-            {title: 'Kesavananda Bharati Case', desc: 'Held Preamble is part of Constitution & Basic Structure doctrine.'},
-            {title: 'Maneka Gandhi v Union of India', desc: 'Expanded Art 21 (Right to Life) to include Due Process.'},
-            {title: 'Puttaswamy Case', desc: 'Right to Privacy is a fundamental right.'}
-        ], 
-        proTip: 'Memorize the writs: Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto.',
-        quiz: [
-          {
-            question: "The 'Doctrine of Basic Structure' was propounded by the Supreme Court in which landmark case?",
-            options: ["Golaknath v. State of Punjab", "Kesavananda Bharati v. State of Kerala", "Minerva Mills v. Union of India", "Maneka Gandhi v. Union of India"],
-            correctIndex: 1,
-            explanation: "In Kesavananda Bharati (1973), the SC held that Parliament cannot alter the 'Basic Structure' of the Constitution."
-          },
-          {
-            question: "Which Article of the Indian Constitution is described by Dr. B.R. Ambedkar as the 'Heart and Soul' of the Constitution?",
-            options: ["Article 14", "Article 19", "Article 21", "Article 32"],
-            correctIndex: 3,
-            explanation: "Article 32 provides the Right to Constitutional Remedies, allowing citizens to approach the SC for enforcement of Fundamental Rights."
-          },
-          {
-            question: "The writ of 'Habeas Corpus' literally means:",
-            options: ["To have the body of", "We Command", "By what authority", "To be certified"],
-            correctIndex: 0,
-            explanation: "Habeas Corpus is a Latin term meaning 'to have the body'. It is a bulwark against illegal detention."
-          },
-          {
-            question: "Fundamental Duties were incorporated in the Indian Constitution by which Amendment Act?",
-            options: ["42nd Amendment Act", "44th Amendment Act", "86th Amendment Act", "73rd Amendment Act"],
-            correctIndex: 0,
-            explanation: "The 42nd Amendment Act, 1976 (Mini Constitution) added Part IVA (Article 51A) on the recommendation of the Swaran Singh Committee."
-          },
-          {
-            question: "Protection against double jeopardy is provided under which Article?",
-            options: ["Article 20(1)", "Article 20(2)", "Article 20(3)", "Article 21"],
-            correctIndex: 1,
-            explanation: "Article 20(2) states that no person shall be prosecuted and punished for the same offence more than once."
-          }
-        ]
-    },
-    {
-        title: "Indian Constitution: DPSP & Duties",
-        readTime: "25m",
-        summary: "Directive Principles of State Policy (Part IV) and Fundamental Duties (Part IVA). DPSPs are non-justiciable guidelines for the State.",
-        keyPoints: [
-            "Art 39A: Equal Justice & Free Legal Aid.",
-            "Art 44: Uniform Civil Code (UCC).",
-            "Art 51A: Fundamental Duties added by 42nd Amendment (Swaran Singh Committee)."
-        ],
-        casesOrExamples: [
-            {title: 'Minerva Mills Case', desc: 'Harmony between FR and DPSP is essential.'}
-        ],
-        proTip: 'DPSPs are borrowed from the Irish Constitution.'
-    },
-    { 
-        title: "Law of Contracts: Essentials", 
-        readTime: "25m", 
-        summary: "According to the Indian Contract Act, 1872, an agreement enforceable by law is a contract. Section 10 defines the essentials.", 
-        keyPoints: [
-            "Offer + Acceptance = Agreement.", 
-            "Agreement + Enforceability = Contract.",
-            "Free Consent: Not caused by Coercion, Undue Influence, Fraud, Misrepresentation, or Mistake.",
-            "Consideration: Something in return (Quid Pro Quo)."
-        ], 
-        casesOrExamples: [
-            {title: 'Carlill v Carbolic Smoke Ball Co', desc: 'General Offer can be accepted by performance.'},
-            {title: 'Mohori Bibee v Dharmodas Ghose', desc: 'Minors agreement is void ab initio.'},
-            {title: 'Harvey v Facey', desc: 'Quotation of price is NOT an offer.'}
-        ], 
-        proTip: 'Silence does not amount to acceptance (Felthouse v Bindley).' 
-    },
-    { 
-        title: "Law of Contracts: Void vs Voidable", 
-        readTime: "20m", 
-        summary: "Distinguishing between types of contracts based on enforceability.", 
-        keyPoints: [
-            "Void Contract: Ceases to be enforceable by law (e.g., War breaks out).",
-            "Voidable Contract: Enforceable at the option of one party (e.g., Consent obtained by coercion).",
-            "Void Ab Initio: Void from the very beginning (e.g., Minor's contract)."
-        ], 
-        casesOrExamples: [
-            {title: 'Balfour v Balfour', desc: 'Domestic agreements are not contracts (Lack of legal intention).'}
-        ],
-        proTip: 'Wagering agreements are Void, but Collateral agreements to them are Valid.'
-    },
-    { 
-        title: "Criminal Law: General Exceptions", 
-        readTime: "20m", 
-        summary: "IPC Chapter IV (Sec 76-106) outlines conditions where an act is not an offence.", 
-        keyPoints: [
-            "Mistake of Fact (Sec 76, 79) is a defense; Mistake of Law is NOT.", 
-            "Insanity (Sec 84): McNaughten Rules apply.",
-            "Private Defense (Sec 96-106): Right to defend body and property."
-        ], 
-        casesOrExamples: [
-            {title: 'R v Dudley and Stephens', desc: 'Necessity is not a defense for murder.'},
-            {title: 'KM Nanavati v State of Maharashtra', desc: 'Grave and Sudden Provocation defense.'}
-        ], 
-        proTip: 'Child under 7 years is Doli Incapax (incapable of crime).' 
-    },
-    {
-        title: "Criminal Law: Homicide vs Murder",
-        readTime: "30m",
-        summary: "Distinction between Culpable Homicide (Sec 299) and Murder (Sec 300) in IPC.",
-        keyPoints: [
-            "All murders are culpable homicide, but not all culpable homicides are murder.",
-            "Murder: Intention to cause death is clear and immediate.",
-            "Culpable Homicide not amounting to Murder: Knowledge is present, but intent might be lesser.",
-            "Sec 302: Punishment for Murder."
-        ],
-        casesOrExamples: [
-            {title: 'Virsa Singh v State of Punjab', desc: 'Intention to cause bodily injury sufficient to cause death.'}
-        ],
-        proTip: 'Grave and sudden provocation reduces Murder to Culpable Homicide.'
-    },
-    { 
-        title: "Family Law: Hindu Marriage Act", 
-        readTime: "15m", 
-        summary: "Basics of HMA 1955, conditions for valid marriage, and grounds for divorce.", 
-        keyPoints: [
-            "Monogamy is mandatory (Sec 5).", 
-            "Age: Groom 21, Bride 18.",
-            "Sapinda Relationship: Prohibited degrees of relationship.",
-            "Divorce by Mutual Consent (Sec 13B)."
-        ], 
-        proTip: 'Marriage registration is now compulsory in most states but non-registration does not invalidate it.' 
-    },
-    {
-        title: "Intellectual Property Rights",
-        readTime: "15m",
-        summary: "Copyright, Patents, and Trademarks basics.",
-        keyPoints: [
-            "Copyright: Literary, artistic works (Lifetime + 60 years).",
-            "Patent: Inventions (20 years).",
-            "Trademark: Brand logo/name (Renewable every 10 years)."
-        ],
-        proTip: 'Ideas cannot be copyrighted, only the expression of ideas can be.'
+const STATIC_TOPICS: StudyTopic[] = [
+  // LEGAL APTITUDE
+  {
+    id: 'la-1',
+    title: 'Law of Torts: Basics',
+    subject: Subject.LegalAptitude,
+    readTime: '15m',
+    difficulty: 'Easy',
+    summary: 'Understanding civil wrongs, unliquidated damages, and basic principles like Injuria Sine Damno.',
+    content: {
+      intro: 'Tort is a civil wrong for which the remedy is a common law action for unliquidated damages, and which is not exclusively the breach of a contract or the breach of a trust.',
+      keyPoints: [
+        'Unliquidated Damages: Damages not pre-decided, determined by court.',
+        'Tort vs Crime: Tort is against individual (compensation), Crime is against society (punishment).',
+        'Injuria Sine Damno: Violation of legal right without damage (Actionable).',
+        'Damnum Sine Injuria: Damage without violation of legal right (Not Actionable).'
+      ],
+      caseLaws: [
+        { name: 'Ashby v White', ruling: 'Established Injuria Sine Damno. Plaintiff stopped from voting; no loss caused, but legal right violated. Held liable.' },
+        { name: 'Gloucester Grammar School Case', ruling: 'Established Damnum Sine Injuria. Competitor opened school, fees dropped. No legal injury, so no compensation.' }
+      ]
     }
-  ],
-  [Subject.GK]: [
-    { 
-        title: "Modern History: Freedom Struggle", 
-        readTime: "30m", 
-        summary: "Key timeline of India's fight for independence (1857-1947).", 
-        keyPoints: [
-            "1857: First War of Independence.", 
-            "1905: Partition of Bengal.",
-            "1919: Jallianwala Bagh & Rowlatt Act.",
-            "1930: Dandi March (Civil Disobedience).",
-            "1942: Quit India Movement."
-        ], 
-        proTip: 'Remember Chronology: Non-Cooperation -> Civil Disobedience -> Quit India.' 
-    },
-    {
-        title: "Ancient History: Indus & Vedic",
-        readTime: "20m",
-        summary: "The cradle of Indian civilization.",
-        keyPoints: [
-            "Indus Valley: Urban planning, Grid system, Harappa & Mohenjo Daro.",
-            "Vedic Age: Rig Veda (Oldest), Caste system origins.",
-            "Buddhism: 4 Noble Truths, 8-fold path.",
-            "Jainism: Ahimsa (Non-violence)."
-        ],
-        proTip: 'Harappa was discovered by Dayaram Sahni in 1921.'
-    },
-    { 
-        title: "Geography: Indian Physiography", 
-        readTime: "20m", 
-        summary: "Physical features and river systems of India.", 
-        keyPoints: [
-            "Himalayan Rivers: Ganga, Indus, Brahmaputra (Perennial).", 
-            "Peninsular Rivers: Godavari, Krishna, Kaveri (Rain-fed).",
-            "West Flowing: Narmada, Tapti (Rift Valley)."
-        ], 
-        proTip: 'Godavari is known as Dakshin Ganga.' 
-    },
-    {
-        title: "Geography: Solar System",
-        readTime: "15m",
-        summary: "Planetary facts.",
-        keyPoints: [
-            "Mercury: Smallest.",
-            "Venus: Hottest & Brightest (Morning Star).",
-            "Mars: Red Planet.",
-            "Jupiter: Largest.",
-            "Saturn: Ringed planet."
-        ],
-        proTip: 'Venus rotates East to West (Retrograde), unlike Earth.'
-    },
-    { 
-        title: "International Organizations", 
-        readTime: "15m", 
-        summary: "Headquarters and Heads of major global bodies.", 
-        keyPoints: [
-            "UN: New York.", 
-            "ICJ: The Hague, Netherlands.",
-            "WTO/WHO/ILO: Geneva, Switzerland.",
-            "UNESCO: Paris.",
-            "SAARC: Kathmandu, Nepal."
-        ], 
-        proTip: 'Most organizations ending in "Organization" and starting with "World" are in Geneva.' 
-    },
-    {
-        title: "Indian Economy Basics",
-        readTime: "25m",
-        summary: "GDP, Banking, and Planning.",
-        keyPoints: [
-            "RBI: Central Bank, established 1935. Controls Monetary Policy.",
-            "Repo Rate: Rate at which RBI lends to banks.",
-            "GST: Indirect tax introduced by 101st Amendment.",
-            "NITI Aayog replaced Planning Commission."
-        ],
-        proTip: 'Monetary Policy Committee (MPC) decides interest rates.'
-    },
-    { 
-        title: "Important Days", 
-        readTime: "10m", 
-        summary: "Crucial dates often asked in exams.", 
-        keyPoints: [
-            "Jan 26: Republic Day", 
-            "Feb 28: National Science Day",
-            "June 5: Environment Day",
-            "June 21: Yoga Day",
-            "Nov 26: Constitution Day", 
-            "Dec 10: Human Rights Day"
-        ] 
-    },
-    {
-        title: "Awards & Honours",
-        readTime: "15m",
-        summary: "Highest Civilian and Gallantry awards.",
-        keyPoints: [
-            "Bharat Ratna: Highest Civilian Award.",
-            "Padma Vibhushan > Padma Bhushan > Padma Shri.",
-            "Param Vir Chakra: Highest Wartime Gallantry Award.",
-            "Dadasaheb Phalke Award: Cinema."
-        ],
-        proTip: 'First Bharat Ratna recipients: C. Rajagopalachari, S. Radhakrishnan, CV Raman.'
+  },
+  {
+    id: 'la-2',
+    title: 'Vicarious Liability',
+    subject: Subject.LegalAptitude,
+    readTime: '12m',
+    difficulty: 'Medium',
+    summary: 'Liability of one person for the act of another (Master-Servant relationship).',
+    content: {
+      intro: 'Qui facit per alium facit per se - He who acts through another acts himself.',
+      keyPoints: [
+        'Master is liable for torts committed by servant during the course of employment.',
+        'Reason: Deep Pocket Theory & Respondeat Superior.',
+        'Not liable for acts of Independent Contractors (usually).'
+      ],
+      example: 'If a driver hits a pedestrian while delivering goods for his boss, the boss is liable. If the driver takes a detour to visit his girlfriend and hits someone, the boss is NOT liable (Frolic of his own).'
     }
-  ],
-  [Subject.LogicalReasoning]: [
-    { 
-        title: "Syllogisms: 100-50 Method", 
-        readTime: "20m", 
-        summary: "Deductive reasoning. Drawing conclusions from premises.", 
-        keyPoints: ["All A are B.", "Some A are B.", "No A is B.", "If premises are positive, conclusion must be positive."], 
-        casesOrExamples: [{title: 'Example', desc: 'All Cats are Dogs. All Dogs are Birds. -> All Cats are Birds.'}],
-        proTip: 'Draw Venn Diagrams for visual confirmation.' 
-    },
-    { 
-        title: "Blood Relations", 
-        readTime: "15m", 
-        summary: "Analyzing family trees.", 
-        keyPoints: ["Paternal = Father's side.", "Maternal = Mother's side.", "Spouse = Husband/Wife."], 
-        proTip: 'Break the sentence from the end. "My father\'s only son" is ME (if male).' 
-    },
-    { 
-        title: "Coding & Decoding", 
-        readTime: "15m", 
-        summary: "Deciphering patterns.", 
-        keyPoints: ["Letter Shifting (+1, -1).", "Reverse Order (A=Z).", "Opposite Pairs (AZ, BY, CX)."], 
-        proTip: 'Write A-M and N-Z below it to find opposite pairs quickly.' 
-    },
-    {
-        title: "Direction Sense",
-        readTime: "10m",
-        summary: "Solving movement based problems.",
-        keyPoints: ["NEWS: North, East, West, South.", "Right turn from North = East.", "Pythagoras theorem for shortest distance."],
-        proTip: 'Always draw a compass (+) before starting.'
-    },
-    {
-        title: "Seating Arrangement",
-        readTime: "25m",
-        summary: "Linear and Circular arrangements.",
-        keyPoints: [
-            "Linear: Facing North (Left is Left). Facing South (Left is Right).",
-            "Circular: Facing Center (Right is Anti-clockwise).",
-            "Always fix the definite information first."
-        ],
-        proTip: 'If direction is not mentioned in circular, assume facing center.'
-    },
-    {
-        title: "Critical Reasoning: Statement & Assumption",
-        readTime: "20m",
-        summary: "Identifying implicit assumptions.",
-        keyPoints: [
-            "Assumption is something taken for granted.",
-            "It must be implicit, not explicit.",
-            "Avoid extreme words like 'only', 'all', 'never'."
-        ],
-        proTip: 'The statement is always TRUE. Do not question the facts.'
-    },
-    {
-        title: "Number Series",
-        readTime: "20m",
-        summary: "Finding the missing number.",
-        keyPoints: [
-            "Look for differences between numbers.",
-            "Check for squares/cubes.",
-            "Check for multiplication + addition (x2 +1).",
-            "Prime number series."
-        ],
-        proTip: 'If the series grows slowly, it is addition. If fast, it is multiplication.'
+  },
+  {
+    id: 'la-3',
+    title: 'Constitutional Law: Preamble',
+    subject: Subject.LegalAptitude,
+    readTime: '10m',
+    difficulty: 'Easy',
+    summary: 'The soul of the Constitution. Keywords: Sovereign, Socialist, Secular, Democratic, Republic.',
+    content: {
+      intro: 'The Preamble is an introduction to the Constitution. It secures Justice, Liberty, Equality, and Fraternity.',
+      keyPoints: [
+        '42nd Amendment (1976): Added words "Socialist", "Secular", and "Integrity".',
+        'Source of Authority: "We, the People of India".',
+        'Date of Adoption: 26 Nov 1949.'
+      ],
+      caseLaws: [
+        { name: 'Kesavananda Bharati v State of Kerala', ruling: 'Preamble IS a part of the Constitution and can be amended subject to Basic Structure.' },
+        { name: 'Berubari Union Case', ruling: 'Earlier view: Preamble is NOT part of Constitution (Overruled).' }
+      ]
     }
-  ],
-  [Subject.English]: [
-    { 
-        title: "Grammar: Subject-Verb Agreement", 
-        readTime: "20m", 
-        summary: "The verb must agree with the subject in number and person.", 
-        keyPoints: ["Singular subject -> Singular verb.", "Everyone/Anyone -> Singular verb.", "Neither/Nor -> Verb agrees with nearest subject."], 
-        casesOrExamples: [{title: 'Proximity Rule', desc: 'Neither the teacher nor the students WERE present.'}],
-        proTip: '"One of the boys IS coming" (not are).' 
-    },
-    {
-        title: "Grammar: Tenses",
-        readTime: "25m", 
-        summary: "Correct usage of time in sentences.",
-        keyPoints: [
-            "Simple Present: Habitual action.",
-            "Present Perfect: Action just finished (Has/Have + V3).",
-            "Past Perfect: Action happened before another past action (Had + V3)."
-        ],
-        proTip: 'When two actions happen in the past, the earlier one takes Past Perfect.'
-    },
-    { 
-        title: "Reading Comprehension Strategy", 
-        readTime: "25m", 
-        summary: "Techniques for speed reading and accuracy.", 
-        keyPoints: ["Read questions FIRST.", "Skim first/last lines of paragraphs.", "Eliminate extreme options (always, never)."], 
-        proTip: 'Do not bring outside knowledge. Answer only from the passage.' 
-    },
-    { 
-        title: "Vocabulary: Root Words", 
-        readTime: "30m", 
-        summary: "Etymology hacks.", 
-        keyPoints: ["Mal = Bad (Malice).", "Bene = Good (Benefit).", "Chron = Time (Chronology).", "Logy = Study of."], 
-        proTip: 'Negative prefix usually means negative answer choice.' 
-    },
-    {
-        title: "Idioms & Phrases",
-        readTime: "20m",
-        summary: "Common figurative expressions.",
-        keyPoints: [
-            "Bolt from the blue: Unexpected shock.",
-            "Burning the midnight oil: Working late.",
-            "Apple of discord: Cause of quarrel.",
-            "Break the ice: Start conversation."
-        ],
-        proTip: 'Visualize the literal meaning to guess the metaphorical one.'
-    },
-    {
-        title: "Active & Passive Voice",
-        readTime: "15m",
-        summary: "Changing the focus of the sentence.",
-        keyPoints: [
-            "Active: Subject does the action.",
-            "Passive: Action is done to the subject.",
-            "Tense does NOT change.",
-            "Subject and Object swap places."
-        ],
-        proTip: 'Universal truths usually remain in simple present.'
+  },
+  {
+    id: 'la-4',
+    title: 'Indian Contract Act: Essentials',
+    subject: Subject.LegalAptitude,
+    readTime: '20m',
+    difficulty: 'Medium',
+    summary: 'Offer, Acceptance, Consideration, and Free Consent.',
+    content: {
+      intro: 'Section 10: All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object.',
+      keyPoints: [
+        'Proposal + Acceptance = Promise.',
+        'Promise + Consideration = Agreement.',
+        'Agreement + Enforceability = Contract.',
+        'Void Ab Initio: Void from the start (e.g., with a minor).'
+      ],
+      caseLaws: [
+        { name: 'Carlill v Carbolic Smoke Ball Co', ruling: 'General Offer can be accepted by anyone performing the condition.' },
+        { name: 'Mohori Bibee v Dharmodas Ghose', ruling: 'Contract with a minor is void ab initio.' }
+      ]
     }
-  ],
-  [Subject.Math]: [
-    { 
-        title: "Percentages & Fractions", 
-        readTime: "20m", 
-        summary: "Foundation of arithmetic.", 
-        keyPoints: ["1/2 = 50%", "1/3 = 33.33%", "1/4 = 25%", "1/5 = 20%", "1/8 = 12.5%"], 
-        proTip: 'Memorize fractions up to 1/20 for speed.' 
-    },
-    { 
-        title: "Profit, Loss & Discount", 
-        readTime: "25m", 
-        summary: "Commercial math basics.", 
-        keyPoints: ["Profit = SP - CP", "Profit % = (Profit/CP)*100", "Discount is always on MP."], 
-        proTip: 'Assume CP = 100 for easy calculation.' 
-    },
-    {
-        title: "Time, Speed & Distance",
-        readTime: "25m",
-        summary: "Relationship between D, S, T.",
-        keyPoints: ["D = S x T", "Relative Speed (Opposite) = S1 + S2", "Relative Speed (Same) = S1 - S2"],
-        proTip: 'Convert km/hr to m/s by multiplying with 5/18.'
-    },
-    {
-        title: "Simple & Compound Interest",
-        readTime: "20m",
-        summary: "Money growth over time.",
-        keyPoints: [
-            "SI = (P * R * T) / 100",
-            "CI = P(1 + R/100)^n - P",
-            "Difference between CI and SI for 2 years = P(R/100)^2"
-        ],
-        proTip: 'For CI, use the successive percentage method (x + y + xy/100).'
-    },
-    {
-        title: "Averages",
-        readTime: "15m",
-        summary: "Mean value of data.",
-        keyPoints: [
-            "Average = Sum of observations / Number of observations.",
-            "If a person joins and avg increases, they weigh more than the avg."
-        ],
-        proTip: 'Use deviation method for faster calculation.'
-    },
-    {
-        title: "Ratio & Proportion",
-        readTime: "15m",
-        summary: "Comparison of quantities.",
-        keyPoints: [
-            "a:b = c:d => ad = bc",
-            "Mean proportional of a and b is sqrt(ab).",
-            "Third proportional to a and b is b^2/a."
-        ],
-        proTip: 'If A:B = 2:3 and B:C = 4:5, multiply to make B common (Multiply first by 4, second by 3).'
+  },
+  // GK
+  {
+    id: 'gk-1',
+    title: 'Indian History: 1857 Revolt',
+    subject: Subject.GK,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'The First War of Independence. Causes, Leaders, and Consequences.',
+    content: {
+      intro: 'Started on May 10, 1857, in Meerut. A result of accumulation of grievances against British Rule.',
+      keyPoints: [
+        'Immediate Cause: Greased Cartridges (Enfield Rifle).',
+        'Symbols: Lotus and Bread.',
+        'Ended the rule of East India Company; Crown took over (Govt of India Act 1858).'
+      ],
+      statutes: [
+        { section: 'Mangal Pandey', desc: 'Barrackpore' },
+        { section: 'Rani Laxmibai', desc: 'Jhansi' },
+        { section: 'Bahadur Shah Zafar', desc: 'Delhi (Nominal Head)' }
+      ]
     }
-  ],
-};
-
-const flashcardsData = [
-  { id: 1, type: 'Maxim', front: 'Volenti non fit injuria', back: 'To a willing person, injury is not done.' },
-  { id: 2, type: 'Case', front: 'Kesavananda Bharati', back: 'Basic Structure Doctrine.' },
-  { id: 3, type: 'Maxim', front: 'Audi Alteram Partem', back: 'No one should be condemned unheard.' },
-  { id: 4, type: 'Maxim', front: 'Actus Non Facit Reum Nisi Mens Sit Rea', back: 'The act itself does not constitute guilt unless done with a guilty mind.' },
-  { id: 5, type: 'Maxim', front: 'Ubi Jus Ibi Remedium', back: 'Where there is a right, there is a remedy.' },
-  { id: 6, type: 'Case', front: 'Shah Bano Case', back: 'Maintenance rights for Muslim women.' },
-  { id: 7, type: 'Maxim', front: 'Res Ipsa Loquitur', back: 'The thing speaks for itself (Negligence).' },
-  { id: 8, type: 'Case', front: 'Minerva Mills v Union of India', back: 'Judicial Review is part of Basic Structure.' }
-];
-
-// --- Sub-Components ---
-
-const QuickBytesView: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const { clientWidth } = scrollRef.current;
-      scrollRef.current.scrollBy({ left: direction === 'left' ? -clientWidth : clientWidth, behavior: 'smooth' });
+  },
+  {
+    id: 'gk-2',
+    title: 'Geography: Rivers of India',
+    subject: Subject.GK,
+    readTime: '15m',
+    difficulty: 'Medium',
+    summary: 'Himalayan vs Peninsular Rivers. Origins and Tributaries.',
+    content: {
+      intro: 'India is the land of rivers. The drainage system is divided into Himalayan and Peninsular.',
+      keyPoints: [
+        'Ganga: Originates as Bhagirathi from Gangotri. Longest river in India.',
+        'Indus: Originates near Mansarovar. Major tributaries: Jhelum, Chenab, Ravi, Beas, Sutlej.',
+        'Godavari: Dakshin Ganga. Longest peninsular river.',
+        'Narmada & Tapti: Flow West into Arabian Sea (Rift Valleys).'
+      ]
     }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <button onClick={onClose} className="absolute top-4 right-4 text-white bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors z-50"><X /></button>
-      
-      <button onClick={() => scroll('left')} className="absolute left-4 text-white/50 hover:text-white transition-colors hidden md:block z-50 p-2 bg-white/10 rounded-full hover:bg-white/20">
-        <ChevronLeft className="w-8 h-8" />
-      </button>
-      
-      <div 
-        ref={scrollRef}
-        className="w-full max-w-sm md:max-w-md h-[65vh] flex overflow-x-auto snap-x snap-mandatory rounded-3xl no-scrollbar gap-4 items-center"
-      >
-        {QUICK_BYTES.map((byte, i) => (
-          <div key={i} className={`relative flex-shrink-0 w-full h-full snap-center flex flex-col items-center justify-center p-8 bg-gradient-to-br ${byte.color} text-white text-center rounded-3xl shadow-2xl border border-white/10 overflow-hidden`}>
-            {/* Background Pattern */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
-            
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="bg-white/20 p-4 rounded-full inline-flex mb-8 backdrop-blur-md shadow-lg ring-1 ring-white/30">
-                {byte.icon && <byte.icon className="w-10 h-10 text-white" />}
-              </div>
-              <p className="text-2xl md:text-3xl font-bold leading-tight drop-shadow-md mb-6 font-serif">
-                "{byte.text}"
-              </p>
-              <div className="w-16 h-1.5 bg-white/40 rounded-full mx-auto mb-6"></div>
-               <div className="bg-black/20 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider text-white/80">
-                Fact {i + 1} of {QUICK_BYTES.length}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <button onClick={() => scroll('right')} className="absolute right-4 text-white/50 hover:text-white transition-colors hidden md:block z-50 p-2 bg-white/10 rounded-full hover:bg-white/20">
-        <ChevronRight className="w-8 h-8" />
-      </button>
-
-       {/* Mobile Dots Indicator */}
-       <div className="absolute bottom-10 flex gap-2 md:hidden">
-          {QUICK_BYTES.map((_, i) => (
-             <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/30" />
-          ))}
-       </div>
-    </div>
-  );
-};
-
-const MatchGame: React.FC<{ pairs: typeof MATCH_PAIRS, onClose: () => void }> = ({ pairs, onClose }) => {
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
-  const [matchedIds, setMatchedIds] = useState<string[]>([]);
-  const [shuffledRight, setShuffledRight] = useState([...pairs].sort(() => Math.random() - 0.5));
-
-  const handleLeftClick = (id: string) => setSelectedLeft(id);
-  
-  const handleRightClick = (pairId: string) => {
-    if (!selectedLeft) return;
-    if (selectedLeft === pairId) {
-      setMatchedIds(prev => [...prev, pairId]);
-      setSelectedLeft(null);
-    } else {
-      setSelectedLeft(null);
+  },
+  // LOGIC
+  {
+    id: 'lr-1',
+    title: 'Syllogisms',
+    subject: Subject.LogicalReasoning,
+    readTime: '20m',
+    difficulty: 'Hard',
+    summary: 'Deductive logic using Venn Diagrams.',
+    content: {
+      intro: 'Syllogisms test your ability to draw conclusions from given statements, disregarding real-world facts.',
+      keyPoints: [
+        'All A are B: A is inside B.',
+        'Some A are B: Intersection of A and B.',
+        'No A is B: A and B are disjoint.',
+        'Tip: Always draw the "Minimum Overlap" diagram first.'
+      ],
+      example: 'Statements: All Cats are Dogs. All Dogs are Birds.\nConclusion: All Cats are Birds (True).'
     }
-  };
-
-  if (matchedIds.length === pairs.length) {
-    return (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl text-center animate-in zoom-in shadow-2xl border border-gray-200 dark:border-gray-700">
-                <div className="w-20 h-20 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Check className="w-10 h-10" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">All Matched!</h3>
-                <button onClick={onClose} className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold mt-4 hover:bg-indigo-700">Close</button>
-            </div>
-        </div>
-    )
+  },
+  // ENGLISH
+  {
+    id: 'eng-1',
+    title: 'Common Legal Idioms',
+    subject: Subject.English,
+    readTime: '10m',
+    difficulty: 'Easy',
+    summary: 'Latin terms and English phrases frequently asked.',
+    content: {
+      intro: 'Legal English is a key component of the exam.',
+      keyPoints: [
+        'Bona Fide: In good faith.',
+        'Mala Fide: In bad faith.',
+        'Prima Facie: On the face of it.',
+        'Sub Judice: Under judicial consideration.',
+        'Ultra Vires: Beyond powers.'
+      ]
+    }
   }
+];
 
-  return (
-    <div className="fixed inset-0 z-50 bg-indigo-900/95 flex flex-col items-center justify-center p-4 backdrop-blur-md animate-in fade-in">
-      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl border border-gray-200 dark:border-gray-700 overflow-y-auto max-h-[90vh]">
-        <div className="flex justify-between mb-6 sticky top-0 bg-white dark:bg-gray-800 pb-2 z-10">
-          <h3 className="font-bold text-lg text-gray-800 dark:text-white">Match the Terms</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-red-500 font-bold">Exit</button>
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:gap-8">
-           <div className="space-y-3">
-             {pairs.map(p => (
-               <button 
-                key={p.id}
-                disabled={matchedIds.includes(p.id)}
-                onClick={() => handleLeftClick(p.id)}
-                className={`w-full p-4 rounded-xl text-left border-2 transition-all font-medium ${
-                    matchedIds.includes(p.id) ? 'opacity-0' : 
-                    selectedLeft === p.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-500'
-                }`}
-               >
-                 {p.left}
-               </button>
-             ))}
-           </div>
-           <div className="space-y-3">
-             {shuffledRight.map(p => (
-               <button 
-                key={p.id}
-                disabled={matchedIds.includes(p.id)}
-                onClick={() => handleRightClick(p.id)}
-                className={`w-full p-4 rounded-xl text-left border-2 transition-all font-medium ${
-                    matchedIds.includes(p.id) ? 'opacity-0' : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-indigo-300 dark:hover:border-indigo-500'
-                }`}
-               >
-                 {p.right}
-               </button>
-             ))}
-           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+const REELS_DATA: Reel[] = [
+  { id: 'r1', type: 'Maxim', text: 'Volenti Non Fit Injuria', subText: 'To a willing person, injury is not done.', color: 'bg-gradient-to-br from-pink-500 to-rose-600' },
+  { id: 'r2', type: 'Fact', text: 'Magna Carta', subText: 'Signed in 1215. The first document to put into writing the principle that the king and his government was not above the law.', color: 'bg-gradient-to-br from-purple-600 to-indigo-700' },
+  { id: 'r3', type: 'Tip', text: 'Syllogism Hack', subText: 'If both premises are particular (Some/Some), NO conclusion follows.', color: 'bg-gradient-to-br from-yellow-500 to-orange-600' },
+  { id: 'r4', type: 'Case', text: 'Donoghue v Stevenson', subText: 'The "Snail in the Bottle" case. Established the Neighbor Principle in Negligence.', color: 'bg-gradient-to-br from-blue-500 to-cyan-600' },
+  { id: 'r5', type: 'Maxim', text: 'Audi Alteram Partem', subText: 'Listen to the other side. No one should be condemned unheard.', color: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
+  { id: 'r6', type: 'Fact', text: 'Constitution Day', subText: 'Celebrated on 26th November. Adopted in 1949.', color: 'bg-gradient-to-br from-red-500 to-pink-600' },
+  { id: 'r7', type: 'Tip', text: 'Math Speed', subText: 'To multiply by 5: Divide by 2 and move decimal/add zero. (e.g. 48 * 5 = 240)', color: 'bg-gradient-to-br from-gray-700 to-gray-900' },
+  { id: 'r8', type: 'Maxim', text: 'Res Ipsa Loquitur', subText: 'The thing speaks for itself. Used in accidents where negligence is obvious.', color: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
+];
 
-// --- Sub-Component: Explain Modal ---
-const ExplainModal: React.FC<{ concept: string; subject: string; onClose: () => void }> = ({ concept, subject, onClose }) => {
-  const [content, setContent] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+const QUIZZES: StaticQuiz[] = [
+  {
+    id: 'q1',
+    subject: Subject.LegalAptitude,
+    title: 'Torts Challenge',
+    questions: [
+      { q: 'Which of these is NOT a defense in Torts?', options: ['Volenti non fit injuria', 'Act of God', 'Mens Rea', 'Statutory Authority'], correct: 2, explanation: 'Mens Rea (Guilty Mind) is a concept in Criminal Law, generally irrelevant in Torts.' },
+      { q: 'The case of Rylands v Fletcher laid down which rule?', options: ['Absolute Liability', 'Strict Liability', 'Vicarious Liability', 'Negligence'], correct: 1, explanation: 'It established Strict Liability. Absolute Liability (no exceptions) was established in MC Mehta case.' },
+      { q: 'Defamation involves:', options: ['Only Libel', 'Only Slander', 'Both Libel and Slander', 'None'], correct: 2, explanation: 'Libel is permanent form, Slander is transient form.' }
+    ]
+  },
+  {
+    id: 'q2',
+    subject: Subject.GK,
+    title: 'Indian Polity Mix',
+    questions: [
+      { q: 'Who appoints the Governor of a State?', options: ['Chief Minister', 'President', 'Prime Minister', 'Chief Justice'], correct: 1, explanation: 'The President appoints the Governor under Article 155.' },
+      { q: 'Financial Emergency is under which Article?', options: ['Article 352', 'Article 356', 'Article 360', 'Article 370'], correct: 2, explanation: 'Art 360 deals with Financial Emergency. It has never been imposed in India.' }
+    ]
+  }
+];
 
-  useEffect(() => {
-    const fetchExplanation = async () => {
-      const text = await explainConcept(concept, subject);
-      setContent(text);
-      setLoading(false);
-    };
-    fetchExplanation();
-  }, [concept, subject]);
+// --- COMPONENTS ---
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-      <div className="bg-white dark:bg-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col max-h-[85vh]">
-        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-indigo-50/50 dark:bg-gray-800 rounded-t-2xl">
-          <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400">
-             <Sparkles className="w-5 h-5" />
-             <h3 className="font-bold text-lg">Deep Dive</h3>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"><X className="w-5 h-5" /></button>
-        </div>
-        <div className="p-6 overflow-y-auto">
-          {loading ? (
-             <div className="space-y-4 animate-pulse">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-                <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-             </div>
-          ) : (
-            <div className="prose dark:prose-invert max-w-none text-sm md:text-base">
-                <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">{concept}</h2>
-                <div className="whitespace-pre-wrap">{content}</div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+const StudyHub = () => {
+  const [course, setCourse] = useState<CourseType>('5-Year');
+  const [activeTab, setActiveTab] = useState<ViewMode>('learn');
+  const [activeSubject, setActiveSubject] = useState<Subject>(Subject.LegalAptitude);
+  const [readTopic, setReadTopic] = useState<StudyTopic | null>(null);
+  
+  // Reels State
+  const reelsRef = useRef<HTMLDivElement>(null);
+  
+  // Quiz State
+  const [activeQuiz, setActiveQuiz] = useState<StaticQuiz | null>(null);
+  const [quizState, setQuizState] = useState<{idx: number, score: number, finished: boolean, selected: number | null}>({idx: 0, score: 0, finished: false, selected: null});
 
-// --- Sub-Component: Quiz Modal ---
-const TopicQuizModal: React.FC<{ topic: string; subject: string; onClose: () => void }> = ({ topic, subject, onClose }) => {
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentQIndex, setCurrentQIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [showExplanation, setShowExplanation] = useState(false);
+  // Flashcard State
+  const [cardIndex, setCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
 
-  useEffect(() => {
-    const loadQuiz = async () => {
-      // Check for preloaded quiz first to avoid API call
-      const subjectTopics = studyContentPlaceholder[subject as Subject];
-      const foundTopic = subjectTopics?.find(t => t.title === topic);
-      
-      if (foundTopic?.quiz && foundTopic.quiz.length > 0) {
-        setQuestions(foundTopic.quiz);
-        setLoading(false);
-        return;
-      }
+  const availableSubjects = course === '5-Year' ? SUBJECTS_5YR : SUBJECTS_3YR;
 
-      // If no preloaded quiz, generate via AI
-      const qs = await generateTopicQuiz(topic, subject);
-      if (qs && qs.length > 0) {
-        setQuestions(qs);
-      } else {
-        // Fallback for demo if API fails
-        setQuestions([{
-            question: `What is the core principle of ${topic}?`,
-            options: ["Principle A", "Principle B", "Principle C", "Principle D"],
-            correctIndex: 0,
-            explanation: "This is a fallback question."
-        }]);
-      }
-      setLoading(false);
-    };
-    loadQuiz();
-  }, [topic, subject]);
+  // Filter topics based on course and active subject
+  const filteredTopics = STATIC_TOPICS.filter(t => t.subject === activeSubject);
 
-  const handleOptionClick = (index: number) => {
-    if (selectedOption !== null) return;
-    setSelectedOption(index);
-    setShowExplanation(true);
-    if (index === questions[currentQIndex].correctIndex) {
-      setScore(s => s + 1);
-    }
+  const handleQuizOption = (optIdx: number) => {
+    if (quizState.selected !== null) return;
+    const isCorrect = optIdx === activeQuiz!.questions[quizState.idx].correct;
+    setQuizState(prev => ({...prev, selected: optIdx, score: isCorrect ? prev.score + 1 : prev.score}));
   };
 
   const nextQuestion = () => {
-    if (currentQIndex < questions.length - 1) {
-      setCurrentQIndex(p => p + 1);
-      setSelectedOption(null);
-      setShowExplanation(false);
+    if (quizState.idx < activeQuiz!.questions.length - 1) {
+      setQuizState(prev => ({...prev, idx: prev.idx + 1, selected: null}));
     } else {
-      setFinished(true);
+      setQuizState(prev => ({...prev, finished: true}));
     }
   };
 
+  const resetQuiz = () => {
+    setActiveQuiz(null);
+    setQuizState({idx: 0, score: 0, finished: false, selected: null});
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-      <div className="bg-white dark:bg-gray-800 w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {loading ? (
-            <div className="p-12 text-center">
-                <div className="animate-spin w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-500 dark:text-gray-400 font-medium">Generating questions for {topic}...</p>
+    <div className="relative h-[calc(100vh-6rem)] md:h-full flex flex-col bg-white dark:bg-gray-900 overflow-hidden md:rounded-2xl shadow-xl md:border border-gray-200 dark:border-gray-800">
+      
+      {/* --- TOP BAR: Course Selector --- */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 z-10">
+        <div className="flex items-center gap-2">
+           <div className="bg-indigo-600 p-1.5 rounded-lg">
+             <GraduationCap className="w-5 h-5 text-white" />
+           </div>
+           <span className="font-bold text-gray-800 dark:text-white">MHCET Hub</span>
+        </div>
+        <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+          {(['5-Year', '3-Year'] as CourseType[]).map((c) => (
+            <button
+              key={c}
+              onClick={() => { setCourse(c); setActiveSubject(Subject.LegalAptitude); }}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${course === c ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="flex-1 overflow-hidden relative">
+        
+        {/* VIEW: LEARN (Library) */}
+        {activeTab === 'learn' && !readTopic && (
+          <div className="h-full flex flex-col animate-in fade-in">
+             {/* Subject Tabs */}
+             <div className="flex overflow-x-auto p-4 gap-3 no-scrollbar border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900">
+               {availableSubjects.map((sub) => (
+                 <button
+                  key={sub}
+                  onClick={() => setActiveSubject(sub)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold border transition-all whitespace-nowrap ${
+                    activeSubject === sub 
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md transform scale-105' 
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'
+                  }`}
+                 >
+                   {sub}
+                 </button>
+               ))}
+             </div>
+
+             {/* Topic List */}
+             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+               <div className="flex justify-between items-center mb-2">
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">{activeSubject}</h2>
+                  <span className="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">{filteredTopics.length} Topics</span>
+               </div>
+               
+               {filteredTopics.length === 0 ? (
+                 <div className="text-center py-10 text-gray-400">
+                   <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                   <p>Content coming soon for this section.</p>
+                 </div>
+               ) : (
+                 filteredTopics.map((topic) => (
+                   <div 
+                    key={topic.id}
+                    onClick={() => setReadTopic(topic)}
+                    className="group bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm active:scale-[0.98] transition-all cursor-pointer relative overflow-hidden"
+                   >
+                      <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500 group-hover:bg-indigo-400 transition-colors"></div>
+                      <div className="flex justify-between items-start mb-2 pl-2">
+                        <h3 className="font-bold text-gray-800 dark:text-white text-lg leading-tight">{topic.title}</h3>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded uppercase ${
+                          topic.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                          topic.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                        }`}>{topic.difficulty}</span>
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 pl-2 mb-3">{topic.summary}</p>
+                      <div className="flex items-center gap-4 pl-2 text-xs text-gray-400">
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {topic.readTime}</span>
+                        <span className="flex items-center gap-1 text-indigo-500 font-medium">Read Now <ArrowRight className="w-3 h-3" /></span>
+                      </div>
+                   </div>
+                 ))
+               )}
+             </div>
+          </div>
+        )}
+
+        {/* VIEW: READING MODE (Overlay) */}
+        {readTopic && (
+          <div className="absolute inset-0 z-20 bg-white dark:bg-gray-900 flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0">
+               <button onClick={() => setReadTopic(null)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"><ChevronLeft className="w-6 h-6 text-gray-800 dark:text-white" /></button>
+               <h3 className="font-bold text-gray-800 dark:text-white truncate flex-1">{readTopic.title}</h3>
+               <button className="text-indigo-600"><Bookmark className="w-5 h-5" /></button>
             </div>
-        ) : finished ? (
-            <div className="p-8 text-center">
-                <div className="w-20 h-20 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-yellow-600 text-3xl font-bold">
-                    {score}/{questions.length}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Quiz Complete!</h3>
-                <p className="text-gray-500 mb-6">You've mastered this micro-topic.</p>
-                <button onClick={onClose} className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors">Close</button>
+            <div className="flex-1 overflow-y-auto p-5 pb-24">
+               <div className="prose dark:prose-invert max-w-none">
+                 <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-6 font-medium">{readTopic.content.intro}</p>
+                 
+                 <div className="my-6 space-y-3">
+                   <h4 className="text-sm font-bold uppercase tracking-wider text-indigo-500">Key Points</h4>
+                   <ul className="space-y-2">
+                     {readTopic.content.keyPoints.map((kp, i) => (
+                       <li key={i} className="flex gap-3 text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
+                         <span className="text-indigo-500 font-bold mt-0.5">•</span>
+                         {kp}
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+
+                 {readTopic.content.caseLaws && (
+                   <div className="my-6">
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-indigo-500 mb-3">Landmark Case Laws</h4>
+                      <div className="grid gap-3">
+                        {readTopic.content.caseLaws.map((cl, i) => (
+                          <div key={i} className="border-l-4 border-indigo-500 pl-4 py-1">
+                            <p className="font-bold text-gray-900 dark:text-white">{cl.name}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 italic">"{cl.ruling}"</p>
+                          </div>
+                        ))}
+                      </div>
+                   </div>
+                 )}
+
+                 {readTopic.content.example && (
+                   <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-xl border border-yellow-200 dark:border-yellow-900/30 text-sm text-yellow-800 dark:text-yellow-200">
+                      <span className="font-bold block mb-1">Example:</span>
+                      {readTopic.content.example}
+                   </div>
+                 )}
+               </div>
+               
+               <div className="mt-12 flex justify-center">
+                 <button onClick={() => setReadTopic(null)} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-transform active:scale-95">
+                   <CheckCircle2 className="w-5 h-5" /> Mark as Read
+                 </button>
+               </div>
             </div>
-        ) : (
-            <div className="p-6">
-                 <div className="flex justify-between items-center mb-6">
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Question {currentQIndex + 1}/{questions.length}</span>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+          </div>
+        )}
+
+        {/* VIEW: REELS (Quick Bytes) */}
+        {activeTab === 'reels' && (
+          <div 
+            ref={reelsRef}
+            className="absolute inset-0 bg-black overflow-y-auto snap-y snap-mandatory no-scrollbar"
+          >
+            {REELS_DATA.map((reel) => (
+              <div key={reel.id} className={`w-full h-full snap-start relative flex flex-col items-center justify-center p-8 text-center ${reel.color}`}>
+                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.4)_100%)]"></div>
+                 
+                 <div className="relative z-10 max-w-md animate-in zoom-in duration-500">
+                    <span className="inline-block px-4 py-1 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-xs uppercase tracking-widest mb-6 border border-white/30">
+                      {reel.type}
+                    </span>
+                    <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight drop-shadow-lg font-serif">
+                      {reel.text}
+                    </h2>
+                    <div className="w-16 h-1 bg-white/50 rounded-full mx-auto mb-6"></div>
+                    <p className="text-lg md:text-xl text-white/90 font-medium leading-relaxed drop-shadow-md">
+                      {reel.subText}
+                    </p>
+                 </div>
+
+                 {/* Reel Actions */}
+                 <div className="absolute right-4 bottom-20 flex flex-col gap-6 z-20">
+                    <button className="flex flex-col items-center gap-1 text-white opacity-80 hover:opacity-100 transition-opacity">
+                       <div className="p-3 bg-white/10 rounded-full backdrop-blur-md"><Star className="w-6 h-6" /></div>
+                       <span className="text-[10px] font-bold">Save</span>
+                    </button>
+                    <button className="flex flex-col items-center gap-1 text-white opacity-80 hover:opacity-100 transition-opacity">
+                       <div className="p-3 bg-white/10 rounded-full backdrop-blur-md"><Share2 className="w-6 h-6" /></div>
+                       <span className="text-[10px] font-bold">Share</span>
+                    </button>
                  </div>
                  
-                 <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-6 leading-relaxed">
-                    {questions[currentQIndex].question}
-                 </h3>
-
-                 <div className="space-y-3 mb-6">
-                    {questions[currentQIndex].options.map((opt: string, idx: number) => {
-                        let btnClass = "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700";
-                        if (selectedOption !== null) {
-                            if (idx === questions[currentQIndex].correctIndex) btnClass = "bg-green-100 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-300";
-                            else if (idx === selectedOption) btnClass = "bg-red-100 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-300";
-                            else btnClass = "opacity-50";
-                        }
-                        return (
-                            <button 
-                                key={idx} 
-                                onClick={() => handleOptionClick(idx)}
-                                disabled={selectedOption !== null}
-                                className={`w-full text-left p-4 rounded-xl border-2 transition-all font-medium text-sm ${btnClass}`}
-                            >
-                                {opt}
-                            </button>
-                        );
-                    })}
+                 <div className="absolute bottom-6 left-0 w-full text-center">
+                    <p className="text-white/40 text-xs animate-bounce">Swipe for more</p>
                  </div>
-
-                 {showExplanation && (
-                    <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-sm text-blue-800 dark:text-blue-300 animate-in fade-in">
-                        <span className="font-bold block mb-1">Explanation:</span>
-                        {questions[currentQIndex].explanation}
-                    </div>
-                 )}
-
-                 <div className="flex justify-end">
-                    <button 
-                        onClick={nextQuestion} 
-                        disabled={selectedOption === null}
-                        className="bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-all"
-                    >
-                        {currentQIndex === questions.length - 1 ? "Finish" : "Next"} <ChevronRight className="w-4 h-4" />
-                    </button>
-                 </div>
-            </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const StudyHub: React.FC = () => {
-  const { markTopicMastered, incrementStudyHours } = useProgress();
-  const [activeTab, setActiveTab] = useState<'materials' | 'plan' | 'flashcards'>('materials');
-  const [selectedSubject, setSelectedSubject] = useState<Subject>(Subject.LegalAptitude);
-  const [expandedTopicIndex, setExpandedTopicIndex] = useState<number | null>(null);
-  const [showQuickBytes, setShowQuickBytes] = useState(false);
-  const [showMatchGame, setShowMatchGame] = useState(false);
-  const [weakAreas, setWeakAreas] = useState('');
-  const [hoursPerDay, setHoursPerDay] = useState('4');
-  const [studyPlan, setStudyPlan] = useState<string | null>(null);
-  const [loadingPlan, setLoadingPlan] = useState(false);
-  const [cardFilter, setCardFilter] = useState<'All' | 'Maxim' | 'Case' | 'Difficult'>('All');
-  const [difficultCardIds, setDifficultCardIds] = useState<number[]>([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
-  
-  // Search State
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // AI Interaction States
-  const [explainModalData, setExplainModalData] = useState<{concept: string, subject: string} | null>(null);
-  const [quizModalData, setQuizModalData] = useState<{topic: string, subject: string} | null>(null);
-
-  const topics = studyContentPlaceholder[selectedSubject] || [];
-  
-  // Filtering Logic
-  const filteredTopics = topics.filter(topic => {
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-        topic.title.toLowerCase().includes(query) ||
-        topic.summary.toLowerCase().includes(query) ||
-        topic.keyPoints.some(kp => kp.toLowerCase().includes(query))
-    );
-  });
-
-  useEffect(() => {
-    const savedCards = localStorage.getItem('lawranker_flashcards_difficult');
-    if (savedCards) setDifficultCardIds(JSON.parse(savedCards));
-    const savedNotes = localStorage.getItem('lawranker_user_notes');
-    if (savedNotes) setNotes(JSON.parse(savedNotes));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('lawranker_flashcards_difficult', JSON.stringify(difficultCardIds));
-  }, [difficultCardIds]);
-
-  useEffect(() => {
-    localStorage.setItem('lawranker_user_notes', JSON.stringify(notes));
-  }, [notes]);
-
-  const handleGeneratePlan = async () => {
-    setLoadingPlan(true);
-    const plan = await generateStudyPlan(weakAreas, hoursPerDay);
-    setStudyPlan(plan);
-    setLoadingPlan(false);
-  };
-
-  const toggleTopic = (index: number) => {
-    if (expandedTopicIndex === index) {
-      setExpandedTopicIndex(null);
-    } else {
-      setExpandedTopicIndex(index);
-      incrementStudyHours(0.1); 
-    }
-  };
-
-  const filteredCards = flashcardsData.filter(c => {
-    if (cardFilter === 'Difficult') return difficultCardIds.includes(c.id);
-    return cardFilter === 'All' || (c as any).type === cardFilter;
-  });
-  const currentCard = filteredCards[currentCardIndex];
-
-  const toggleDifficult = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDifficultCardIds(prev => prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]);
-  };
-
-  const updateNote = (noteId: string, content: string) => {
-    setNotes(prev => ({ ...prev, [noteId]: content }));
-  };
-
-  return (
-    <div className="h-full flex flex-col relative">
-      {/* Modals */}
-      {showQuickBytes && <QuickBytesView onClose={() => setShowQuickBytes(false)} />}
-      {showMatchGame && <MatchGame pairs={MATCH_PAIRS} onClose={() => setShowMatchGame(false)} />}
-      {explainModalData && <ExplainModal concept={explainModalData.concept} subject={explainModalData.subject} onClose={() => setExplainModalData(null)} />}
-      {quizModalData && <TopicQuizModal topic={quizModalData.topic} subject={quizModalData.subject} onClose={() => setQuizModalData(null)} />}
-
-      <header className="flex flex-col gap-6 mb-6 shrink-0">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Study Hub</h2>
-            <p className="text-gray-500 dark:text-gray-400">Master concepts with AI support.</p>
-          </div>
-        </div>
-        
-        <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto no-scrollbar" aria-label="Tabs">
-            {[
-                { id: 'materials', label: 'Study Materials', icon: BookOpen },
-                { id: 'flashcards', label: 'Flashcards', icon: RotateCw },
-                { id: 'plan', label: 'Rank 1 Plan', icon: Target }
-            ].map((tab) => {
-                const isActive = activeTab === tab.id;
-                const Icon = tab.icon;
-                return (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
-                        className={`
-                        group inline-flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-all whitespace-nowrap
-                        ${isActive
-                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600'
-                        }
-                        `}
-                    >
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 group-hover:text-gray-500'}`} />
-                        {tab.label}
-                    </button>
-                );
-            })}
-            </nav>
-        </div>
-      </header>
-
-      {activeTab === 'materials' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1 h-full overflow-hidden">
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-3 overflow-y-auto max-h-[200px] lg:max-h-full pr-2">
-            {subjects.map((sub) => (
-              <button
-                key={sub.id}
-                onClick={() => setSelectedSubject(sub.id)}
-                className={`w-full text-left p-4 rounded-xl transition-all flex items-center gap-3 ${selectedSubject === sub.id ? 'bg-white dark:bg-gray-800 shadow-md border-l-4 border-indigo-600 ring-1 ring-indigo-50 dark:ring-gray-700' : 'bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 border border-transparent dark:border-gray-800'}`}
-              >
-                <div className={`p-2 rounded-lg ${sub.bg} ${sub.color}`}><sub.icon className="w-5 h-5" /></div>
-                <div>
-                  <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">{sub.id}</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 truncate w-32">{sub.desc}</p>
-                </div>
-              </button>
+              </div>
             ))}
           </div>
+        )}
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col overflow-hidden">
-            
-            {/* Sticky Search Header */}
-            <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 z-10">
-                <div className="flex gap-3">
-                    <div className="relative flex-1">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={`Search topics in ${selectedSubject}...`}
-                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-gray-700 rounded-xl leading-5 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all sm:text-sm"
-                        />
+        {/* VIEW: FLASHCARDS */}
+        {activeTab === 'cards' && (
+           <div className="h-full flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-800 animate-in fade-in">
+              <div className="w-full max-w-md h-[400px] perspective-1000 relative group cursor-pointer" onClick={() => setIsFlipped(!isFlipped)}>
+                 <div className={`w-full h-full transition-all duration-500 preserve-3d relative ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
+                    {/* Front */}
+                    <div className="absolute inset-0 backface-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border-2 border-indigo-100 dark:border-gray-700 flex flex-col items-center justify-center p-8 text-center">
+                       <span className="absolute top-6 right-6 text-xs font-bold text-gray-400">Card {cardIndex + 1}/{REELS_DATA.length}</span>
+                       <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-bold uppercase mb-6">{REELS_DATA[cardIndex].type}</span>
+                       <h3 className="text-2xl font-bold text-gray-800 dark:text-white leading-relaxed">{REELS_DATA[cardIndex].text}</h3>
+                       <p className="absolute bottom-6 text-gray-400 text-xs flex items-center gap-2"><RotateCw className="w-3 h-3" /> Tap to flip</p>
                     </div>
-                    <button
-                        onClick={() => setShowQuickBytes(true)}
-                        className="flex-shrink-0 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white p-3 rounded-xl shadow-lg shadow-pink-500/20 transition-all flex items-center gap-2 font-bold"
-                        title="Open Quick Bytes"
-                    >
-                        <Zap className="w-5 h-5" />
-                        <span className="hidden sm:inline">Quick Bytes</span>
-                    </button>
+                    {/* Back */}
+                    <div className="absolute inset-0 backface-hidden bg-indigo-600 rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 text-center" style={{ transform: 'rotateY(180deg)' }}>
+                       <p className="text-xl text-white font-medium leading-relaxed">{REELS_DATA[cardIndex].subText}</p>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="flex gap-4 mt-8">
+                 <button onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => prev > 0 ? prev - 1 : REELS_DATA.length - 1), 200) }} className="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg text-indigo-600 dark:text-white hover:scale-110 transition-transform">
+                    <ChevronLeft className="w-6 h-6" />
+                 </button>
+                 <button onClick={() => { setIsFlipped(false); setTimeout(() => setCardIndex(prev => (prev + 1) % REELS_DATA.length), 200) }} className="p-4 bg-white dark:bg-gray-700 rounded-full shadow-lg text-indigo-600 dark:text-white hover:scale-110 transition-transform">
+                    <ChevronRight className="w-6 h-6" />
+                 </button>
+              </div>
+           </div>
+        )}
+
+        {/* VIEW: QUIZ */}
+        {activeTab === 'quiz' && (
+          <div className="h-full flex flex-col p-4 animate-in fade-in">
+             {!activeQuiz ? (
+               <div className="grid gap-4">
+                 {QUIZZES.map(q => (
+                   <button 
+                    key={q.id}
+                    onClick={() => setActiveQuiz(q)}
+                    className="flex items-center justify-between p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:border-indigo-500 transition-colors text-left"
+                   >
+                     <div className="flex items-center gap-4">
+                        <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
+                          <Brain className="w-6 h-6" />
+                        </div>
+                        <div>
+                           <h3 className="font-bold text-gray-800 dark:text-white text-lg">{q.title}</h3>
+                           <p className="text-sm text-gray-500 dark:text-gray-400">{q.questions.length} Questions • {q.subject}</p>
+                        </div>
+                     </div>
+                     <ChevronRight className="w-5 h-5 text-gray-400" />
+                   </button>
+                 ))}
+               </div>
+             ) : activeQuiz && !quizState.finished ? (
+                <div className="flex-1 flex flex-col max-w-xl mx-auto w-full">
+                   <div className="flex justify-between items-center mb-8">
+                      <button onClick={resetQuiz}><X className="w-6 h-6 text-gray-400" /></button>
+                      <span className="font-bold text-indigo-600">{quizState.idx + 1}/{activeQuiz.questions.length}</span>
+                   </div>
+                   
+                   <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-8 leading-snug">
+                        {activeQuiz.questions[quizState.idx].q}
+                      </h3>
+                      <div className="space-y-3">
+                        {activeQuiz.questions[quizState.idx].options.map((opt, i) => {
+                          const isSelected = quizState.selected === i;
+                          const isCorrect = i === activeQuiz.questions[quizState.idx].correct;
+                          let btnClass = "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50";
+                          
+                          if (quizState.selected !== null) {
+                             if (isCorrect) btnClass = "bg-green-100 dark:bg-green-900/30 border-green-500 text-green-700 dark:text-green-300";
+                             else if (isSelected) btnClass = "bg-red-100 dark:bg-red-900/30 border-red-500 text-red-700 dark:text-red-300";
+                             else btnClass = "opacity-50";
+                          }
+
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => handleQuizOption(i)}
+                              disabled={quizState.selected !== null}
+                              className={`w-full p-4 rounded-xl border-2 text-left font-medium transition-all ${btnClass}`}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      
+                      {quizState.selected !== null && (
+                        <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl text-indigo-800 dark:text-indigo-200 text-sm animate-in fade-in">
+                          <span className="font-bold">Explanation:</span> {activeQuiz.questions[quizState.idx].explanation}
+                        </div>
+                      )}
+                   </div>
+
+                   <button 
+                    onClick={nextQuestion}
+                    disabled={quizState.selected === null}
+                    className="mt-6 w-full py-4 bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-lg"
+                   >
+                     {quizState.idx === activeQuiz.questions.length - 1 ? 'Finish' : 'Next Question'}
+                   </button>
                 </div>
-            </div>
-
-            {/* Scrollable List */}
-            <div className="p-6 overflow-y-auto flex-1">
-                {filteredTopics.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400 py-12">
-                        {searchQuery ? (
-                             <>
-                                <Search className="w-16 h-16 mb-4 opacity-20" />
-                                <p>No topics found matching "{searchQuery}".</p>
-                                <button onClick={() => setSearchQuery('')} className="mt-2 text-indigo-500 hover:underline">Clear Search</button>
-                             </>
-                        ) : (
-                            <>
-                                <BookOpen className="w-16 h-16 mb-4 opacity-20" />
-                                <p>Select a subject to view topics.</p>
-                            </>
-                        )}
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                    {filteredTopics.map((topic: DetailedTopic, index: number) => {
-                        const noteId = `${selectedSubject}-${index}`;
-                        return (
-                        <div key={index} className={`border rounded-xl transition-all duration-300 ${expandedTopicIndex === index ? 'border-indigo-200 dark:border-indigo-800 shadow-lg bg-white dark:bg-gray-800 ring-1 ring-indigo-50 dark:ring-indigo-900/30' : 'border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 hover:border-indigo-200'}`}>
-                        <button onClick={() => toggleTopic(index)} className="w-full flex items-center justify-between p-5 text-left group">
-                            <div className="flex items-center gap-4">
-                            <span className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm transition-colors ${expandedTopicIndex === index ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-600'}`}>{index + 1}</span>
-                            <div>
-                                <h4 className={`font-bold text-lg ${expandedTopicIndex === index ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-800 dark:text-gray-200'}`}>{topic.title}</h4>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1"><Clock className="w-3 h-3" /> {topic.readTime} Read</p>
-                            </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                                {selectedSubject === Subject.LegalAptitude && (
-                                    <div 
-                                        role="button"
-                                        tabIndex={0}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setExplainModalData({ concept: topic.title, subject: selectedSubject });
-                                        }}
-                                        className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-xs font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all mr-2 z-10"
-                                    >
-                                        <Sparkles className="w-3 h-3" />
-                                        Explain Concept
-                                    </div>
-                                )}
-                                {expandedTopicIndex === index ? <ChevronUp className="w-5 h-5 text-indigo-600" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
-                            </div>
-                        </button>
-
-                        {expandedTopicIndex === index && (
-                            <div className="p-5 pt-0 pl-4 md:pl-[4.5rem] animate-in fade-in slide-in-from-top-2">
-                            <div className="bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-lg mb-6 border border-indigo-100 dark:border-indigo-900/20">
-                                 <div className="flex justify-between items-start gap-4">
-                                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm md:text-base">{topic.summary}</p>
-                                    <button 
-                                        onClick={() => setExplainModalData({ concept: topic.title, subject: selectedSubject })}
-                                        className="flex-shrink-0 bg-white dark:bg-gray-700 shadow-sm border border-indigo-100 dark:border-gray-600 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-300 flex items-center gap-1 hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors"
-                                    >
-                                        <Sparkles className="w-3 h-3" /> Explain Concept
-                                    </button>
-                                 </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><Target className="w-4 h-4 text-indigo-500" /> Key Concepts</h5>
-                                    <ul className="space-y-2">
-                                        {topic.keyPoints?.map((kp: string, i: number) => (
-                                            <li key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2 group cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                                                onClick={() => setExplainModalData({ concept: kp, subject: selectedSubject })}
-                                            >
-                                                <span className="w-1.5 h-1.5 bg-indigo-300 rounded-full mt-1.5 group-hover:bg-indigo-500 transition-colors"></span>
-                                                {kp}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                {topic.casesOrExamples && (
-                                    <div>
-                                        <h5 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2"><GavelIcon /> Cases & Examples</h5>
-                                        <div className="space-y-2">
-                                            {topic.casesOrExamples.map((ce, i) => (
-                                                <div key={i} className="bg-gray-50 dark:bg-gray-700/50 p-2.5 rounded-lg border border-gray-100 dark:border-gray-700">
-                                                    <p className="text-xs font-bold text-gray-800 dark:text-gray-200">{ce.title}</p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{ce.desc}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {topic.proTip && (
-                                <div className="mb-6 flex gap-3 items-start bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
-                                    <Lightbulb className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
-                                    <div>
-                                        <span className="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase tracking-wide">Rank 1 Tip</span>
-                                        <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-0.5">{topic.proTip}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-t border-gray-100 dark:border-gray-700 pt-5">
-                                <button onClick={() => setShowMatchGame(true)} className="bg-gray-50 hover:bg-white border hover:border-indigo-200 dark:bg-gray-700/50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group">
-                                    <Gamepad2 className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" /> Match Terms
-                                </button>
-                                <button onClick={() => setQuizModalData({ topic: topic.title, subject: selectedSubject })} className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
-                                    <Brain className="w-5 h-5 group-hover:scale-110 transition-transform" /> Take Quiz
-                                </button>
-                                <button onClick={() => markTopicMastered()} className="bg-green-50 hover:bg-green-100 border border-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:border-green-800 text-green-700 dark:text-green-300 p-3 rounded-xl text-xs font-bold flex flex-col items-center gap-2 transition-all group shadow-sm">
-                                    <Check className="w-5 h-5 group-hover:scale-110 transition-transform" /> Mark Done
-                                </button>
-                            </div>
-                            
-                            {/* Notes Section */}
-                            <div className="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
-                                <button 
-                                    onClick={() => setActiveNoteId(activeNoteId === noteId ? null : noteId)}
-                                    className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400 transition-colors"
-                                >
-                                    <PenLine className="w-4 h-4" />
-                                    {notes[noteId] ? 'Edit My Notes' : 'Add Personal Note'}
-                                </button>
-                                
-                                {activeNoteId === noteId && (
-                                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 relative">
-                                    <textarea
-                                        value={notes[noteId] || ''}
-                                        onChange={(e) => updateNote(noteId, e.target.value)}
-                                        className="w-full p-4 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 focus:border-indigo-300 outline-none min-h-[120px] bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 shadow-inner resize-none"
-                                        placeholder="Jot down your understanding..."
-                                    />
-                                    <div className="absolute bottom-3 right-3 flex items-center gap-1 pointer-events-none transition-opacity opacity-50">
-                                        <Save className="w-3 h-3 text-gray-400" />
-                                        <span className="text-[10px] text-gray-400">Auto-saved</span>
-                                    </div>
-                                    </div>
-                                )}
-                                </div>
-                            </div>
-                        )}
-                        </div>
-                    );})}
-                    </div>
-                )}
-            </div>
-          </div>
-        </div>
-      ) : activeTab === 'plan' ? (
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
-             {!studyPlan ? (
-                 <div className="text-center max-w-md mx-auto mt-10">
-                    <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <GraduationCap className="w-10 h-10 text-indigo-600 dark:text-indigo-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white">Personalized Rank 1 Blueprint</h3>
-                    <p className="text-gray-500 mb-6">AI-generated strategy tailored to your weak areas.</p>
-                    
-                    <div className="space-y-4 text-left">
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Focus Areas</label>
-                            <input value={weakAreas} onChange={(e) => setWeakAreas(e.target.value)} placeholder="e.g. Torts, Math" className="w-full p-3 border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
-                        </div>
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 uppercase ml-1">Daily Commitment</label>
-                            <select value={hoursPerDay} onChange={(e) => setHoursPerDay(e.target.value)} className="w-full p-3 border dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                                <option value="2">2 Hours (Working Pro)</option>
-                                <option value="4">4 Hours (Student)</option>
-                                <option value="6">6 Hours (Serious)</option>
-                                <option value="8">8+ Hours (Rank 1 Mode)</option>
-                            </select>
-                        </div>
-                        <button onClick={handleGeneratePlan} disabled={loadingPlan} className="bg-indigo-600 hover:bg-indigo-700 text-white w-full py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all mt-4 flex items-center justify-center gap-2">
-                            {loadingPlan ? <><div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> Generating...</> : "Generate Blueprint"}
-                        </button>
-                    </div>
-                 </div>
              ) : (
-                 <div className="animate-in fade-in">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-bold text-gray-800 dark:text-white">Your Strategy</h3>
-                        <button onClick={() => setStudyPlan(null)} className="text-sm text-indigo-600 font-bold hover:underline">Reset Plan</button>
-                    </div>
-                    <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <div className="whitespace-pre-wrap">{studyPlan}</div>
-                    </div>
-                 </div>
+                <div className="flex-1 flex flex-col items-center justify-center text-center">
+                   <Trophy className="w-24 h-24 text-yellow-400 mb-6" />
+                   <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Quiz Complete!</h2>
+                   <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">You scored {quizState.score} out of {activeQuiz.questions.length}</p>
+                   <button onClick={resetQuiz} className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg">Back to Quizzes</button>
+                </div>
              )}
-        </div>
-      ) : (
-        // Flashcard UI 
-        <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-xl p-4 md:p-8 flex flex-col items-center justify-center min-h-[600px]">
-             {/* Implementation matches previous, just updating container styles */}
-             <div className="max-w-2xl w-full flex flex-col gap-6">
-                 {/* Filter */}
-                 <div className="flex justify-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mx-auto flex-wrap">
-                    {['All', 'Maxim', 'Case', 'Difficult'].map((type) => (
-                        <button
-                        key={type}
-                        onClick={() => setCardFilter(type as any)}
-                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all flex items-center gap-2 ${cardFilter === type ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-                        >
-                           {type === 'Difficult' && <Star className="w-3 h-3 fill-current" />}
-                           {type}
-                        </button>
-                    ))}
-                 </div>
-                 {/* Card */}
-                 {filteredCards.length > 0 ? (
-                    <div className="relative perspective-1000 w-full h-80 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
-                         <div className={`relative w-full h-full text-center transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`} style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}>
-                             {/* Front */}
-                             <div className="absolute w-full h-full backface-hidden bg-white dark:bg-gray-800 border-2 border-indigo-100 dark:border-gray-700 rounded-3xl shadow-xl flex flex-col items-center justify-center p-8 hover:border-indigo-300 transition-colors">
-                                 <button onClick={(e) => toggleDifficult(currentCard.id, e)} className="absolute top-6 left-6 z-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"><Star className={`w-6 h-6 ${difficultCardIds.includes(currentCard.id) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'}`} /></button>
-                                 <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full text-xs font-bold mb-6 uppercase tracking-wider">{(currentCard as any).type}</span>
-                                 <h3 className="text-2xl md:text-4xl font-bold text-gray-800 dark:text-white mb-4 leading-tight">{currentCard.front}</h3>
-                                 <p className="text-sm text-gray-400 absolute bottom-6 flex items-center gap-2"><RotateCw className="w-3 h-3" /> Click to flip</p>
-                             </div>
-                             {/* Back */}
-                             <div className="absolute w-full h-full backface-hidden bg-gradient-to-br from-indigo-600 to-indigo-800 dark:from-indigo-900 dark:to-gray-900 text-white rounded-3xl shadow-xl flex flex-col items-center justify-center p-8" style={{ transform: 'rotateY(180deg)' }}>
-                                 <p className="text-xl md:text-2xl font-medium leading-relaxed">{currentCard.back}</p>
-                             </div>
-                         </div>
-                    </div>
-                 ) : (
-                     <div className="text-center text-gray-500 dark:text-gray-400 py-20 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">No cards found matching this filter.</div>
-                 )}
-                 {/* Controls */}
-                 {filteredCards.length > 0 && (
-                    <div className="flex items-center justify-between text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                        <button onClick={() => {setIsFlipped(false); setTimeout(()=>setCurrentCardIndex(p=>(p-1+filteredCards.length)%filteredCards.length), 200)}} className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"><ChevronLeft className="w-6 h-6" /></button>
-                        <span className="font-bold font-mono text-lg">{currentCardIndex+1} / {filteredCards.length}</span>
-                        <button onClick={() => {setIsFlipped(false); setTimeout(()=>setCurrentCardIndex(p=>(p+1)%filteredCards.length), 200)}} className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"><ChevronRight className="w-6 h-6" /></button>
-                    </div>
-                 )}
-             </div>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
+
+      {/* --- BOTTOM NAVIGATION BAR --- */}
+      <div className="flex-shrink-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 py-2 flex justify-between items-center z-10 safe-area-bottom">
+         {[
+           { id: 'learn', label: 'Learn', icon: BookOpen },
+           { id: 'reels', label: 'Reels', icon: PlayCircle },
+           { id: 'cards', label: 'Cards', icon: Layers },
+           { id: 'quiz', label: 'Quiz', icon: Trophy }
+         ].map((nav) => (
+           <button
+             key={nav.id}
+             onClick={() => { setActiveTab(nav.id as ViewMode); setReadTopic(null); }}
+             className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-all duration-300 ${
+               activeTab === nav.id ? 'text-indigo-600 dark:text-indigo-400 -translate-y-1' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+             }`}
+           >
+             <nav.icon className={`w-6 h-6 ${activeTab === nav.id ? 'fill-current' : ''}`} />
+             <span className="text-[10px] font-bold">{nav.label}</span>
+           </button>
+         ))}
+      </div>
+
     </div>
   );
 };
