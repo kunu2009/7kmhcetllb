@@ -155,14 +155,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      <main className="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 mr-16 md:mr-0">
         {/* Mobile Header Title (since nav is on right now) */}
         <div className="md:hidden p-4 pb-0 flex items-center gap-2">
             <GraduationCap className="w-6 h-6 text-indigo-600 dark:text-yellow-400" />
             <span className="font-bold text-lg text-indigo-900 dark:text-white">LawRanker</span>
         </div>
         
-        <div className="p-4 md:p-8 pb-24 md:pb-8 max-w-7xl mx-auto h-full">
+        <div className="p-4 md:p-8 pb-8 max-w-7xl mx-auto h-full">
           {children}
         </div>
       </main>
