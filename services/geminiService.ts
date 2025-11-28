@@ -112,13 +112,13 @@ export const generateQuestion = async (subject: string, difficulty: string = 'Me
 };
 
 /**
- * Generates a quick 3-question quiz for a specific topic.
+ * Generates a quick 5-question quiz for a specific topic.
  */
 export const generateTopicQuiz = async (topic: string, subject: string): Promise<any[]> => {
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: `Generate 3 multiple-choice questions specifically about "${topic}" for ${subject} (MHCET Law).
+      contents: `Generate 5 multiple-choice questions specifically about "${topic}" for ${subject} (MHCET Law).
       
       Return ONLY raw JSON (no markdown formatting) as an array of objects with fields: 
       - question (string)

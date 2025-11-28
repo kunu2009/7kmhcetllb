@@ -10,6 +10,13 @@ import { generateStudyPlan, explainConcept, generateTopicQuiz } from '../service
 import { useProgress } from '../context/ProgressContext';
 
 // --- Types & Data ---
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
 interface DetailedTopic {
   title: string;
   readTime: string;
@@ -19,6 +26,7 @@ interface DetailedTopic {
   proTip?: string;
   quickBytes?: { text: string, color: string }[];
   matchPairs?: { id: string, left: string, right: string }[];
+  quiz?: QuizQuestion[];
 }
 
 const GavelIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m14 13-7.5 7.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L11 10"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>;
@@ -89,7 +97,39 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
             {title: 'Maneka Gandhi v Union of India', desc: 'Expanded Art 21 (Right to Life) to include Due Process.'},
             {title: 'Puttaswamy Case', desc: 'Right to Privacy is a fundamental right.'}
         ], 
-        proTip: 'Memorize the writs: Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto.' 
+        proTip: 'Memorize the writs: Habeas Corpus, Mandamus, Prohibition, Certiorari, Quo Warranto.',
+        quiz: [
+          {
+            question: "The 'Doctrine of Basic Structure' was propounded by the Supreme Court in which landmark case?",
+            options: ["Golaknath v. State of Punjab", "Kesavananda Bharati v. State of Kerala", "Minerva Mills v. Union of India", "Maneka Gandhi v. Union of India"],
+            correctIndex: 1,
+            explanation: "In Kesavananda Bharati (1973), the SC held that Parliament cannot alter the 'Basic Structure' of the Constitution."
+          },
+          {
+            question: "Which Article of the Indian Constitution is described by Dr. B.R. Ambedkar as the 'Heart and Soul' of the Constitution?",
+            options: ["Article 14", "Article 19", "Article 21", "Article 32"],
+            correctIndex: 3,
+            explanation: "Article 32 provides the Right to Constitutional Remedies, allowing citizens to approach the SC for enforcement of Fundamental Rights."
+          },
+          {
+            question: "The writ of 'Habeas Corpus' literally means:",
+            options: ["To have the body of", "We Command", "By what authority", "To be certified"],
+            correctIndex: 0,
+            explanation: "Habeas Corpus is a Latin term meaning 'to have the body'. It is a bulwark against illegal detention."
+          },
+          {
+            question: "Fundamental Duties were incorporated in the Indian Constitution by which Amendment Act?",
+            options: ["42nd Amendment Act", "44th Amendment Act", "86th Amendment Act", "73rd Amendment Act"],
+            correctIndex: 0,
+            explanation: "The 42nd Amendment Act, 1976 (Mini Constitution) added Part IVA (Article 51A) on the recommendation of the Swaran Singh Committee."
+          },
+          {
+            question: "Protection against double jeopardy is provided under which Article?",
+            options: ["Article 20(1)", "Article 20(2)", "Article 20(3)", "Article 21"],
+            correctIndex: 1,
+            explanation: "Article 20(2) states that no person shall be prosecuted and punished for the same offence more than once."
+          }
+        ]
     },
     {
         title: "Indian Constitution: DPSP & Duties",
@@ -367,7 +407,7 @@ const studyContentPlaceholder: Record<Subject, DetailedTopic[]> = {
     },
     {
         title: "Grammar: Tenses",
-        readTime: "25m",
+        readTime: "25m", 
         summary: "Correct usage of time in sentences.",
         keyPoints: [
             "Simple Present: Habitual action.",
@@ -672,6 +712,17 @@ const TopicQuizModal: React.FC<{ topic: string; subject: string; onClose: () => 
 
   useEffect(() => {
     const loadQuiz = async () => {
+      // Check for preloaded quiz first to avoid API call
+      const subjectTopics = studyContentPlaceholder[subject as Subject];
+      const foundTopic = subjectTopics?.find(t => t.title === topic);
+      
+      if (foundTopic?.quiz && foundTopic.quiz.length > 0) {
+        setQuestions(foundTopic.quiz);
+        setLoading(false);
+        return;
+      }
+
+      // If no preloaded quiz, generate via AI
       const qs = await generateTopicQuiz(topic, subject);
       if (qs && qs.length > 0) {
         setQuestions(qs);
