@@ -5,7 +5,7 @@ import {
   X, Star, Share2, Bookmark, CheckCircle2, RotateCw, 
   Trophy, ArrowRight, PlayCircle, Clock, Filter, Search,
   GraduationCap, Smartphone, HelpCircle, Lightbulb,
-  Globe, Calendar, ExternalLink, Newspaper
+  Globe, Calendar, ExternalLink, Newspaper, SlidersHorizontal
 } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 import { fetchCurrentAffairs, SearchResult, Source } from '../services/geminiService';
@@ -29,6 +29,7 @@ interface StudyTopic {
     statutes?: { section: string; desc: string }[];
     example?: string;
   };
+  quiz?: any[]; // Preloaded quiz questions
 }
 
 interface Reel {
@@ -152,7 +153,14 @@ const STATIC_TOPICS: StudyTopic[] = [
         { name: 'Kesavananda Bharati v State of Kerala', ruling: 'Preamble IS a part of the Constitution and can be amended subject to Basic Structure.' },
         { name: 'Berubari Union Case', ruling: 'Earlier view: Preamble is NOT part of Constitution (Overruled).' }
       ]
-    }
+    },
+    quiz: [
+      { question: "Which case held Preamble is part of Constitution?", options: ["Berubari", "Kesavananda Bharati", "Golaknath", "Minerva Mills"], correctIndex: 1, explanation: "Kesavananda Bharati overruled Berubari." },
+      { question: "Which word was added by 42nd Amendment?", options: ["Republic", "Democratic", "Secular", "Liberty"], correctIndex: 2, explanation: "Socialist, Secular, Integrity were added." },
+      { question: "Preamble secures how many types of Justice?", options: ["2", "3", "4", "5"], correctIndex: 1, explanation: "Social, Economic, and Political (3)." },
+      { question: "Who called Preamble the 'Identity Card'?", options: ["N.A. Palkhivala", "Ambedkar", "Nehru", "Patel"], correctIndex: 0, explanation: "N.A. Palkhivala." },
+      { question: "Idea of Liberty, Equality, Fraternity taken from?", options: ["US", "Russian", "French", "Irish"], correctIndex: 2, explanation: "French Revolution." }
+    ]
   },
   {
     id: 'la-4',
@@ -545,6 +553,11 @@ const StudyHub = () => {
   const [readTopic, setReadTopic] = useState<StudyTopic | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Filtering States
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterDifficulty, setFilterDifficulty] = useState<'All' | 'Easy' | 'Medium' | 'Hard'>('All');
+  const [filterTime, setFilterTime] = useState<'All' | 'Short' | 'Long'>('All'); // Short < 15m, Long >= 15m
+
   // Reels State
   const reelsRef = useRef<HTMLDivElement>(null);
   
@@ -564,15 +577,27 @@ const StudyHub = () => {
 
   const availableSubjects = course === '5-Year' ? SUBJECTS_5YR : SUBJECTS_3YR;
 
-  // Filter topics based on course and active subject
+  // Filter topics based on course, active subject, and filters
   const filteredTopics = STATIC_TOPICS
     .filter(t => t.subject === activeSubject)
-    .filter(t => 
-      searchTerm === '' || 
+    .filter(t => {
+      // 1. Text Search
+      const matchesSearch = searchTerm === '' || 
       t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
       t.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      t.content.keyPoints.some(kp => kp.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+      t.content.keyPoints.some(kp => kp.toLowerCase().includes(searchTerm.toLowerCase()));
+
+      // 2. Difficulty Filter
+      const matchesDifficulty = filterDifficulty === 'All' || t.difficulty === filterDifficulty;
+
+      // 3. Time Filter
+      let matchesTime = true;
+      const minutes = parseInt(t.readTime.replace('m', ''));
+      if (filterTime === 'Short') matchesTime = minutes < 15;
+      if (filterTime === 'Long') matchesTime = minutes >= 15;
+
+      return matchesSearch && matchesDifficulty && matchesTime;
+    });
 
   const handleQuizOption = (optIdx: number) => {
     if (quizState.selected !== null) return;
@@ -634,8 +659,8 @@ const StudyHub = () => {
         {/* VIEW: LEARN (Library) */}
         {activeTab === 'learn' && !readTopic && (
           <div className="h-full flex flex-col animate-in fade-in">
-             {/* Search Bar */}
-             <div className="p-4 pb-2">
+             {/* Search Bar & Filters */}
+             <div className="p-4 pb-2 bg-white dark:bg-gray-900 z-20">
                <div className="flex gap-2">
                  <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -647,6 +672,14 @@ const StudyHub = () => {
                       className="w-full bg-gray-50 dark:bg-gray-800 pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                  </div>
+                 {/* Filter Toggle */}
+                 <button 
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`p-2.5 rounded-xl transition-colors shadow-sm flex items-center gap-2 border ${showFilters || filterDifficulty !== 'All' || filterTime !== 'All' ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'}`}
+                  title="Filter Topics"
+                 >
+                   <SlidersHorizontal className="w-5 h-5" />
+                 </button>
                  {/* Quick Bytes Access */}
                  <button 
                   onClick={() => setActiveTab('reels')}
@@ -656,6 +689,46 @@ const StudyHub = () => {
                    <PlayCircle className="w-5 h-5" />
                  </button>
                </div>
+               
+               {/* Expanded Filters */}
+               {showFilters && (
+                 <div className="mt-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2 duration-200">
+                    <div className="space-y-3">
+                       <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+                          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Difficulty:</span>
+                          {(['All', 'Easy', 'Medium', 'Hard'] as const).map(diff => (
+                             <button
+                               key={diff}
+                               onClick={() => setFilterDifficulty(diff)}
+                               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                                 filterDifficulty === diff 
+                                 ? 'bg-indigo-600 text-white border-indigo-600' 
+                                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+                               }`}
+                             >
+                               {diff}
+                             </button>
+                          ))}
+                       </div>
+                       <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+                          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Duration:</span>
+                          {(['All', 'Short', 'Long'] as const).map(time => (
+                             <button
+                               key={time}
+                               onClick={() => setFilterTime(time)}
+                               className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                                 filterTime === time
+                                 ? 'bg-indigo-600 text-white border-indigo-600' 
+                                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+                               }`}
+                             >
+                               {time === 'Short' ? 'Quick (<15m)' : time === 'Long' ? 'Deep Dive (15m+)' : 'Any Time'}
+                             </button>
+                          ))}
+                       </div>
+                    </div>
+                 </div>
+               )}
              </div>
 
              {/* Subject Tabs */}
@@ -684,8 +757,14 @@ const StudyHub = () => {
                
                {filteredTopics.length === 0 ? (
                  <div className="text-center py-10 text-gray-400">
-                   <Search className="w-12 h-12 mx-auto mb-3 opacity-20" />
-                   <p>{searchTerm ? 'No matches found.' : 'Content coming soon for this section.'}</p>
+                   <Filter className="w-12 h-12 mx-auto mb-3 opacity-20" />
+                   <p>{searchTerm || filterDifficulty !== 'All' || filterTime !== 'All' ? 'No matching topics found.' : 'Content coming soon for this section.'}</p>
+                   <button 
+                    onClick={() => { setSearchTerm(''); setFilterDifficulty('All'); setFilterTime('All'); }} 
+                    className="mt-2 text-indigo-500 text-sm font-medium hover:underline"
+                   >
+                     Clear filters
+                   </button>
                  </div>
                ) : (
                  filteredTopics.map((topic) => (
