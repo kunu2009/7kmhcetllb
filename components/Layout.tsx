@@ -18,7 +18,8 @@ import {
   FileText,
   Layers,
   Zap,
-  CalendarDays
+  CalendarDays,
+  StickyNote
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -55,6 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/practice', label: 'Test Arena', icon: Swords },
     { path: '/daily', label: 'Daily Challenge', icon: Zap },
     { path: '/planner', label: 'Study Planner', icon: CalendarDays },
+    { path: '/notes', label: 'Quick Notes', icon: StickyNote },
     { path: '/pyq', label: 'PYQ Papers', icon: FileText },
     { path: '/flashcards', label: 'Flashcards', icon: Layers },
     { path: '/colleges', label: 'Colleges', icon: Building2 },
