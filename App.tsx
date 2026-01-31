@@ -9,6 +9,7 @@ import Analytics from './components/Analytics';
 import CollegeHub from './components/CollegeHub';
 import PreviousYearPapers from './components/PreviousYearPapers';
 import Flashcards from './components/Flashcards';
+import DailyPractice from './components/DailyPractice';
 import { ProgressProvider } from './context/ProgressContext';
 
 const App: React.FC = () => {
@@ -20,6 +21,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Dashboard />} />
             <Route path="/study" element={<StudyHub />} />
             <Route path="/practice" element={<TestArena />} />
+            <Route path="/daily" element={<DailyPractice />} />
             <Route path="/pyq" element={<PreviousYearPapers />} />
             <Route path="/flashcards" element={<Flashcards />} />
             <Route path="/colleges" element={<CollegeHub />} />

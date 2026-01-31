@@ -103,7 +103,12 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Quick Access Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Link to="/daily" className="bg-gradient-to-br from-yellow-500 to-amber-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Zap className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold">Daily Challenge</h3>
+          <p className="text-xs text-yellow-200">Build your streak!</p>
+        </Link>
         <Link to="/pyq" className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
           <FileText className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
           <h3 className="font-bold">PYQ Papers</h3>

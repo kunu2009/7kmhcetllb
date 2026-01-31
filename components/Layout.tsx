@@ -16,7 +16,8 @@ import {
   PanelLeftOpen,
   Building2,
   FileText,
-  Layers
+  Layers,
+  Zap
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -51,6 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/study', label: 'Study Hub', icon: BookOpen },
     { path: '/practice', label: 'Test Arena', icon: Swords },
+    { path: '/daily', label: 'Daily Challenge', icon: Zap },
     { path: '/pyq', label: 'PYQ Papers', icon: FileText },
     { path: '/flashcards', label: 'Flashcards', icon: Layers },
     { path: '/colleges', label: 'Colleges', icon: Building2 },
