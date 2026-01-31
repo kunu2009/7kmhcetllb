@@ -443,9 +443,10 @@ This app will be the **#1 MH CET Law preparation resource** in Maharashtra.
 | **Criminal Law (IPC/BNS)** | ✅ DONE | HIGH |
 | **Law of Torts** | ✅ DONE | HIGH |
 | **Family Law** | ✅ DONE | HIGH |
+| **Daily Practice Challenge** | ✅ DONE (25 questions, streak system) | HIGH |
+| **Study Planner** | ✅ DONE (AI-powered weekly schedule) | HIGH |
 | Mock Tests | 🟡 Basic Done | HIGH |
 | PWA Mode | 🔴 Not Started | LOW |
-| Study Planner AI | 🔴 Not Started | MEDIUM |
 
 ---
 
@@ -502,11 +503,27 @@ This app will be the **#1 MH CET Law preparation resource** in Maharashtra.
 - **Law of Torts Overview** (NEW)
 - **Family Law Essentials** (NEW)
 
+### ✅ Daily Practice Challenge
+- 25 questions covering all subjects
+- 10 questions per day rotating
+- 10-minute timer
+- Streak system with local storage
+- Score tracking & review mode
+
+### ✅ Study Planner
+- AI-powered weekly schedule generator
+- Customizable study hours (2-8h/day)
+- Weak area focus selection
+- Exam countdown integration
+- Pro tips for MH CET success
+
 ---
 
 **Total Study Topics: 22+ comprehensive chapters covering all MH CET Law syllabus areas!**
 
-**Next Step**: Add more previous year questions, implement Daily Practice Test, and AI Study Planner!
+**Total Features: 10+ major features implemented!**
+
+**Next Step**: Add more PYQ questions, implement PWA mode for offline access!
 
 🎯 *Target: Make every MH CET Law aspirant's journey smoother!*
 
