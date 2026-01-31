@@ -1,12 +1,32 @@
-import React, { useState } from 'react';
-import { TrendingUp, Award, Clock, AlertCircle, ChevronRight, CheckCircle2, Circle, Activity, BookOpen, Target, Zap, Trophy, BrainCircuit, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Award, Clock, AlertCircle, ChevronRight, CheckCircle2, Circle, Activity, BookOpen, Target, Zap, Trophy, BrainCircuit, Plus, Scale, FileText, Layers, Building2, Flame, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
+// Legal Maxims for "Maxim of the Day"
+const DAILY_MAXIMS = [
+  { latin: 'Actus non facit reum nisi mens sit rea', meaning: 'An act does not make one guilty unless the mind is also guilty', usage: 'Criminal Law - Both actus reus and mens rea needed' },
+  { latin: 'Ignorantia juris non excusat', meaning: 'Ignorance of law is no excuse', usage: 'Everyone is presumed to know the law' },
+  { latin: 'Ubi jus ibi remedium', meaning: 'Where there is a right, there is a remedy', usage: 'Foundation of legal remedies' },
+  { latin: 'Audi alteram partem', meaning: 'Hear the other side', usage: 'Natural Justice - No one condemned unheard' },
+  { latin: 'Volenti non fit injuria', meaning: 'To one who consents, no injury is done', usage: 'Defense in Law of Torts' },
+  { latin: 'Res ipsa loquitur', meaning: 'The thing speaks for itself', usage: 'Negligence - when accident itself proves negligence' },
+  { latin: 'Nemo judex in causa sua', meaning: 'No one can be judge in their own cause', usage: 'Principle of Natural Justice' },
+];
+
 const Dashboard: React.FC = () => {
   const { stats, todos, toggleTodo, addTodo } = useProgress();
   const [newGoal, setNewGoal] = useState('');
+  
+  // Get maxim of the day based on date
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+  const todaysMaxim = DAILY_MAXIMS[dayOfYear % DAILY_MAXIMS.length];
+
+  // Days until MH CET Law 2026 (assuming May 2026)
+  const examDate = new Date('2026-05-15');
+  const daysUntilExam = Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
   // Mock data for consistency chart
   const activityData = [
@@ -66,7 +86,7 @@ const Dashboard: React.FC = () => {
           { label: 'Accuracy', value: `${stats.accuracy}%`, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
           { label: 'Topics Mastered', value: stats.topicsMastered, icon: Award, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
           { label: 'Study Hours', value: `${stats.studyHours}h`, icon: Clock, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
-          { label: 'Focus Area', value: stats.weakArea, icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
+          { label: 'Days to Exam', value: daysUntilExam, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
             <div className="flex justify-between items-start">
@@ -80,6 +100,48 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Quick Access Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Link to="/pyq" className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <FileText className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold">PYQ Papers</h3>
+          <p className="text-xs text-purple-200">2023-2025 Papers</p>
+        </Link>
+        <Link to="/flashcards" className="bg-gradient-to-br from-amber-500 to-orange-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Layers className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold">Flashcards</h3>
+          <p className="text-xs text-amber-200">30+ Legal Cards</p>
+        </Link>
+        <Link to="/colleges" className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Building2 className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold">Colleges</h3>
+          <p className="text-xs text-emerald-200">Cutoff Predictor</p>
+        </Link>
+        <Link to="/mentor" className="bg-gradient-to-br from-rose-500 to-pink-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <BrainCircuit className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold">AI Mentor</h3>
+          <p className="text-xs text-rose-200">Ask Doubts</p>
+        </Link>
+      </div>
+
+      {/* Maxim of the Day */}
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black rounded-2xl p-6 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 opacity-10">
+          <Scale className="w-32 h-32 transform rotate-12" />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Flame className="w-5 h-5 text-amber-400" />
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Legal Maxim of the Day</span>
+          </div>
+          <h3 className="text-xl md:text-2xl font-bold italic mb-2">"{todaysMaxim.latin}"</h3>
+          <p className="text-slate-300 mb-2">{todaysMaxim.meaning}</p>
+          <p className="text-xs text-slate-400 flex items-center gap-1">
+            <BookOpen className="w-3 h-3" /> {todaysMaxim.usage}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
