@@ -436,6 +436,13 @@ This app will be the **#1 MH CET Law preparation resource** in Maharashtra.
 | Critical Reasoning | ✅ DONE | MEDIUM |
 | English Grammar | ✅ DONE | MEDIUM |
 | One-Word Substitutions | ✅ DONE | MEDIUM |
+| **Mathematics Topics** | ✅ DONE (6 chapters) | HIGH |
+| **Indian History** | ✅ DONE | MEDIUM |
+| **Indian Geography** | ✅ DONE | MEDIUM |
+| **Current Affairs 2025-26** | ✅ DONE | HIGH |
+| **Criminal Law (IPC/BNS)** | ✅ DONE | HIGH |
+| **Law of Torts** | ✅ DONE | HIGH |
+| **Family Law** | ✅ DONE | HIGH |
 | Mock Tests | 🟡 Basic Done | HIGH |
 | PWA Mode | 🔴 Not Started | LOW |
 | Study Planner AI | 🔴 Not Started | MEDIUM |
@@ -482,8 +489,22 @@ This app will be the **#1 MH CET Law preparation resource** in Maharashtra.
 - Critical Reasoning
 - English Grammar Rules
 - 50 One-Word Substitutions
+- **Percentages & Profit-Loss** (NEW)
+- **Ratio, Proportion & Partnership** (NEW)
+- **Time, Speed & Distance** (NEW)
+- **Indian History: Freedom Struggle** (NEW)
+- **Indian Geography** (NEW)
+- **Current Affairs 2025-26** (NEW)
+- **Simple & Compound Interest** (NEW)
+- **Time & Work** (NEW)
+- **Number System & LCM-HCF** (NEW)
+- **Criminal Law Basics (IPC/BNS)** (NEW)
+- **Law of Torts Overview** (NEW)
+- **Family Law Essentials** (NEW)
 
 ---
+
+**Total Study Topics: 22+ comprehensive chapters covering all MH CET Law syllabus areas!**
 
 **Next Step**: Add more previous year questions, implement Daily Practice Test, and AI Study Planner!
 

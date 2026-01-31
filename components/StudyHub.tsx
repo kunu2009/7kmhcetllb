@@ -873,6 +873,738 @@ If "A + B" means A is father of B:
 49. **Omniscient** - All-knowing
 50. **Omnipotent** - All-powerful
     `
+  },
+  
+  // MATHEMATICS TOPICS
+  {
+    id: 'math-1',
+    title: 'Percentages & Profit-Loss',
+    subject: Subject.Math,
+    difficulty: 'Easy',
+    readTime: 15,
+    summary: 'Fundamental concepts for commercial mathematics.',
+    tags: ['Mathematics', 'Commercial Math', 'Important'],
+    content: `
+# Percentages & Profit-Loss
+
+## Percentage Basics
+- Percent = Per Hundred
+- x% = x/100
+
+### Quick Conversions:
+| Fraction | Percentage |
+|----------|------------|
+| 1/2 | 50% |
+| 1/3 | 33.33% |
+| 1/4 | 25% |
+| 1/5 | 20% |
+| 1/6 | 16.67% |
+| 1/8 | 12.5% |
+| 1/10 | 10% |
+
+### Formulas:
+- Percentage Increase = (Change / Original) × 100
+- Percentage Decrease = (Decrease / Original) × 100
+
+## Profit and Loss
+
+### Key Terms:
+- **Cost Price (CP)** = Price at which goods are bought
+- **Selling Price (SP)** = Price at which goods are sold
+- **Profit** = SP - CP (when SP > CP)
+- **Loss** = CP - SP (when CP > SP)
+
+### Formulas:
+- Profit % = (Profit / CP) × 100
+- Loss % = (Loss / CP) × 100
+- SP = CP × (100 + Profit%)/100
+- SP = CP × (100 - Loss%)/100
+
+### Quick Tricks:
+- If profit is 20%, SP = 1.2 × CP
+- If loss is 10%, SP = 0.9 × CP
+- Marked Price (MP) and Discount: SP = MP × (100 - Discount%)/100
+
+## Example:
+An article bought for ₹500 is sold for ₹600.
+- Profit = 600 - 500 = ₹100
+- Profit % = (100/500) × 100 = 20%
+    `
+  },
+  {
+    id: 'math-2',
+    title: 'Ratio, Proportion & Partnership',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Essential for partnership and mixture problems.',
+    tags: ['Mathematics', 'Ratio', 'Important'],
+    content: `
+# Ratio, Proportion & Partnership
+
+## Ratio
+A ratio compares two quantities of the same unit.
+- Written as a:b or a/b
+- A ratio of 2:3 means for every 2 parts of A, there are 3 parts of B
+
+### Properties:
+- a:b = ka:kb (multiply both by same number)
+- a:b = a/k : b/k (divide both by same number)
+
+### Types:
+- **Duplicate Ratio** of a:b = a²:b²
+- **Triplicate Ratio** of a:b = a³:b³
+- **Sub-duplicate Ratio** of a:b = √a:√b
+
+## Proportion
+When two ratios are equal: a:b = c:d
+Written as a:b :: c:d
+
+### Properties:
+- Product of extremes = Product of means
+- a × d = b × c
+
+## Partnership
+When two or more people invest money for a business.
+
+### Simple Partnership (Same Time):
+- Profit shared in ratio of investments
+- A:B = Investment_A : Investment_B
+
+### Compound Partnership (Different Time):
+- Profit shared in ratio of (Investment × Time)
+- A:B = (I₁ × T₁) : (I₂ × T₂)
+
+## Example:
+A invests ₹5000 for 6 months, B invests ₹6000 for 5 months.
+- A's share = 5000 × 6 = 30000
+- B's share = 6000 × 5 = 30000
+- Ratio = 30000:30000 = 1:1
+- Profit divided equally!
+    `
+  },
+  {
+    id: 'math-3',
+    title: 'Time, Speed & Distance',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 18,
+    summary: 'Problems on trains, boats, and relative speed.',
+    tags: ['Mathematics', 'Speed', 'Important'],
+    content: `
+# Time, Speed & Distance
+
+## Basic Formula
+**Distance = Speed × Time**
+
+### Unit Conversions:
+- km/hr to m/s: Multiply by 5/18
+- m/s to km/hr: Multiply by 18/5
+
+Example: 72 km/hr = 72 × 5/18 = 20 m/s
+
+## Average Speed
+When same distance is covered at different speeds:
+**Average Speed = 2ab/(a+b)**
+where a and b are the two speeds.
+
+## Relative Speed
+
+### Same Direction:
+- Relative Speed = Difference of speeds
+- If A=60 km/hr, B=40 km/hr → Relative = 20 km/hr
+
+### Opposite Direction:
+- Relative Speed = Sum of speeds
+- If A=60 km/hr, B=40 km/hr → Relative = 100 km/hr
+
+## Train Problems
+
+### Train crossing a pole/person:
+- Distance = Length of Train
+- Time = Length / Speed
+
+### Train crossing a platform:
+- Distance = Length of Train + Length of Platform
+- Time = (L_train + L_platform) / Speed
+
+### Two trains crossing each other:
+- Same direction: Time = (L₁ + L₂) / (S₁ - S₂)
+- Opposite direction: Time = (L₁ + L₂) / (S₁ + S₂)
+
+## Boats & Streams
+- **Downstream** (with stream): Speed = Boat + Stream
+- **Upstream** (against stream): Speed = Boat - Stream
+- Speed of Boat = (Downstream + Upstream) / 2
+- Speed of Stream = (Downstream - Upstream) / 2
+    `
+  },
+  
+  // MORE GK TOPICS
+  {
+    id: 'gk-4',
+    title: 'Indian History: Freedom Struggle',
+    subject: Subject.GK,
+    difficulty: 'Medium',
+    readTime: 20,
+    summary: 'Key events and movements from 1857 to 1947.',
+    tags: ['History', 'Freedom Struggle', 'Important'],
+    content: `
+# Indian Freedom Struggle (1857-1947)
+
+## First War of Independence (1857)
+- Also called: Sepoy Mutiny, Great Rebellion
+- Started: 10 May 1857 at Meerut
+- Causes: Greased cartridges (cow/pig fat), Doctrine of Lapse
+
+### Key Leaders:
+- Mangal Pandey - Barrackpore
+- Rani Lakshmibai - Jhansi
+- Tantia Tope - Kanpur
+- Bahadur Shah Zafar - Delhi (Nominal leader)
+
+## Moderate Phase (1885-1905)
+- **INC Founded**: 1885, Bombay
+- **Founder**: A.O. Hume
+- **First President**: W.C. Bonnerjee
+
+Key Leaders: Dadabhai Naoroji, Gopal Krishna Gokhale, Pherozeshah Mehta
+Method: Prayer, Petition, Protest
+
+## Extremist Phase (1905-1920)
+- Key Leaders: Bal Gangadhar Tilak, Bipin Chandra Pal, Lala Lajpat Rai (Lal-Bal-Pal)
+- Tilak: "Swaraj is my birthright"
+
+### Bengal Partition (1905)
+- By Lord Curzon
+- Led to Swadeshi Movement
+- Annulled in 1911
+
+## Gandhian Era (1920-1947)
+
+### Non-Cooperation Movement (1920-22)
+- Against Rowlatt Act & Jallianwala Bagh
+- Suspended after Chauri Chaura incident (1922)
+
+### Civil Disobedience Movement (1930)
+- Started with Dandi March (Salt Satyagraha)
+- 12 March 1930, 385 km walk
+
+### Quit India Movement (1942)
+- "Do or Die" - Gandhi
+- 8 August 1942
+
+## Independence
+- **15 August 1947**
+- Mountbatten Plan
+- Partition: India & Pakistan
+    `
+  },
+  {
+    id: 'gk-5',
+    title: 'Indian Geography: Physical Features',
+    subject: Subject.GK,
+    difficulty: 'Easy',
+    readTime: 15,
+    summary: 'Mountains, rivers, and climate of India.',
+    tags: ['Geography', 'Physical', 'Important'],
+    content: `
+# Physical Geography of India
+
+## Physiographic Divisions
+
+### 1. The Himalayan Mountains
+- **Three Ranges**:
+  - Greater Himalayas (Himadri) - Highest peaks
+  - Lesser Himalayas (Himachal) - Hill stations
+  - Outer Himalayas (Shiwaliks) - Lowest
+
+### Highest Peaks in India:
+1. K2/Godwin Austin - 8611m (PoK)
+2. Kangchenjunga - 8586m (Sikkim)
+3. Nanda Devi - 7816m (Uttarakhand)
+
+### 2. Northern Plains
+- Formed by: Indus, Ganga, Brahmaputra
+- Most fertile region
+- High population density
+
+### 3. Peninsular Plateau
+- Deccan Plateau (largest)
+- Western Ghats & Eastern Ghats
+- Black Soil (Regur) - Cotton
+
+### 4. Coastal Plains
+- Western Coast: Narrow, backwaters (Kerala)
+- Eastern Coast: Wider, deltas
+
+## Major Rivers
+
+| River | Origin | Falls Into |
+|-------|--------|-----------|
+| Ganga | Gangotri | Bay of Bengal |
+| Yamuna | Yamunotri | Ganga |
+| Brahmaputra | Tibet (Mansarovar) | Bay of Bengal |
+| Godavari | Nasik | Bay of Bengal |
+| Krishna | Mahabaleshwar | Bay of Bengal |
+| Narmada | Amarkantak | Arabian Sea |
+| Tapi | Satpura | Arabian Sea |
+
+## Climate
+- **Monsoon Climate**
+- Southwest Monsoon: June-September (80% rainfall)
+- Northeast Monsoon: October-December (Tamil Nadu)
+- Hottest: May-June
+- Coldest: December-January
+    `
+  },
+  {
+    id: 'gk-6',
+    title: 'Current Affairs: 2025-26 Highlights',
+    subject: Subject.GK,
+    difficulty: 'Medium',
+    readTime: 12,
+    summary: 'Recent important events for MH CET Law 2026.',
+    tags: ['Current Affairs', '2025-26', 'Important'],
+    content: `
+# Current Affairs 2025-26 Highlights
+
+## India's Key Appointments
+- **President**: Droupadi Murmu
+- **Vice President**: Jagdeep Dhankhar
+- **Chief Justice of India**: Justice Sanjiv Khanna (from Nov 2024)
+- **RBI Governor**: Shaktikanta Das (extended)
+
+## International Organizations
+- **UN Secretary General**: António Guterres
+- **WHO Director-General**: Dr. Tedros Adhanom
+- **World Bank President**: Ajay Banga (Indian-American)
+- **IMF Managing Director**: Kristalina Georgieva
+
+## India's Achievements
+- G20 Presidency (2023)
+- Chandrayaan-3: Moon landing (Aug 2023)
+- Aditya L1: Sun mission (2023)
+- UPI global expansion
+
+## Important Days
+| Date | Day |
+|------|-----|
+| Jan 26 | Republic Day |
+| Apr 14 | Ambedkar Jayanti |
+| Aug 15 | Independence Day |
+| Oct 2 | Gandhi Jayanti |
+| Nov 26 | Constitution Day |
+| Dec 10 | Human Rights Day |
+
+## Recent Legal Developments
+- Bharatiya Nyaya Sanhita (BNS) replaced IPC
+- Bharatiya Nagarik Suraksha Sanhita (BNSS) replaced CrPC
+- Bharatiya Sakshya Adhiniyam (BSA) replaced Indian Evidence Act
+- Effective from July 1, 2024
+
+## Sports
+- Cricket World Cup 2023: India Runner-up
+- Asian Games 2023: India - 4th position
+- Olympics 2024 Paris
+
+*Note: Keep updating with recent news for MH CET Law 2026!*
+    `
+  },
+  
+  // MORE MATHEMATICS
+  {
+    id: 'math-4',
+    title: 'Simple & Compound Interest',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Interest calculations essential for banking problems.',
+    tags: ['Mathematics', 'Interest', 'Banking'],
+    content: `
+# Simple & Compound Interest
+
+## Simple Interest (SI)
+
+Interest calculated only on principal amount.
+
+### Formula:
+**SI = (P × R × T) / 100**
+
+Where:
+- P = Principal (initial amount)
+- R = Rate of interest (per annum)
+- T = Time (in years)
+
+### Related Formulas:
+- Amount (A) = P + SI = P(1 + RT/100)
+- P = (SI × 100) / (R × T)
+- R = (SI × 100) / (P × T)
+- T = (SI × 100) / (P × R)
+
+### Example:
+Find SI on ₹5000 at 8% for 3 years.
+SI = (5000 × 8 × 3) / 100 = ₹1200
+
+## Compound Interest (CI)
+
+Interest calculated on principal + accumulated interest.
+
+### Formula:
+**A = P(1 + R/100)^T**
+**CI = A - P**
+
+### For Different Compounding:
+- Half-yearly: A = P(1 + R/200)^(2T)
+- Quarterly: A = P(1 + R/400)^(4T)
+
+### Quick Comparison:
+| Time | SI | CI (when CI > SI) |
+|------|----|--------------------|
+| 2 years | 2PR/100 | PR/100 × (2 + R/100) |
+
+### Difference between CI and SI for 2 years:
+**CI - SI = P(R/100)²**
+
+### Example:
+CI on ₹10000 at 10% for 2 years compounded annually:
+A = 10000(1 + 10/100)² = 10000 × 1.21 = ₹12100
+CI = 12100 - 10000 = ₹2100
+    `
+  },
+  {
+    id: 'math-5',
+    title: 'Time & Work',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Work efficiency and combined work problems.',
+    tags: ['Mathematics', 'Work', 'Important'],
+    content: `
+# Time & Work
+
+## Basic Concept
+If A can do a work in 'n' days, A's one day's work = 1/n
+
+## Key Formulas
+
+### Work Done:
+**Work = Efficiency × Time**
+
+### Combined Work:
+If A does work in 'a' days, B in 'b' days:
+- Together: Work/day = 1/a + 1/b
+- **Time together = ab/(a+b) days**
+
+### For Three People (A, B, C):
+Time = abc / (ab + bc + ca)
+
+## Efficiency Concept
+- Assume total work = LCM of all individual times
+- Calculate efficiency of each person
+
+### Example:
+A does work in 10 days, B in 15 days.
+- LCM = 30 units (total work)
+- A's efficiency = 30/10 = 3 units/day
+- B's efficiency = 30/15 = 2 units/day
+- Together = 5 units/day
+- Time = 30/5 = 6 days
+
+## Special Cases
+
+### Pipes & Cisterns:
+- Inlet pipe: Positive work (fills)
+- Outlet pipe: Negative work (empties)
+- Net work = Inlet - Outlet
+
+### Alternate Days:
+If A and B work on alternate days starting with A:
+- Calculate 2-day cycle work
+- Find complete cycles
+- Adjust for remaining work
+
+### Men-Days Work:
+**M₁ × D₁ = M₂ × D₂** (for same work)
+**M₁ × D₁ × H₁ = M₂ × D₂ × H₂** (different hours)
+    `
+  },
+  {
+    id: 'math-6',
+    title: 'Number System & LCM-HCF',
+    subject: Subject.Math,
+    difficulty: 'Easy',
+    readTime: 12,
+    summary: 'Fundamentals of numbers, divisibility, and factors.',
+    tags: ['Mathematics', 'Numbers', 'Basic'],
+    content: `
+# Number System & LCM-HCF
+
+## Types of Numbers
+
+| Type | Definition | Examples |
+|------|------------|----------|
+| Natural | Counting numbers | 1, 2, 3... |
+| Whole | Natural + 0 | 0, 1, 2... |
+| Integers | Whole + Negatives | ...-2, -1, 0, 1, 2... |
+| Rational | p/q form (q≠0) | 1/2, 3/4, 0.5 |
+| Irrational | Non-terminating | √2, π |
+| Prime | Only 2 factors (1 & itself) | 2, 3, 5, 7, 11 |
+| Composite | More than 2 factors | 4, 6, 8, 9 |
+
+## Divisibility Rules
+
+| Divisor | Rule |
+|---------|------|
+| 2 | Last digit even |
+| 3 | Sum of digits divisible by 3 |
+| 4 | Last 2 digits divisible by 4 |
+| 5 | Ends in 0 or 5 |
+| 6 | Divisible by both 2 and 3 |
+| 8 | Last 3 digits divisible by 8 |
+| 9 | Sum of digits divisible by 9 |
+| 11 | Difference of alternate digits sums = 0 or ÷11 |
+
+## LCM (Least Common Multiple)
+Smallest number divisible by all given numbers.
+
+### Method: Prime Factorization
+LCM = Product of highest powers of all prime factors
+
+Example: LCM of 12 and 18
+- 12 = 2² × 3
+- 18 = 2 × 3²
+- LCM = 2² × 3² = 36
+
+## HCF (Highest Common Factor)
+Largest number that divides all given numbers.
+
+### Method: Prime Factorization
+HCF = Product of lowest powers of common prime factors
+
+Example: HCF of 12 and 18
+- 12 = 2² × 3
+- 18 = 2 × 3²
+- HCF = 2 × 3 = 6
+
+## Key Relation:
+**LCM × HCF = Product of two numbers**
+LCM × HCF = a × b
+    `
+  },
+  
+  // MORE LEGAL TOPICS
+  {
+    id: 'law-6',
+    title: 'Criminal Law Basics (IPC/BNS)',
+    subject: Subject.Legal,
+    difficulty: 'Hard',
+    readTime: 20,
+    summary: 'Introduction to criminal law concepts and important sections.',
+    tags: ['Criminal Law', 'IPC', 'BNS', 'Important'],
+    content: `
+# Criminal Law Basics
+
+## Introduction
+- **IPC (1860)** - Replaced by **BNS (2023)** from July 1, 2024
+- Bharatiya Nyaya Sanhita (BNS) is the new criminal code
+
+## Key Concepts
+
+### Mens Rea & Actus Reus
+- **Mens Rea**: Guilty mind/intention
+- **Actus Reus**: Guilty act
+- Crime = Mens Rea + Actus Reus
+
+### Types of Offences:
+
+| Type | Bailable | Compoundable |
+|------|----------|--------------|
+| Cognizable | Police can arrest without warrant | |
+| Non-cognizable | Warrant needed | |
+| Bailable | Bail as of right | |
+| Non-bailable | Bail at court discretion | |
+
+## Important Offences
+
+### Against Body:
+| IPC | BNS | Offence |
+|-----|-----|---------|
+| 299-300 | 100-101 | Culpable Homicide/Murder |
+| 304 | 105 | Causing death by negligence |
+| 307 | 109 | Attempt to murder |
+| 319-322 | 115-117 | Hurt/Grievous Hurt |
+
+### Murder vs Culpable Homicide:
+- Murder = Intention to cause death
+- Culpable Homicide = Knowledge that death likely
+
+### Against Property:
+| IPC | BNS | Offence |
+|-----|-----|---------|
+| 378 | 303 | Theft |
+| 383 | 308 | Extortion |
+| 390 | 309 | Robbery |
+| 392 | 310 | Dacoity |
+
+## General Exceptions (Chapter IV)
+- Mistake of fact (not law)
+- Judicial acts
+- Act of child under 7
+- Unsoundness of mind
+- Intoxication (involuntary)
+- Consent
+- Private defence
+
+## Right of Private Defence
+- **Section 96-106 IPC** / **Section 34-44 BNS**
+- Right to defend body & property
+- Cannot cause more harm than necessary
+    `
+  },
+  {
+    id: 'law-7',
+    title: 'Law of Torts Overview',
+    subject: Subject.Legal,
+    difficulty: 'Medium',
+    readTime: 18,
+    summary: 'Civil wrongs and remedies in tort law.',
+    tags: ['Torts', 'Civil Law', 'Important'],
+    content: `
+# Law of Torts
+
+## What is a Tort?
+A **civil wrong** (other than breach of contract) for which remedy is damages.
+
+### Elements:
+1. Wrongful act or omission
+2. Legal damage to plaintiff
+3. Legal remedy (damages)
+
+## Tort vs Crime vs Breach of Contract
+
+| Aspect | Tort | Crime | Contract |
+|--------|------|-------|----------|
+| Nature | Civil wrong | Public wrong | Private agreement |
+| Remedy | Damages | Punishment | Specific performance |
+| Parties | Individual vs Individual | State vs Accused | Party vs Party |
+
+## Types of Torts
+
+### 1. Intentional Torts:
+- **Assault** - Threat of force
+- **Battery** - Actual physical contact
+- **False Imprisonment** - Unlawful restraint
+- **Trespass** - Unauthorized entry
+- **Defamation** - Harm to reputation
+
+### 2. Negligence:
+Elements to prove:
+1. Duty of care existed
+2. Breach of duty
+3. Causation
+4. Damage
+
+### 3. Strict Liability (Rylands v Fletcher):
+- Liability without fault
+- Dangerous thing escapes
+- Non-natural use of land
+
+### 4. Absolute Liability (MC Mehta v UOI):
+- No exceptions/defences
+- Hazardous industries
+- Higher standards in India
+
+## Important Maxims:
+- **Volenti non fit injuria** - No injury to a willing person
+- **Res ipsa loquitur** - The thing speaks for itself
+- **Damnum sine injuria** - Damage without legal injury
+- **Injuria sine damnum** - Legal injury without actual damage
+
+## Defences:
+1. Volenti non fit injuria (consent)
+2. Act of God
+3. Inevitable accident
+4. Private defence
+5. Statutory authority
+6. Necessity
+    `
+  },
+  {
+    id: 'law-8',
+    title: 'Family Law Essentials',
+    subject: Subject.Legal,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Marriage, divorce, and succession laws in India.',
+    tags: ['Family Law', 'Personal Law', 'Important'],
+    content: `
+# Family Law Essentials
+
+## Marriage Laws in India
+
+### Hindu Marriage Act, 1955
+**Conditions for Valid Hindu Marriage (Section 5):**
+1. Neither party has living spouse
+2. Sound mind
+3. Age: Male 21, Female 18
+4. Not within prohibited degrees
+5. Not sapindas (unless custom permits)
+
+**Ceremonies Required:**
+- Saptapadi (seven steps) OR
+- Customary rites
+
+### Special Marriage Act, 1954
+- Secular law for all Indians
+- Civil marriage
+- Inter-religious marriages
+- 30-day notice required
+
+### Muslim Marriage
+- Contract between parties
+- Mehr (dower) to wife
+- Witnesses required
+
+## Divorce
+
+### Hindu Marriage Act - Grounds (Section 13):
+1. Adultery
+2. Cruelty
+3. Desertion (2 years)
+4. Conversion
+5. Unsound mind
+6. Leprosy/Venereal disease
+7. Renunciation
+8. Not heard alive (7 years)
+
+### Section 13B - Mutual Consent Divorce:
+- Living separately 1+ year
+- Cannot live together
+- Mutually agreed
+
+### Muslim Divorce:
+- Talaq (by husband)
+- Khula (wife's initiation)
+- Mubarat (mutual)
+
+## Succession/Inheritance
+
+### Hindu Succession Act, 1956
+**Class I Heirs (equal share):**
+- Son, Daughter
+- Widow, Mother
+- Son/Daughter of predeceased son/daughter
+
+**2005 Amendment:**
+- Daughters = Sons (coparcenary rights)
+- Equal right in ancestral property
+
+### Muslim Succession:
+- Sharers (fixed share)
+- Residuaries (remaining)
+- Distant kindred
+    `
   }
 ];
 
