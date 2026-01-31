@@ -13,7 +13,8 @@ import {
   Moon,
   Menu,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Building2
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -48,6 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/study', label: 'Study Hub', icon: BookOpen },
     { path: '/practice', label: 'Test Arena', icon: Swords },
+    { path: '/colleges', label: 'Colleges', icon: Building2 },
     { path: '/mentor', label: 'AI Mentor', icon: BrainCircuit },
     { path: '/analytics', label: 'Performance', icon: BarChart3 },
   ];

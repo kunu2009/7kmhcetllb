@@ -234,6 +234,645 @@ Conclusion: All Dogs (100) are Cats (50).
 - **HQ**: Kathmandu, Nepal
 - **Members**: Afghanistan, Bangladesh, Bhutan, India, Maldives, Nepal, Pakistan, Sri Lanka.
     `
+  },
+  
+  // MORE LEGAL APTITUDE TOPICS
+  {
+    id: 'la-4',
+    title: 'Fundamental Rights (Articles 12-35)',
+    subject: Subject.LegalAptitude,
+    difficulty: 'Hard',
+    readTime: 25,
+    summary: 'Part III of the Constitution - The soul of Indian democracy.',
+    tags: ['Constitution', 'Rights', 'Important'],
+    content: `
+# Fundamental Rights (Part III: Articles 12-35)
+
+Fundamental Rights are **justiciable** (enforceable by courts). Article 32 is the "heart and soul" of the Constitution.
+
+## Six Fundamental Rights:
+
+### 1. Right to Equality (Art. 14-18)
+- **Art. 14**: Equality before law
+- **Art. 15**: Prohibition of discrimination
+- **Art. 16**: Equal opportunity in public employment
+- **Art. 17**: Abolition of Untouchability
+- **Art. 18**: Abolition of Titles
+
+### 2. Right to Freedom (Art. 19-22)
+**Art. 19** gives 6 freedoms to citizens only:
+- Speech and expression
+- Assemble peacefully
+- Form associations/unions
+- Move freely in India
+- Reside and settle
+- Practice any profession
+
+**Art. 20**: Protection against conviction (No ex-post-facto law, Double jeopardy, Self-incrimination)
+**Art. 21**: Right to Life and Personal Liberty
+**Art. 21A**: Right to Education (6-14 years) - Added by 86th Amendment
+**Art. 22**: Protection against arrest and detention
+
+### 3. Right Against Exploitation (Art. 23-24)
+- **Art. 23**: Prohibition of human trafficking
+- **Art. 24**: No child labor below 14 years in hazardous industries
+
+### 4. Right to Freedom of Religion (Art. 25-28)
+- Secular State provisions
+- Freedom of conscience and religion
+
+### 5. Cultural & Educational Rights (Art. 29-30)
+- Protection of minorities' interests
+
+### 6. Right to Constitutional Remedies (Art. 32)
+Dr. Ambedkar called Article 32 the "heart and soul" of the Constitution.
+
+## Five Writs:
+1. **Habeas Corpus** - "You may have the body"
+2. **Mandamus** - "We command"
+3. **Certiorari** - "To be certified"
+4. **Prohibition** - Stop lower court
+5. **Quo Warranto** - "By what authority"
+
+## Important Cases:
+- **Maneka Gandhi v. UOI (1978)**: Expanded Art. 21 scope
+- **Vishakha v. State of Rajasthan (1997)**: Sexual harassment guidelines
+- **NALSA v. UOI (2014)**: Transgender rights
+    `,
+    quiz: [
+      {
+        q: "Which Article is called the 'Heart and Soul' of the Constitution?",
+        options: ["Article 14", "Article 19", "Article 21", "Article 32"],
+        correct: 3,
+        explanation: "Article 32 (Right to Constitutional Remedies) was called by Dr. Ambedkar as the heart and soul."
+      },
+      {
+        q: "Right to Education was added by which Amendment?",
+        options: ["73rd Amendment", "86th Amendment", "42nd Amendment", "44th Amendment"],
+        correct: 1,
+        explanation: "86th Amendment added Article 21A - Right to Education for children 6-14 years."
+      }
+    ]
+  },
+  {
+    id: 'la-5',
+    title: 'Contract Law: Essentials of Valid Contract',
+    subject: Subject.LegalAptitude,
+    difficulty: 'Medium',
+    readTime: 18,
+    summary: 'Section 10 of Indian Contract Act, 1872 - What makes a contract valid.',
+    tags: ['Contract', 'Civil Law', 'Important'],
+    content: `
+# Essentials of a Valid Contract (Section 10)
+
+**"All agreements are contracts if made by free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not hereby expressly declared to be void."**
+
+## Essential Elements:
+
+### 1. Offer and Acceptance
+- Clear offer by one party
+- Unconditional acceptance by another
+- Communication is essential
+
+### 2. Intention to Create Legal Relations
+- Social/domestic agreements generally not enforceable
+- **Balfour v. Balfour**: Husband's promise to wife - Not enforceable
+
+### 3. Lawful Consideration
+- "Something in return" (Quid pro quo)
+- Can be past, present, or future
+- Must be real, not illusory
+
+### 4. Capacity to Contract (Sec 11)
+Every person is competent EXCEPT:
+- Minors (below 18)
+- Persons of unsound mind
+- Persons disqualified by law
+
+**Mohiri Bibi v. Dharmodas Ghose (1903)**: Contract with minor is VOID AB INITIO
+
+### 5. Free Consent (Sec 14)
+Consent is free when NOT caused by:
+- Coercion (Sec 15)
+- Undue Influence (Sec 16)
+- Fraud (Sec 17)
+- Misrepresentation (Sec 18)
+- Mistake (Sec 20-22)
+
+### 6. Lawful Object
+Object should not be:
+- Forbidden by law
+- Fraudulent
+- Injurious to person or property
+- Immoral or against public policy
+
+### 7. Not Expressly Declared Void
+Agreements in restraint of:
+- Marriage (Sec 26)
+- Trade (Sec 27)
+- Legal proceedings (Sec 28)
+- Are VOID
+    `,
+    quiz: [
+      {
+        q: "Contract with a minor is:",
+        options: ["Voidable", "Valid", "Void ab initio", "Illegal"],
+        correct: 2,
+        explanation: "As per Mohiri Bibi v. Dharmodas Ghose, contract with minor is void ab initio (void from beginning)."
+      }
+    ]
+  },
+  {
+    id: 'la-6',
+    title: 'Legal Maxims You Must Know',
+    subject: Subject.LegalAptitude,
+    difficulty: 'Easy',
+    readTime: 12,
+    summary: '25 Most important Latin legal maxims for MH CET Law.',
+    tags: ['Maxims', 'Important', 'Quick Read'],
+    content: `
+# 25 Essential Legal Maxims
+
+## Basic Principles
+1. **Actus non facit reum nisi mens sit rea** - An act does not make one guilty unless the mind is also guilty
+2. **Ignorantia juris non excusat** - Ignorance of law is no excuse
+3. **Ubi jus ibi remedium** - Where there is a right, there is a remedy
+4. **Audi alteram partem** - Hear the other side
+5. **Nemo debet bis vexari** - No man should be tried twice for same offence
+
+## Tort Law Maxims
+6. **Volenti non fit injuria** - No injury to one who consents
+7. **Res ipsa loquitur** - The thing speaks for itself
+8. **Damnum sine injuria** - Damage without legal injury
+9. **Injuria sine damno** - Legal injury without actual damage
+10. **Sic utere tuo ut alienum non laedas** - Use your property so as not to injure another's
+
+## Contract Law Maxims
+11. **Pacta sunt servanda** - Agreements must be kept
+12. **Consensus ad idem** - Meeting of minds
+13. **Ex nudo pacto non oritur actio** - No action arises from bare agreement
+14. **Caveat emptor** - Let the buyer beware
+15. **Quantum meruit** - As much as deserved
+
+## Criminal Law Maxims
+16. **Actus reus** - Guilty act
+17. **Mens rea** - Guilty mind
+18. **In pari delicto** - In equal fault
+19. **Nemo judex in causa sua** - No one can be judge in their own cause
+20. **De minimis non curat lex** - Law does not concern itself with trifles
+
+## Constitutional Law Maxims
+21. **Salus populi suprema lex** - Welfare of people is supreme law
+22. **Rex non potest peccare** - The King can do no wrong
+23. **Delegatus non potest delegare** - A delegate cannot delegate
+
+## Procedural Maxims
+24. **Res judicata** - Matter already judged
+25. **Obiter dicta** - Said in passing (not binding)
+    `
+  },
+  {
+    id: 'la-7',
+    title: 'Directive Principles & Fundamental Duties',
+    subject: Subject.LegalAptitude,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Part IV (DPSP) and Part IVA (Duties) of the Constitution.',
+    tags: ['Constitution', 'DPSP', 'Duties'],
+    content: `
+# Directive Principles of State Policy (Part IV: Art. 36-51)
+
+DPSPs are **non-justiciable** (not enforceable by courts) but fundamental in governance.
+
+## Classification:
+
+### Socialist Principles
+- Art. 38: Promote welfare of people
+- Art. 39: Equal distribution of resources
+- Art. 39A: Free legal aid
+- Art. 41: Right to work, education, public assistance
+- Art. 42: Just and humane conditions of work
+- Art. 43: Living wage for workers
+- Art. 43A: Worker participation in management
+
+### Gandhian Principles
+- Art. 40: Panchayati Raj
+- Art. 43: Cottage industries
+- Art. 46: Promotion of SC/ST welfare
+- Art. 47: Prohibition of intoxicating drinks
+- Art. 48: Prohibition of cow slaughter
+
+### Liberal-Intellectual Principles
+- Art. 44: Uniform Civil Code
+- Art. 45: Early childhood care (0-6 years)
+- Art. 48A: Environment protection
+- Art. 49: Protection of monuments
+- Art. 50: Separation of judiciary from executive
+- Art. 51: International peace
+
+---
+
+# Fundamental Duties (Part IVA: Art. 51A)
+
+Added by **42nd Amendment, 1976** based on USSR Constitution.
+Originally 10 duties, **11th duty added by 86th Amendment (2002)**.
+
+## The 11 Fundamental Duties:
+1. Abide by Constitution, respect Flag & Anthem
+2. Follow noble ideals of freedom struggle
+3. Protect sovereignty, unity, integrity
+4. Defend country and render national service
+5. Promote harmony, renounce discrimination
+6. Value and preserve composite culture
+7. Protect natural environment
+8. Develop scientific temper
+9. Safeguard public property
+10. Strive for excellence
+11. **Provide education to children (6-14 years)** - Added in 2002
+    `
+  },
+  
+  // MORE GK TOPICS
+  {
+    id: 'gk-2',
+    title: 'Indian Judiciary System',
+    subject: Subject.GK,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Structure of Indian Courts from Supreme Court to Lok Adalats.',
+    tags: ['Polity', 'Judiciary', 'Important'],
+    content: `
+# Indian Judiciary System
+
+## Hierarchy of Courts
+
+### 1. Supreme Court of India
+- **Seat**: New Delhi
+- **Established**: 26 January 1950
+- **Chief Justice**: Head of Indian Judiciary
+- **Judges**: 1 CJI + 33 other judges (max 34)
+- **Jurisdiction**: Original, Appellate, Advisory
+
+**Important Articles**:
+- Art. 124: Establishment
+- Art. 131: Original Jurisdiction
+- Art. 136: Special Leave Petition
+- Art. 141: Law declared by SC binding on all courts
+- Art. 143: Advisory Jurisdiction
+
+### 2. High Courts
+- 25 High Courts in India
+- Art. 214-231 deal with High Courts
+- Can issue writs under Art. 226 (wider than Art. 32)
+
+**Territorial Jurisdiction**:
+- Bombay HC: Maharashtra, Goa, Dadra-Nagar Haveli, Daman-Diu
+- Delhi HC: Delhi NCT
+- Calcutta HC: West Bengal, Andaman-Nicobar
+
+### 3. District Courts
+- Principal civil court of original jurisdiction
+- Sessions Court for criminal matters
+- District Judge heads the court
+
+### 4. Subordinate Courts
+- Civil: Munsif Courts, Sub-Judge Courts
+- Criminal: Magistrate Courts (CJM, JMFC)
+
+### 5. Tribunals
+- Administrative Tribunals (CAT)
+- Income Tax Appellate Tribunal (ITAT)
+- National Green Tribunal (NGT)
+- NCLT (Company matters)
+
+### 6. Lok Adalats
+- Alternative Dispute Resolution
+- No court fee
+- Decision is final and binding
+- Based on conciliation
+    `
+  },
+  {
+    id: 'gk-3',
+    title: 'Important Constitutional Amendments',
+    subject: Subject.GK,
+    difficulty: 'Hard',
+    readTime: 20,
+    summary: 'Key amendments that shaped Indian Constitution.',
+    tags: ['Constitution', 'Amendments', 'Important'],
+    content: `
+# Important Constitutional Amendments
+
+## Landmark Amendments:
+
+### 1st Amendment (1951)
+- Added 9th Schedule
+- Restrictions on freedom of speech (Art. 19)
+- Land reforms validation
+
+### 7th Amendment (1956)
+- Reorganization of states on linguistic basis
+- Abolished Part A, B, C, D states
+
+### 24th Amendment (1971)
+- Parliament can amend any part of Constitution
+- Including Fundamental Rights
+
+### 42nd Amendment (1976) - "Mini Constitution"
+- Added Socialist, Secular, Integrity to Preamble
+- Added Fundamental Duties (Part IVA)
+- Made DPSP superior to FRs (Art. 14, 19, 31)
+- Changed term "Fundamental Rights" scope
+
+### 44th Amendment (1978)
+- Right to Property removed from FRs
+- Made legal right under Art. 300A
+- Safeguards for Emergency
+
+### 52nd Amendment (1985)
+- Anti-defection law
+- Added 10th Schedule
+
+### 61st Amendment (1989)
+- Voting age reduced: 21 → 18 years
+
+### 73rd Amendment (1992)
+- Panchayati Raj institutions
+- Added Part IX, 11th Schedule
+
+### 74th Amendment (1992)
+- Municipalities
+- Added Part IXA, 12th Schedule
+
+### 86th Amendment (2002)
+- Right to Education (Art. 21A)
+- 11th Fundamental Duty
+
+### 91st Amendment (2003)
+- Limited Council of Ministers size
+- 15% of Lok Sabha/Assembly strength
+
+### 101st Amendment (2016)
+- Goods and Services Tax (GST)
+
+### 103rd Amendment (2019)
+- 10% EWS reservation
+    `
+  },
+  
+  // LOGICAL REASONING TOPICS
+  {
+    id: 'lr-2',
+    title: 'Blood Relations Made Easy',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Systematic approach to solve blood relation problems.',
+    tags: ['Logic', 'Family Tree', 'Important'],
+    content: `
+# Blood Relations
+
+## Basic Relationships:
+
+### Paternal Side (Father's side)
+- Father's Father = Grandfather
+- Father's Mother = Grandmother
+- Father's Brother = Uncle (Chacha/Tau)
+- Father's Sister = Aunt (Bua)
+- Father's Brother's children = Cousins
+
+### Maternal Side (Mother's side)
+- Mother's Father = Maternal Grandfather (Nana)
+- Mother's Mother = Maternal Grandmother (Nani)
+- Mother's Brother = Maternal Uncle (Mama)
+- Mother's Sister = Aunt (Mausi)
+
+### Spouse Relations
+- Spouse's Father = Father-in-law
+- Spouse's Mother = Mother-in-law
+- Spouse's Brother = Brother-in-law
+- Spouse's Sister = Sister-in-law
+
+## Golden Rules:
+
+1. **Same Generation = Same Level**
+   - Siblings, Cousins → Same level
+
+2. **One Generation Gap**
+   - Parents, Aunts, Uncles → One level up
+   - Children, Nephews, Nieces → One level down
+
+3. **Two Generation Gap**
+   - Grandparents → Two levels up
+   - Grandchildren → Two levels down
+
+## Symbols to Use:
+- **+** = Male
+- **-** = Female
+- **=** = Married couple
+- **|** = Parent-child
+- **---** = Siblings
+
+## Coded Relations:
+If "A + B" means A is father of B:
+- A + B - C means: A is father of B, B is mother of C
+- So A is grandfather of C
+    `
+  },
+  {
+    id: 'lr-3',
+    title: 'Critical Reasoning: Arguments',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Hard',
+    readTime: 18,
+    summary: 'Strengthen, weaken, and evaluate arguments.',
+    tags: ['Logic', 'Arguments', 'Important'],
+    content: `
+# Critical Reasoning
+
+## Argument Structure:
+1. **Premise** - Given facts/statements
+2. **Conclusion** - What follows from premises
+3. **Assumption** - Unstated but necessary for conclusion
+
+## Types of Questions:
+
+### 1. Strengthen the Argument
+- Find option that supports the conclusion
+- Add evidence that makes conclusion more likely
+
+### 2. Weaken the Argument
+- Find option that attacks the conclusion
+- Show alternative explanations
+- Attack the assumptions
+
+### 3. Find the Assumption
+- What MUST be true for conclusion to hold
+- Bridge between premise and conclusion
+
+### 4. Inference Questions
+- What can be concluded from given statements
+- Must be definitely true
+
+### 5. Paradox/Resolve Questions
+- Two seemingly contradictory statements
+- Find what explains both
+
+## Common Logical Fallacies:
+
+1. **Ad Hominem** - Attacking the person, not argument
+2. **Appeal to Authority** - Expert said so
+3. **Circular Reasoning** - Conclusion in premise
+4. **False Cause** - Correlation ≠ Causation
+5. **Slippery Slope** - Extreme consequence assumed
+6. **Straw Man** - Misrepresenting opponent's argument
+7. **False Dilemma** - Only two options presented
+
+## Approach:
+1. Read conclusion first
+2. Identify the assumption
+3. Eliminate clearly wrong options
+4. Choose the most relevant answer
+    `
+  },
+  
+  // ENGLISH TOPICS
+  {
+    id: 'eng-1',
+    title: 'Spotting Errors: Grammar Rules',
+    subject: Subject.English,
+    difficulty: 'Medium',
+    readTime: 20,
+    summary: 'Common grammar rules tested in MH CET Law.',
+    tags: ['Grammar', 'Errors', 'Important'],
+    content: `
+# Spotting Errors - Key Rules
+
+## Subject-Verb Agreement
+
+### Rule 1: Singular Subject = Singular Verb
+- The boy **plays** cricket. ✓
+- The boys **play** cricket. ✓
+
+### Rule 2: "Either...or", "Neither...nor"
+- Verb agrees with NEARER subject
+- Neither the teacher nor the students **were** present. ✓
+
+### Rule 3: Collective Nouns
+- As unit → Singular verb
+- As individuals → Plural verb
+- The jury **has** given its verdict. ✓
+- The jury **are** divided in their opinion. ✓
+
+### Rule 4: "Each", "Every", "Either", "Neither"
+- Always singular verb
+- Each of the boys **was** given a prize. ✓
+
+## Tense Errors
+
+### Rule 1: Consistency
+- Don't mix tenses unnecessarily
+- He **went** to market and **bought** vegetables. ✓
+
+### Rule 2: Time Expressions
+- Yesterday, ago, last → Past tense
+- Tomorrow, next → Future tense
+
+## Pronoun Errors
+
+### Rule 1: Agreement
+- Pronoun must agree with antecedent
+- Everyone should do **their** duty. ✗
+- Everyone should do **his/her** duty. ✓
+
+### Rule 2: Case
+- Subject case: I, we, he, she, they
+- Object case: me, us, him, her, them
+- Between you and **me** (not I) ✓
+
+## Preposition Errors
+
+### Common Mistakes:
+- Accompanied **by** (not with)
+- Angry **with** person, **at** thing
+- Congratulate **on** (not for)
+- Consist **of** (not in)
+- Die **of** disease
+- Different **from** (not than)
+- Interested **in**
+- Married **to**
+- Superior/Inferior **to** (not than)
+    `
+  },
+  {
+    id: 'eng-2',
+    title: 'One-Word Substitutions',
+    subject: Subject.English,
+    difficulty: 'Easy',
+    readTime: 15,
+    summary: '50 most important one-word substitutions.',
+    tags: ['Vocabulary', 'Important', 'Quick Read'],
+    content: `
+# 50 Important One-Word Substitutions
+
+## People
+1. **Altruist** - One who works for others' welfare
+2. **Atheist** - One who doesn't believe in God
+3. **Bibliophile** - Lover of books
+4. **Celibate** - One who remains unmarried
+5. **Connoisseur** - Expert in fine arts/food/wine
+6. **Cynic** - One who doubts human sincerity
+7. **Egoist** - Self-centered person
+8. **Extrovert** - Outgoing person
+9. **Feminist** - Advocate of women's rights
+10. **Glutton** - One who eats excessively
+11. **Hypocrite** - One who pretends to be what they're not
+12. **Introvert** - Reserved, inward-thinking person
+13. **Misanthrope** - Hater of mankind
+14. **Misogynist** - Hater of women
+15. **Optimist** - One who sees the bright side
+16. **Pessimist** - One who sees the dark side
+17. **Philanthropist** - Lover of mankind
+18. **Stoic** - One indifferent to pleasure/pain
+
+## Actions/States
+19. **Amnesty** - General pardon
+20. **Autopsy** - Post-mortem examination
+21. **Blasphemy** - Speaking against religion
+22. **Calligraphy** - Beautiful handwriting
+23. **Euthanasia** - Mercy killing
+24. **Genocide** - Killing of a race
+25. **Homicide** - Killing of a human
+26. **Infanticide** - Killing of an infant
+27. **Matricide** - Killing of one's mother
+28. **Patricide** - Killing of one's father
+29. **Regicide** - Killing of a king
+30. **Suicide** - Killing oneself
+
+## Government/Politics
+31. **Anarchy** - Absence of government
+32. **Autocracy** - Rule by one person
+33. **Bureaucracy** - Rule by officials
+34. **Democracy** - Rule by people
+35. **Monarchy** - Rule by a king/queen
+36. **Oligarchy** - Rule by a few
+37. **Plutocracy** - Rule by the wealthy
+38. **Theocracy** - Rule by religious leaders
+
+## Miscellaneous
+39. **Anonymous** - Without a name
+40. **Antidote** - Medicine against poison
+41. **Belligerent** - Engaged in war
+42. **Contemporary** - Of the same time
+43. **Eatable** - Fit to be eaten
+44. **Edible** - Suitable for eating
+45. **Illegal** - Against law
+46. **Illegible** - Cannot be read
+47. **Invisible** - Cannot be seen
+48. **Inevitable** - Cannot be avoided
+49. **Omniscient** - All-knowing
+50. **Omnipotent** - All-powerful
+    `
   }
 ];
 

@@ -6,6 +6,7 @@ import StudyHub from './components/StudyHub';
 import TestArena from './components/TestArena';
 import AiMentor from './components/AiMentor';
 import Analytics from './components/Analytics';
+import CollegeHub from './components/CollegeHub';
 import { ProgressProvider } from './context/ProgressContext';
 
 const App: React.FC = () => {
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <Route path="/practice" element={<TestArena />} />
             <Route path="/mentor" element={<AiMentor />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/colleges" element={<CollegeHub />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
