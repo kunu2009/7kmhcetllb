@@ -20,7 +20,11 @@ import {
   Zap,
   CalendarDays,
   StickyNote,
-  ListChecks
+  ListChecks,
+  Scale,
+  BookText,
+  Calculator,
+  Lightbulb
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -59,6 +63,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/planner', label: 'Study Planner', icon: CalendarDays },
     { path: '/notes', label: 'Quick Notes', icon: StickyNote },
     { path: '/revision', label: 'Quick Revision', icon: ListChecks },
+    { path: '/legal-reasoning', label: 'Legal Reasoning', icon: Scale },
+    { path: '/reading-comprehension', label: 'Reading Comp', icon: BookText },
+    { path: '/formulas', label: 'Math Formulas', icon: Calculator },
+    { path: '/study-tips', label: 'Study Tips', icon: Lightbulb },
     { path: '/pyq', label: 'PYQ Papers', icon: FileText },
     { path: '/flashcards', label: 'Flashcards', icon: Layers },
     { path: '/colleges', label: 'Colleges', icon: Building2 },
