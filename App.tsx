@@ -12,6 +12,7 @@ import Flashcards from './components/Flashcards';
 import DailyPractice from './components/DailyPractice';
 import StudyPlanner from './components/StudyPlanner';
 import QuickNotes from './components/QuickNotes';
+import QuickRevision from './components/QuickRevision';
 import { ProgressProvider } from './context/ProgressContext';
 
 const App: React.FC = () => {
@@ -26,6 +27,7 @@ const App: React.FC = () => {
             <Route path="/daily" element={<DailyPractice />} />
             <Route path="/planner" element={<StudyPlanner />} />
             <Route path="/notes" element={<QuickNotes />} />
+            <Route path="/revision" element={<QuickRevision />} />
             <Route path="/pyq" element={<PreviousYearPapers />} />
             <Route path="/flashcards" element={<Flashcards />} />
             <Route path="/colleges" element={<CollegeHub />} />

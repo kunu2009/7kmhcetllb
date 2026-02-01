@@ -1855,40 +1855,40 @@ const StudyHub: React.FC = () => {
   };
 
   const renderLibrary = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Search Header */}
-      <div className="sticky top-0 bg-gray-100 dark:bg-gray-900 pt-2 pb-4 z-10">
-        <div className="flex gap-2 mb-4">
+      <div className="sticky top-0 bg-gray-100 dark:bg-gray-900 pt-2 pb-3 md:pb-4 z-10">
+        <div className="flex gap-2 mb-3 md:mb-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
             <input 
               type="text" 
               placeholder="Search topics, tags..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              className="w-full pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm md:text-base"
             />
           </div>
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`p-3 rounded-xl border transition-colors ${showFilters ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'}`}
+            className={`p-2.5 md:p-3 rounded-lg md:rounded-xl border transition-colors ${showFilters ? 'bg-indigo-100 border-indigo-200 text-indigo-700' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500'}`}
           >
-            <Filter className="w-5 h-5" />
+            <Filter className="w-4 h-4 md:w-5 md:h-5" />
           </button>
         </div>
 
         {/* Filters Panel */}
         {showFilters && (
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
-            <div className="space-y-4">
+          <div className="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg md:rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
+            <div className="space-y-3 md:space-y-4">
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Difficulty</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {['All', 'Easy', 'Medium', 'Hard'].map(lvl => (
                     <button 
                       key={lvl}
                       onClick={() => setFilterDifficulty(lvl as any)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterDifficulty === lvl ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
+                      className={`px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${filterDifficulty === lvl ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
                     >
                       {lvl}
                     </button>
@@ -1897,14 +1897,14 @@ const StudyHub: React.FC = () => {
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">Read Time</label>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {['All', 'Short', 'Long'].map(time => (
                     <button 
                       key={time}
                       onClick={() => setFilterTime(time as any)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterTime === time ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
+                      className={`px-2.5 md:px-3 py-1 md:py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${filterTime === time ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
                     >
-                      {time === 'All' ? 'Any Time' : (time === 'Short' ? '< 15 mins' : '> 15 mins')}
+                      {time === 'All' ? 'Any' : (time === 'Short' ? '<15m' : '>15m')}
                     </button>
                   ))}
                 </div>
@@ -1916,55 +1916,55 @@ const StudyHub: React.FC = () => {
       
       {/* Quick Access - Legal Aptitude */}
       <div className="mb-2">
-        <div className="flex items-center gap-2 mb-3">
-           <Gavel className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: Legal Essentials</span>
+        <div className="flex items-center gap-2 mb-2 md:mb-3">
+           <Gavel className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
+           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: Legal</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 md:gap-2">
            <button
              onClick={() => {
                 const t = STUDY_DATA.find(i => i.id === 'la-1');
                 if(t) setSelectedTopic(t);
              }}
-             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
            >
-             <Scale className="w-3.5 h-3.5" />
-             Constitution: Preamble
+             <Scale className="w-3 h-3 md:w-3.5 md:h-3.5" />
+             <span className="hidden sm:inline">Constitution:</span> Preamble
            </button>
            <button
              onClick={() => {
                 const t = STUDY_DATA.find(i => i.id === 'la-2');
                 if(t) setSelectedTopic(t);
              }}
-             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
            >
-             <ShieldAlert className="w-3.5 h-3.5" />
-             Torts: Vicarious Liability
+             <ShieldAlert className="w-3 h-3 md:w-3.5 md:h-3.5" />
+             <span className="hidden sm:inline">Torts:</span> Vicarious
            </button>
            <button
              onClick={() => {
                 const t = STUDY_DATA.find(i => i.id === 'la-3');
                 if(t) setSelectedTopic(t);
              }}
-             className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
            >
-             <Gavel className="w-3.5 h-3.5" />
-             IPC: General Exceptions
+             <Gavel className="w-3 h-3 md:w-3.5 md:h-3.5" />
+             <span className="hidden sm:inline">IPC:</span> Exceptions
            </button>
         </div>
       </div>
 
       {/* Topics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {filteredTopics.length > 0 ? (
           filteredTopics.map(topic => (
             <div 
               key={topic.id}
               onClick={() => setSelectedTopic(topic)}
-              className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-900 transition-all cursor-pointer group"
+              className="bg-white dark:bg-gray-800 p-4 md:p-5 rounded-lg md:rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-900 transition-all cursor-pointer group"
             >
-              <div className="flex justify-between items-start mb-3">
-                <span className={`px-2 py-1 rounded text-xs font-bold ${
+              <div className="flex justify-between items-start mb-2 md:mb-3">
+                <span className={`px-1.5 md:px-2 py-0.5 md:py-1 rounded text-xs font-bold ${
                   topic.difficulty === 'Easy' ? 'bg-green-100 text-green-700' : 
                   topic.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 
                   'bg-red-100 text-red-700'
@@ -1975,32 +1975,32 @@ const StudyHub: React.FC = () => {
                   <Clock className="w-3 h-3" /> {topic.readTime}m
                 </span>
               </div>
-              <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-2 group-hover:text-indigo-600 transition-colors">
+              <h3 className="font-bold text-gray-800 dark:text-gray-100 text-base md:text-lg mb-1.5 md:mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">
                 {topic.title}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4">
+              <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-3 md:mb-4">
                 {topic.summary}
               </p>
               <div className="flex items-center justify-between mt-auto">
-                <div className="flex gap-2">
-                   {topic.tags.map(tag => (
-                     <span key={tag} className="text-xs bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-2 py-1 rounded">#{tag}</span>
+                <div className="flex gap-1.5 md:gap-2 flex-wrap">
+                   {topic.tags.slice(0, 2).map(tag => (
+                     <span key={tag} className="text-xs bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 md:px-2 py-0.5 md:py-1 rounded">#{tag}</span>
                    ))}
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-500 transform group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-300 group-hover:text-indigo-500 transform group-hover:translate-x-1 transition-all flex-shrink-0" />
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-12">
-            <div className="bg-gray-50 dark:bg-gray-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-               <Search className="w-8 h-8 text-gray-300" />
+          <div className="col-span-full text-center py-8 md:py-12">
+            <div className="bg-gray-50 dark:bg-gray-800 w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+               <Search className="w-6 h-6 md:w-8 md:h-8 text-gray-300" />
             </div>
-            <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">No topics found</h3>
-            <p className="text-gray-400 text-sm">Try adjusting your search or filters</p>
+            <h3 className="text-base md:text-lg font-medium text-gray-600 dark:text-gray-300">No topics found</h3>
+            <p className="text-gray-400 text-xs md:text-sm">Try adjusting your search or filters</p>
             <button 
               onClick={() => { setSearchQuery(''); setFilterDifficulty('All'); setFilterTime('All'); }}
-              className="mt-4 text-indigo-600 font-bold text-sm hover:underline"
+              className="mt-3 md:mt-4 text-indigo-600 font-bold text-sm hover:underline"
             >
               Clear all filters
             </button>
@@ -2011,56 +2011,58 @@ const StudyHub: React.FC = () => {
   );
 
   const renderNews = () => (
-    <div className="space-y-6">
-      <div className="bg-indigo-900 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+    <div className="space-y-4 md:space-y-6">
+      <div className="bg-indigo-900 text-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg relative overflow-hidden">
         <div className="relative z-10">
-           <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-             <Newspaper className="w-6 h-6" /> Archive & Current Affairs
+           <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
+             <Newspaper className="w-5 h-5 md:w-6 md:h-6" /> Archive & Current Affairs
            </h2>
-           <p className="text-indigo-200 text-sm mb-6 max-w-lg">
+           <p className="text-indigo-200 text-xs md:text-sm mb-4 md:mb-6 max-w-lg">
              Powered by Google Search Grounding. Travel back to 2014 or get today's updates.
            </p>
            
-           <div className="flex flex-col md:flex-row gap-3">
-             <select 
-               value={newsYear} 
-               onChange={(e) => setNewsYear(e.target.value)}
-               className="bg-white/10 border border-indigo-400/30 rounded-lg px-4 py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-             >
-               {Array.from({length: 12}, (_, i) => 2025 - i).map(year => (
-                 <option key={year} value={year} className="text-gray-900">{year}</option>
-               ))}
-             </select>
-             <input 
-               type="text" 
-               value={newsTopic}
-               onChange={(e) => setNewsTopic(e.target.value)}
-               placeholder="Enter topic (e.g. Padma Awards, Elections)"
-               className="flex-1 bg-white/10 border border-indigo-400/30 rounded-lg px-4 py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-             />
+           <div className="flex flex-col gap-2 md:gap-3">
+             <div className="flex gap-2 md:gap-3">
+               <select 
+                 value={newsYear} 
+                 onChange={(e) => setNewsYear(e.target.value)}
+                 className="bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base w-24 md:w-auto"
+               >
+                 {Array.from({length: 12}, (_, i) => 2025 - i).map(year => (
+                   <option key={year} value={year} className="text-gray-900">{year}</option>
+                 ))}
+               </select>
+               <input 
+                 type="text" 
+                 value={newsTopic}
+                 onChange={(e) => setNewsTopic(e.target.value)}
+                 placeholder="Enter topic..."
+                 className="flex-1 bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base"
+               />
+             </div>
              <button 
                onClick={handleNewsFetch}
                disabled={newsLoading}
-               className="bg-yellow-400 text-indigo-900 font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition-colors shadow-lg flex items-center justify-center gap-2"
+               className="bg-yellow-400 text-indigo-900 font-bold px-4 md:px-6 py-2.5 md:py-3 rounded-lg hover:bg-yellow-300 transition-colors shadow-lg flex items-center justify-center gap-2 text-sm md:text-base"
              >
                {newsLoading ? <div className="w-4 h-4 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin" /> : <Search className="w-4 h-4" />}
                Fetch Data
              </button>
            </div>
         </div>
-        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none hidden md:block">
            <Search className="w-64 h-64 -mb-12 -mr-12" />
         </div>
       </div>
 
       {newsResult && (
-        <div className="space-y-6 animate-in slide-in-from-bottom-4">
+        <div className="space-y-4 md:space-y-6 animate-in slide-in-from-bottom-4">
            {/* Summary Card */}
-           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
+           <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+             <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white mb-3 md:mb-4">
                AI Summary: {newsTopic} ({newsYear})
              </h3>
-             <ReactMarkdown className="prose dark:prose-invert max-w-none text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+             <ReactMarkdown className="prose dark:prose-invert max-w-none text-xs md:text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                {newsResult.text}
              </ReactMarkdown>
            </div>
@@ -2068,20 +2070,20 @@ const StudyHub: React.FC = () => {
            {/* Sources */}
            {newsResult.sources.length > 0 && (
              <div>
-               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Verified Sources</h4>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 md:mb-3">Verified Sources</h4>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
                  {newsResult.sources.map((source, idx) => (
                    <a 
                      key={idx} 
                      href={source.uri} 
                      target="_blank" 
                      rel="noreferrer"
-                     className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors group"
+                     className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors group"
                    >
-                     <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                       <ExternalLink className="w-4 h-4" />
+                     <div className="p-1.5 md:p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                       <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
                      </div>
-                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">
+                     <span className="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">
                        {source.title}
                      </span>
                    </a>
@@ -2095,25 +2097,25 @@ const StudyHub: React.FC = () => {
   );
 
   const renderPlan = () => (
-    <div className="max-w-3xl mx-auto space-y-8">
-      <div className="text-center space-y-4">
-         <h2 className="text-3xl font-bold text-gray-800 dark:text-white">AI Personal Strategist</h2>
-         <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto">
+    <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+      <div className="text-center space-y-3 md:space-y-4">
+         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">AI Personal Strategist</h2>
+         <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 max-w-lg mx-auto px-4">
            Get a custom 12-week roadmap tailored to your weak areas and schedule.
          </p>
          <button 
            onClick={handleGeneratePlan}
            disabled={planLoading}
-           className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 mx-auto"
+           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 mx-auto text-sm md:text-base"
          >
-           {planLoading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Zap className="w-5 h-5" />}
+           {planLoading ? <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Zap className="w-4 h-4 md:w-5 md:h-5" />}
            Generate My Plan
          </button>
       </div>
       
       {studyPlan && (
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 animate-in fade-in zoom-in-95">
-           <ReactMarkdown className="prose dark:prose-invert max-w-none prose-headings:text-indigo-600 dark:prose-headings:text-indigo-400 prose-a:text-blue-500">
+        <div className="bg-white dark:bg-gray-800 p-4 md:p-8 rounded-xl md:rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 animate-in fade-in zoom-in-95">
+           <ReactMarkdown className="prose dark:prose-invert max-w-none prose-sm md:prose-base prose-headings:text-indigo-600 dark:prose-headings:text-indigo-400 prose-a:text-blue-500">
              {studyPlan}
            </ReactMarkdown>
         </div>
@@ -2126,31 +2128,31 @@ const StudyHub: React.FC = () => {
   if (selectedTopic) return renderReader();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Top Navigation Tabs */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4 md:mb-6 overflow-x-auto no-scrollbar">
          <button 
            onClick={() => setActiveTab('library')}
-           className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium transition-colors ${activeTab === 'library' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+           className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-3 md:py-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'library' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
          >
            <BookOpen className="w-4 h-4" /> Library
          </button>
          <button 
            onClick={() => setActiveTab('news')}
-           className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium transition-colors ${activeTab === 'news' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+           className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-3 md:py-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'news' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
          >
            <Newspaper className="w-4 h-4" /> Archive
          </button>
          <button 
            onClick={() => setActiveTab('plan')}
-           className={`flex items-center gap-2 px-6 py-4 border-b-2 font-medium transition-colors ${activeTab === 'plan' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+           className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-3 md:py-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'plan' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
          >
-           <Zap className="w-4 h-4" /> Study Plan
+           <Zap className="w-4 h-4" /> <span className="hidden sm:inline">Study</span> Plan
          </button>
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[500px]">
+      <div className="min-h-[400px] md:min-h-[500px]">
         {activeTab === 'library' && renderLibrary()}
         {activeTab === 'news' && renderNews()}
         {activeTab === 'plan' && renderPlan()}

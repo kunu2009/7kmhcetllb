@@ -148,27 +148,27 @@ const QuickNotes: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-3 md:p-6 max-w-6xl mx-auto space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 md:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <StickyNote className="w-8 h-8 text-amber-400" />
+          <h1 className="text-xl md:text-3xl font-bold text-white flex items-center gap-2 md:gap-3">
+            <StickyNote className="w-6 h-6 md:w-8 md:h-8 text-amber-400" />
             Quick Notes
           </h1>
-          <p className="text-gray-400 mt-1">Save important points for quick revision</p>
+          <p className="text-sm md:text-base text-gray-400 mt-1">Save important points for quick revision</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={exportNotes}
-            className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all flex items-center gap-2"
+            className="px-3 md:px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all flex items-center gap-1 md:gap-2 text-sm md:text-base"
           >
             <Download className="w-4 h-4" />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </button>
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-2"
+            className="px-3 md:px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-1 md:gap-2 text-sm md:text-base"
           >
             <Plus className="w-4 h-4" />
             Add Note
@@ -178,30 +178,30 @@ const QuickNotes: React.FC = () => {
 
       {/* Add/Edit Note Modal */}
       {isAdding && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-xl border border-gray-700 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-0 md:p-4">
+          <div className="bg-gray-800 rounded-t-2xl md:rounded-xl p-4 md:p-6 w-full md:max-w-xl border-t md:border border-gray-700 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">
               {editingNote ? 'Edit Note' : 'Add New Note'}
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Title</label>
+                <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">Title</label>
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g., Article 14 - Right to Equality"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 text-sm md:text-base"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Subject</label>
+                <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">Subject</label>
                 <select
                   value={newSubject}
                   onChange={(e) => setNewSubject(e.target.value as Subject)}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 text-sm md:text-base"
                 >
                   {Object.values(Subject).map(subject => (
                     <option key={subject} value={subject}>{subject}</option>
@@ -210,39 +210,39 @@ const QuickNotes: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Content</label>
+                <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">Content</label>
                 <textarea
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
-                  placeholder="Write your notes here... You can use markdown!"
-                  rows={6}
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 resize-none"
+                  placeholder="Write your notes here..."
+                  rows={5}
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 resize-none text-sm md:text-base"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">Tags (comma separated)</label>
+                <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">Tags (comma separated)</label>
                 <input
                   type="text"
                   value={newTags}
                   onChange={(e) => setNewTags(e.target.value)}
-                  placeholder="e.g., Constitution, Important, Article"
-                  className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g., Constitution, Important"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 text-sm md:text-base"
                 />
               </div>
               
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2 md:gap-3 pt-2">
                 <button
                   onClick={cancelEditing}
-                  className="flex-1 px-4 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all"
+                  className="flex-1 px-3 md:px-4 py-2.5 md:py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={editingNote ? handleUpdateNote : handleAddNote}
-                  className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
+                  className="flex-1 px-3 md:px-4 py-2.5 md:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm md:text-base"
                 >
-                  {editingNote ? 'Update Note' : 'Save Note'}
+                  {editingNote ? 'Update' : 'Save'}
                 </button>
               </div>
             </div>
@@ -251,48 +251,50 @@ const QuickNotes: React.FC = () => {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-2 md:gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search notes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500"
+            className="w-full pl-9 md:pl-10 pr-4 py-2 md:py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 text-sm md:text-base"
           />
         </div>
         
-        <select
-          value={filterSubject}
-          onChange={(e) => setFilterSubject(e.target.value as Subject | 'all')}
-          className="px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-indigo-500"
-        >
-          <option value="all">All Subjects</option>
-          {Object.values(Subject).map(subject => (
-            <option key={subject} value={subject}>{subject}</option>
-          ))}
-        </select>
-        
-        <button
-          onClick={() => setShowStarred(!showStarred)}
-          className={`px-4 py-3 rounded-lg transition-all flex items-center gap-2 ${
-            showStarred 
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
-              : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700'
-          }`}
-        >
-          {showStarred ? <Star className="w-5 h-5 fill-current" /> : <StarOff className="w-5 h-5" />}
-          Starred
-        </button>
+        <div className="flex gap-2">
+          <select
+            value={filterSubject}
+            onChange={(e) => setFilterSubject(e.target.value as Subject | 'all')}
+            className="flex-1 sm:flex-none px-3 md:px-4 py-2 md:py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 text-sm md:text-base"
+          >
+            <option value="all">All Subjects</option>
+            {Object.values(Subject).map(subject => (
+              <option key={subject} value={subject}>{subject}</option>
+            ))}
+          </select>
+          
+          <button
+            onClick={() => setShowStarred(!showStarred)}
+            className={`px-3 md:px-4 py-2 md:py-3 rounded-lg transition-all flex items-center gap-1 md:gap-2 text-sm md:text-base ${
+              showStarred 
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700'
+            }`}
+          >
+            {showStarred ? <Star className="w-4 h-4 md:w-5 md:h-5 fill-current" /> : <StarOff className="w-4 h-4 md:w-5 md:h-5" />}
+            <span className="hidden sm:inline">Starred</span>
+          </button>
+        </div>
       </div>
 
       {/* Notes Grid */}
       {filteredNotes.length === 0 ? (
-        <div className="text-center py-16">
-          <StickyNote className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-400 mb-2">No notes found</h3>
-          <p className="text-gray-500 mb-4">
+        <div className="text-center py-10 md:py-16">
+          <StickyNote className="w-12 h-12 md:w-16 md:h-16 text-gray-600 mx-auto mb-3 md:mb-4" />
+          <h3 className="text-lg md:text-xl font-medium text-gray-400 mb-2">No notes found</h3>
+          <p className="text-sm md:text-base text-gray-500 mb-4">
             {searchTerm || filterSubject !== 'all' || showStarred 
               ? 'Try adjusting your filters' 
               : 'Start by adding your first note!'}
@@ -300,25 +302,25 @@ const QuickNotes: React.FC = () => {
           {!searchTerm && filterSubject === 'all' && !showStarred && (
             <button
               onClick={() => setIsAdding(true)}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all inline-flex items-center gap-2"
+              className="px-4 md:px-6 py-2 md:py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all inline-flex items-center gap-2 text-sm md:text-base"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4 md:w-5 md:h-5" />
               Create First Note
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {filteredNotes.map(note => (
             <div 
               key={note.id} 
               className={`bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden hover:border-gray-600 transition-all group`}
             >
               {/* Note Header */}
-              <div className={`p-3 border-b border-gray-700 ${getSubjectColor(note.subject)} flex items-center justify-between`}>
-                <div className="flex items-center gap-2">
+              <div className={`p-2 md:p-3 border-b border-gray-700 ${getSubjectColor(note.subject)} flex items-center justify-between`}>
+                <div className="flex items-center gap-1 md:gap-2">
                   {getSubjectIcon(note.subject)}
-                  <span className="text-xs font-medium">{note.subject}</span>
+                  <span className="text-[10px] md:text-xs font-medium">{note.subject}</span>
                 </div>
                 <button
                   onClick={() => toggleStar(note.id)}
@@ -333,40 +335,40 @@ const QuickNotes: React.FC = () => {
               </div>
               
               {/* Note Content */}
-              <div className="p-4">
-                <h3 className="font-bold text-white mb-2 line-clamp-2">{note.title}</h3>
-                <p className="text-sm text-gray-400 line-clamp-4 whitespace-pre-wrap">{note.content}</p>
+              <div className="p-3 md:p-4">
+                <h3 className="font-bold text-white text-sm md:text-base mb-1 md:mb-2 line-clamp-2">{note.title}</h3>
+                <p className="text-xs md:text-sm text-gray-400 line-clamp-3 md:line-clamp-4 whitespace-pre-wrap">{note.content}</p>
                 
                 {/* Tags */}
                 {note.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-3">
+                  <div className="flex flex-wrap gap-1 mt-2 md:mt-3">
                     {note.tags.slice(0, 3).map(tag => (
-                      <span key={tag} className="px-2 py-0.5 bg-gray-700 text-gray-400 text-xs rounded-full">
+                      <span key={tag} className="px-1.5 md:px-2 py-0.5 bg-gray-700 text-gray-400 text-[10px] md:text-xs rounded-full">
                         #{tag}
                       </span>
                     ))}
                     {note.tags.length > 3 && (
-                      <span className="text-xs text-gray-500">+{note.tags.length - 3}</span>
+                      <span className="text-[10px] md:text-xs text-gray-500">+{note.tags.length - 3}</span>
                     )}
                   </div>
                 )}
               </div>
               
               {/* Note Actions */}
-              <div className="p-3 border-t border-gray-700 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-xs text-gray-500">
+              <div className="p-2 md:p-3 border-t border-gray-700 flex justify-between items-center md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] md:text-xs text-gray-500">
                   {new Date(note.createdAt).toLocaleDateString()}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => startEditing(note)}
-                    className="px-3 py-1 text-xs bg-gray-700 text-white rounded hover:bg-gray-600 transition-all"
+                    className="px-2 md:px-3 py-1 text-[10px] md:text-xs bg-gray-700 text-white rounded hover:bg-gray-600 transition-all"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDeleteNote(note.id)}
-                    className="px-3 py-1 text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-all"
+                    className="px-2 md:px-3 py-1 text-[10px] md:text-xs bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-all"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -378,22 +380,22 @@ const QuickNotes: React.FC = () => {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-800">
+      <div className="grid grid-cols-4 gap-2 md:gap-4 pt-4 border-t border-gray-800">
         <div className="text-center">
-          <p className="text-2xl font-bold text-white">{notes.length}</p>
-          <p className="text-xs text-gray-400">Total Notes</p>
+          <p className="text-lg md:text-2xl font-bold text-white">{notes.length}</p>
+          <p className="text-[10px] md:text-xs text-gray-400">Total</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-amber-400">{notes.filter(n => n.isStarred).length}</p>
-          <p className="text-xs text-gray-400">Starred</p>
+          <p className="text-lg md:text-2xl font-bold text-amber-400">{notes.filter(n => n.isStarred).length}</p>
+          <p className="text-[10px] md:text-xs text-gray-400">Starred</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-purple-400">{notes.filter(n => n.subject === Subject.LegalAptitude).length}</p>
-          <p className="text-xs text-gray-400">Legal Notes</p>
+          <p className="text-lg md:text-2xl font-bold text-purple-400">{notes.filter(n => n.subject === Subject.LegalAptitude).length}</p>
+          <p className="text-[10px] md:text-xs text-gray-400">Legal</p>
         </div>
         <div className="text-center">
-          <p className="text-2xl font-bold text-blue-400">{new Set(notes.flatMap(n => n.tags)).size}</p>
-          <p className="text-xs text-gray-400">Unique Tags</p>
+          <p className="text-lg md:text-2xl font-bold text-blue-400">{new Set(notes.flatMap(n => n.tags)).size}</p>
+          <p className="text-[10px] md:text-xs text-gray-400">Tags</p>
         </div>
       </div>
     </div>

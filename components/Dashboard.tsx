@@ -50,52 +50,52 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-900 dark:to-gray-900 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 p-8 opacity-10">
+      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-900 dark:to-gray-900 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 p-8 opacity-10 hidden md:block">
           <Trophy className="w-64 h-64 transform rotate-12" />
         </div>
-        <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Mission Rank 1 🚀</h2>
-            <p className="text-indigo-100 max-w-lg text-lg">
-              "Consistency is what transforms average into excellence." <br/> Keep pushing, you are closer to your goal than yesterday.
+        <div className="relative z-10 p-5 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
+          <div className="space-y-1 md:space-y-2">
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Mission Rank 1 🚀</h2>
+            <p className="text-indigo-100 max-w-lg text-sm md:text-lg">
+              "Consistency is what transforms average into excellence."
             </p>
           </div>
-          <div className="flex flex-col gap-3 w-full md:w-auto">
+          <div className="flex gap-2 md:gap-3 w-full md:w-auto">
             <Link 
               to="/practice" 
-              className="bg-white text-indigo-700 hover:bg-indigo-50 px-6 py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group"
+              className="flex-1 md:flex-none bg-white text-indigo-700 hover:bg-indigo-50 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
             >
-              <Zap className="w-5 h-5 group-hover:text-yellow-500 transition-colors" />
-              Quick Mock Test
+              <Zap className="w-4 h-4 md:w-5 md:h-5 group-hover:text-yellow-500 transition-colors" />
+              <span className="hidden sm:inline">Quick</span> Mock Test
             </Link>
             <Link 
               to="/study" 
-              className="bg-indigo-700/50 hover:bg-indigo-700/70 backdrop-blur-sm text-white px-6 py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-indigo-400/30"
+              className="flex-1 md:flex-none bg-indigo-700/50 hover:bg-indigo-700/70 backdrop-blur-sm text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-indigo-400/30 text-sm md:text-base"
             >
-              <BookOpen className="w-5 h-5" />
-              Continue Studying
+              <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
+              Study
             </Link>
           </div>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[
           { label: 'Accuracy', value: `${stats.accuracy}%`, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
           { label: 'Topics Mastered', value: stats.topicsMastered, icon: Award, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
           { label: 'Study Hours', value: `${stats.studyHours}h`, icon: Clock, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
           { label: 'Days to Exam', value: daysUntilExam, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
         ].map((item, idx) => (
-          <div key={idx} className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
+          <div key={idx} className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
-                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mt-1 group-hover:scale-105 transition-transform origin-left">{item.value}</h3>
+                <p className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mt-1 group-hover:scale-105 transition-transform origin-left">{item.value}</h3>
               </div>
-              <div className={`p-3 rounded-xl ${item.bg} ${item.color}`}>
-                <item.icon className="w-6 h-6" />
+              <div className={`p-2 md:p-3 rounded-lg md:rounded-xl ${item.bg} ${item.color}`}>
+                <item.icon className="w-5 h-5 md:w-6 md:h-6" />
               </div>
             </div>
           </div>
@@ -103,53 +103,53 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Quick Access Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Link to="/daily" className="bg-gradient-to-br from-yellow-500 to-amber-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
-          <Zap className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-          <h3 className="font-bold">Daily Challenge</h3>
-          <p className="text-xs text-yellow-200">Build your streak!</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
+        <Link to="/daily" className="bg-gradient-to-br from-yellow-500 to-amber-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Zap className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">Daily Challenge</h3>
+          <p className="text-[10px] md:text-xs text-yellow-200 hidden sm:block">Build your streak!</p>
         </Link>
-        <Link to="/pyq" className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
-          <FileText className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-          <h3 className="font-bold">PYQ Papers</h3>
-          <p className="text-xs text-purple-200">2023-2025 Papers</p>
+        <Link to="/pyq" className="bg-gradient-to-br from-purple-500 to-indigo-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <FileText className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">PYQ Papers</h3>
+          <p className="text-[10px] md:text-xs text-purple-200 hidden sm:block">2023-2025 Papers</p>
         </Link>
-        <Link to="/flashcards" className="bg-gradient-to-br from-amber-500 to-orange-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
-          <Layers className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-          <h3 className="font-bold">Flashcards</h3>
-          <p className="text-xs text-amber-200">30+ Legal Cards</p>
+        <Link to="/flashcards" className="bg-gradient-to-br from-amber-500 to-orange-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Layers className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">Flashcards</h3>
+          <p className="text-[10px] md:text-xs text-amber-200 hidden sm:block">30+ Legal Cards</p>
         </Link>
-        <Link to="/colleges" className="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
-          <Building2 className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-          <h3 className="font-bold">Colleges</h3>
-          <p className="text-xs text-emerald-200">Cutoff Predictor</p>
+        <Link to="/colleges" className="bg-gradient-to-br from-emerald-500 to-teal-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <Building2 className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">Colleges</h3>
+          <p className="text-[10px] md:text-xs text-emerald-200 hidden sm:block">Cutoff Predictor</p>
         </Link>
-        <Link to="/mentor" className="bg-gradient-to-br from-rose-500 to-pink-600 p-5 rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
-          <BrainCircuit className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" />
-          <h3 className="font-bold">AI Mentor</h3>
-          <p className="text-xs text-rose-200">Ask Doubts</p>
+        <Link to="/mentor" className="bg-gradient-to-br from-rose-500 to-pink-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group col-span-2 sm:col-span-1">
+          <BrainCircuit className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">AI Mentor</h3>
+          <p className="text-[10px] md:text-xs text-rose-200 hidden sm:block">Ask Doubts</p>
         </Link>
       </div>
 
       {/* Maxim of the Day */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black rounded-2xl p-6 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 opacity-10">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black rounded-xl md:rounded-2xl p-4 md:p-6 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 opacity-10 hidden md:block">
           <Scale className="w-32 h-32 transform rotate-12" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-3">
-            <Flame className="w-5 h-5 text-amber-400" />
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">Legal Maxim of the Day</span>
+          <div className="flex items-center gap-2 mb-2 md:mb-3">
+            <Flame className="w-4 h-4 md:w-5 md:h-5 text-amber-400" />
+            <span className="text-[10px] md:text-xs font-bold text-amber-400 uppercase tracking-wider">Legal Maxim of the Day</span>
           </div>
-          <h3 className="text-xl md:text-2xl font-bold italic mb-2">"{todaysMaxim.latin}"</h3>
-          <p className="text-slate-300 mb-2">{todaysMaxim.meaning}</p>
-          <p className="text-xs text-slate-400 flex items-center gap-1">
+          <h3 className="text-base md:text-2xl font-bold italic mb-1 md:mb-2">"{todaysMaxim.latin}"</h3>
+          <p className="text-slate-300 text-sm md:text-base mb-1 md:mb-2">{todaysMaxim.meaning}</p>
+          <p className="text-[10px] md:text-xs text-slate-400 flex items-center gap-1">
             <BookOpen className="w-3 h-3" /> {todaysMaxim.usage}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Study Consistency Chart */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">

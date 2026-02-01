@@ -403,9 +403,9 @@ const DailyPractice: React.FC = () => {
           )}
           
           {/* Info */}
-          <div className="mt-6 text-left bg-gray-700/30 rounded-lg p-4">
-            <h3 className="font-medium text-white mb-2">📌 Challenge Rules:</h3>
-            <ul className="text-sm text-gray-400 space-y-1">
+          <div className="mt-4 md:mt-6 text-left bg-gray-700/30 rounded-lg p-3 md:p-4">
+            <h3 className="font-medium text-white mb-2 text-sm md:text-base">📌 Challenge Rules:</h3>
+            <ul className="text-xs md:text-sm text-gray-400 space-y-1">
               <li>• 10 questions covering all subjects</li>
               <li>• Each correct answer = 10 points</li>
               <li>• Complete daily to maintain streak</li>
@@ -422,58 +422,58 @@ const DailyPractice: React.FC = () => {
     const percentage = (score / questions.length) * 100;
     
     return (
-      <div className="p-6 max-w-2xl mx-auto">
-        <div className="bg-gray-800/50 rounded-xl p-8 border border-gray-700 text-center">
-          <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+      <div className="p-3 md:p-6 max-w-2xl mx-auto">
+        <div className="bg-gray-800/50 rounded-xl p-4 md:p-8 border border-gray-700 text-center">
+          <div className={`w-16 h-16 md:w-24 md:h-24 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 ${
             percentage >= 70 ? 'bg-green-500/20' : percentage >= 40 ? 'bg-yellow-500/20' : 'bg-red-500/20'
           }`}>
             {percentage >= 70 ? (
-              <Trophy className="w-12 h-12 text-green-400" />
+              <Trophy className="w-8 h-8 md:w-12 md:h-12 text-green-400" />
             ) : percentage >= 40 ? (
-              <Target className="w-12 h-12 text-yellow-400" />
+              <Target className="w-8 h-8 md:w-12 md:h-12 text-yellow-400" />
             ) : (
-              <RefreshCw className="w-12 h-12 text-red-400" />
+              <RefreshCw className="w-8 h-8 md:w-12 md:h-12 text-red-400" />
             )}
           </div>
           
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-xl md:text-3xl font-bold text-white mb-2">
             {percentage >= 70 ? 'Excellent!' : percentage >= 40 ? 'Good Effort!' : 'Keep Practicing!'}
           </h2>
           
-          <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-4">
+          <div className="text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2 md:mb-4">
             {score}/{questions.length}
           </div>
           
-          <p className="text-gray-400 mb-6">You earned {score * 10} points!</p>
+          <p className="text-gray-400 text-sm md:text-base mb-4 md:mb-6">You earned {score * 10} points!</p>
           
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-700/50 rounded-lg p-3">
-              <p className="text-2xl font-bold text-green-400">{score}</p>
-              <p className="text-xs text-gray-400">Correct</p>
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
+            <div className="bg-gray-700/50 rounded-lg p-2 md:p-3">
+              <p className="text-xl md:text-2xl font-bold text-green-400">{score}</p>
+              <p className="text-[10px] md:text-xs text-gray-400">Correct</p>
             </div>
-            <div className="bg-gray-700/50 rounded-lg p-3">
-              <p className="text-2xl font-bold text-red-400">{questions.length - score}</p>
-              <p className="text-xs text-gray-400">Wrong</p>
+            <div className="bg-gray-700/50 rounded-lg p-2 md:p-3">
+              <p className="text-xl md:text-2xl font-bold text-red-400">{questions.length - score}</p>
+              <p className="text-[10px] md:text-xs text-gray-400">Wrong</p>
             </div>
-            <div className="bg-gray-700/50 rounded-lg p-3">
-              <p className="text-2xl font-bold text-amber-400">{percentage.toFixed(0)}%</p>
-              <p className="text-xs text-gray-400">Accuracy</p>
+            <div className="bg-gray-700/50 rounded-lg p-2 md:p-3">
+              <p className="text-xl md:text-2xl font-bold text-amber-400">{percentage.toFixed(0)}%</p>
+              <p className="text-[10px] md:text-xs text-gray-400">Accuracy</p>
             </div>
           </div>
           
           {/* Streak Update */}
-          <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-lg p-4 mb-6">
+          <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-lg p-3 md:p-4 mb-4 md:mb-6">
             <div className="flex items-center justify-center gap-2">
-              <Flame className="w-6 h-6 text-orange-500" />
-              <span className="text-xl font-bold text-white">{streak} Day Streak!</span>
+              <Flame className="w-5 h-5 md:w-6 md:h-6 text-orange-500" />
+              <span className="text-lg md:text-xl font-bold text-white">{streak} Day Streak!</span>
             </div>
-            <p className="text-sm text-gray-400 mt-1">Keep it going tomorrow!</p>
+            <p className="text-xs md:text-sm text-gray-400 mt-1">Keep it going tomorrow!</p>
           </div>
           
           {/* Review Answers */}
-          <div className="text-left bg-gray-700/30 rounded-lg p-4 mb-6 max-h-60 overflow-y-auto">
-            <h3 className="font-medium text-white mb-3">📋 Review Answers:</h3>
+          <div className="text-left bg-gray-700/30 rounded-lg p-3 md:p-4 mb-4 md:mb-6 max-h-48 md:max-h-60 overflow-y-auto">
+            <h3 className="font-medium text-white mb-3 text-sm md:text-base">📋 Review Answers:</h3>
             {questions.map((q, idx) => (
               <div key={q.id} className={`flex items-start gap-2 py-2 border-b border-gray-600/30 last:border-0`}>
                 <span className="flex-shrink-0">
@@ -484,14 +484,14 @@ const DailyPractice: React.FC = () => {
                   )}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-300 truncate">{idx + 1}. {q.question}</p>
-                  <p className="text-xs text-green-400">Ans: {q.options[q.correctAnswer]}</p>
+                  <p className="text-xs md:text-sm text-gray-300 truncate">{idx + 1}. {q.question}</p>
+                  <p className="text-[10px] md:text-xs text-green-400">Ans: {q.options[q.correctAnswer]}</p>
                 </div>
               </div>
             ))}
           </div>
           
-          <p className="text-gray-400 text-sm">Come back tomorrow for new questions!</p>
+          <p className="text-gray-400 text-xs md:text-sm">Come back tomorrow for new questions!</p>
         </div>
       </div>
     );
@@ -501,25 +501,25 @@ const DailyPractice: React.FC = () => {
   const currentQuestion = questions[currentIndex];
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-3 md:p-6 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <span className="text-lg font-bold text-white">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
+        <div className="flex items-center gap-2 md:gap-4">
+          <span className="text-base md:text-lg font-bold text-white">
             Q{currentIndex + 1}/{questions.length}
           </span>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getSubjectColor(currentQuestion.subject)}`}>
+          <span className={`px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-medium ${getSubjectColor(currentQuestion.subject)}`}>
             {currentQuestion.subject}
           </span>
         </div>
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${timeLeft < 60 ? 'bg-red-500/20 text-red-400' : 'bg-gray-700/50 text-white'}`}>
-          <Clock className="w-4 h-4" />
-          <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
+        <div className={`flex items-center gap-1 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 rounded-lg ${timeLeft < 60 ? 'bg-red-500/20 text-red-400' : 'bg-gray-700/50 text-white'}`}>
+          <Clock className="w-3 h-3 md:w-4 md:h-4" />
+          <span className="font-mono font-bold text-sm md:text-base">{formatTime(timeLeft)}</span>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 bg-gray-700 rounded-full mb-6 overflow-hidden">
+      <div className="h-1.5 md:h-2 bg-gray-700 rounded-full mb-4 md:mb-6 overflow-hidden">
         <div 
           className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
           style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
@@ -527,18 +527,18 @@ const DailyPractice: React.FC = () => {
       </div>
 
       {/* Question Card */}
-      <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700 mb-6">
-        <h3 className="text-xl font-medium text-white mb-6">
+      <div className="bg-gray-800/50 rounded-xl p-4 md:p-6 border border-gray-700 mb-4 md:mb-6">
+        <h3 className="text-base md:text-xl font-medium text-white mb-4 md:mb-6">
           {currentQuestion.question}
         </h3>
         
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           {currentQuestion.options.map((option, idx) => (
             <button
               key={idx}
               onClick={() => handleAnswer(idx)}
               disabled={selectedAnswer !== null}
-              className={`w-full p-4 rounded-xl text-left transition-all ${
+              className={`w-full p-3 md:p-4 rounded-xl text-left transition-all text-sm md:text-base ${
                 selectedAnswer === null
                   ? 'bg-gray-700/50 hover:bg-gray-700 border border-gray-600 text-white'
                   : idx === currentQuestion.correctAnswer
@@ -555,8 +555,8 @@ const DailyPractice: React.FC = () => {
 
         {/* Explanation */}
         {showExplanation && (
-          <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-            <p className="text-sm text-blue-300">
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <p className="text-xs md:text-sm text-blue-300">
               <span className="font-bold">💡 Explanation:</span> {currentQuestion.explanation}
             </p>
           </div>
@@ -567,17 +567,17 @@ const DailyPractice: React.FC = () => {
       {selectedAnswer !== null && (
         <button
           onClick={handleNext}
-          className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 md:py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all flex items-center justify-center gap-2 text-sm md:text-base"
         >
           {currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Practice'}
-          <ArrowRight className="w-5 h-5" />
+          <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       )}
 
       {/* Score indicator */}
-      <div className="flex items-center justify-center gap-4 mt-4">
-        <span className="text-green-400 text-sm">✓ {score} correct</span>
-        <span className="text-red-400 text-sm">✗ {currentIndex - score + (selectedAnswer !== null ? 1 : 0) - (selectedAnswer === currentQuestion.correctAnswer ? 1 : 0)} wrong</span>
+      <div className="flex items-center justify-center gap-4 mt-3 md:mt-4">
+        <span className="text-green-400 text-xs md:text-sm">✓ {score} correct</span>
+        <span className="text-red-400 text-xs md:text-sm">✗ {currentIndex - score + (selectedAnswer !== null ? 1 : 0) - (selectedAnswer === currentQuestion.correctAnswer ? 1 : 0)} wrong</span>
       </div>
     </div>
   );

@@ -296,36 +296,36 @@ const CollegeHub: React.FC = () => {
   // Render College Detail View
   if (selectedCollege) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Back Button */}
         <button 
           onClick={() => setSelectedCollege(null)}
-          className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+          className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline font-medium text-sm md:text-base"
         >
           ← Back to Colleges
         </button>
 
         {/* College Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-900 dark:to-purple-900 rounded-2xl p-8 text-white">
-          <div className="flex items-start gap-6">
-            <div className="text-6xl">{selectedCollege.image}</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-900 dark:to-purple-900 rounded-xl md:rounded-2xl p-4 md:p-8 text-white">
+          <div className="flex items-start gap-3 md:gap-6">
+            <div className="text-4xl md:text-6xl">{selectedCollege.image}</div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
+                <span className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-bold ${
                   selectedCollege.type === 'Government' ? 'bg-emerald-500' :
                   selectedCollege.type === 'Aided' ? 'bg-blue-500' : 'bg-purple-500'
                 }`}>
                   {selectedCollege.type}
                 </span>
-                <span className="text-indigo-200 text-sm">Est. {selectedCollege.established}</span>
+                <span className="text-indigo-200 text-xs md:text-sm">Est. {selectedCollege.established}</span>
               </div>
-              <h1 className="text-3xl font-bold mb-2">{selectedCollege.name}</h1>
-              <div className="flex items-center gap-4 text-indigo-200">
+              <h1 className="text-xl md:text-3xl font-bold mb-1 md:mb-2 leading-tight">{selectedCollege.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 text-indigo-200 text-xs md:text-base">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> {selectedCollege.location}
+                  <MapPin className="w-3 h-3 md:w-4 md:h-4" /> {selectedCollege.location}
                 </span>
                 <a href={selectedCollege.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-white">
-                  <Globe className="w-4 h-4" /> Website
+                  <Globe className="w-3 h-3 md:w-4 md:h-4" /> Website
                 </a>
               </div>
             </div>
@@ -333,26 +333,26 @@ const CollegeHub: React.FC = () => {
         </div>
 
         {/* Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* About */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-indigo-500" /> About
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" /> About
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
               {selectedCollege.description}
             </p>
           </div>
 
           {/* Highlights */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-amber-500" /> Highlights
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+              <Star className="w-4 h-4 md:w-5 md:h-5 text-amber-500" /> Highlights
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 md:space-y-2">
               {selectedCollege.highlights.map((h, i) => (
-                <li key={i} className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <li key={i} className="flex items-start gap-2 text-sm md:text-base text-gray-600 dark:text-gray-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
                   {h}
                 </li>
               ))}
@@ -360,43 +360,43 @@ const CollegeHub: React.FC = () => {
           </div>
 
           {/* Courses & Fees */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <IndianRupee className="w-5 h-5 text-emerald-500" /> Courses & Fees
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+              <IndianRupee className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" /> Courses & Fees
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Courses Offered:</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-2">Courses Offered:</p>
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {selectedCollege.courses.map((c, i) => (
-                    <span key={i} className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm">
+                    <span key={i} className="px-2 md:px-3 py-0.5 md:py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-xs md:text-sm">
                       {c}
                     </span>
                   ))}
                 </div>
               </div>
-              <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Annual Fees (Approx):</p>
-                <div className="text-2xl font-bold text-gray-800 dark:text-white">
+              <div className="border-t border-gray-100 dark:border-gray-700 pt-3 md:pt-4">
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1 md:mb-2">Annual Fees (Approx):</p>
+                <div className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
                   ₹{selectedCollege.fees.total.toLocaleString()}
-                  <span className="text-sm font-normal text-gray-500">/year</span>
+                  <span className="text-xs md:text-sm font-normal text-gray-500">/year</span>
                 </div>
                 {selectedCollege.fees.hostel && (
-                  <p className="text-sm text-gray-500 mt-1">Hostel: ₹{selectedCollege.fees.hostel.toLocaleString()}/year</p>
+                  <p className="text-xs md:text-sm text-gray-500 mt-1">Hostel: ₹{selectedCollege.fees.hostel.toLocaleString()}/year</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Notable Alumni */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Award className="w-5 h-5 text-purple-500" /> Notable Alumni
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+              <Award className="w-4 h-4 md:w-5 md:h-5 text-purple-500" /> Notable Alumni
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 md:space-y-2">
               {selectedCollege.alumniNotable.map((a, i) => (
-                <li key={i} className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                  <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                <li key={i} className="flex items-start gap-2 text-sm md:text-base text-gray-600 dark:text-gray-300">
+                  <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-400 flex-shrink-0 mt-0.5" />
                   {a}
                 </li>
               ))}
@@ -405,33 +405,33 @@ const CollegeHub: React.FC = () => {
         </div>
 
         {/* Cutoff History */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-500" /> Cutoff History (Out of 150)
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-blue-500" /> Cutoff History (Out of 150)
           </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+            <table className="w-full text-xs md:text-sm min-w-[500px]">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">Year</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">Course</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">General</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">OBC</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">SC</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">ST</th>
-                  <th className="text-center py-3 px-4 font-semibold text-gray-600 dark:text-gray-300">EWS</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">Year</th>
+                  <th className="text-left py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">Course</th>
+                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">General</th>
+                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">OBC</th>
+                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">SC</th>
+                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">ST</th>
+                  <th className="text-center py-2 md:py-3 px-2 md:px-4 font-semibold text-gray-600 dark:text-gray-300">EWS</th>
                 </tr>
               </thead>
               <tbody>
                 {selectedCollege.cutoffs.map((c, i) => (
                   <tr key={i} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                    <td className="py-3 px-4 font-medium text-gray-800 dark:text-white">{c.year}</td>
-                    <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{c.course}</td>
-                    <td className="py-3 px-4 text-center font-bold text-indigo-600 dark:text-indigo-400">{c.general}</td>
-                    <td className="py-3 px-4 text-center text-gray-600 dark:text-gray-300">{c.obc}</td>
-                    <td className="py-3 px-4 text-center text-gray-600 dark:text-gray-300">{c.sc}</td>
-                    <td className="py-3 px-4 text-center text-gray-600 dark:text-gray-300">{c.st}</td>
-                    <td className="py-3 px-4 text-center text-gray-600 dark:text-gray-300">{c.ews}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 font-medium text-gray-800 dark:text-white">{c.year}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-gray-600 dark:text-gray-300">{c.course}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-center font-bold text-indigo-600 dark:text-indigo-400">{c.general}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-center text-gray-600 dark:text-gray-300">{c.obc}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-center text-gray-600 dark:text-gray-300">{c.sc}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-center text-gray-600 dark:text-gray-300">{c.st}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-4 text-center text-gray-600 dark:text-gray-300">{c.ews}</td>
                   </tr>
                 ))}
               </tbody>
@@ -443,85 +443,86 @@ const CollegeHub: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mumbai Law Colleges</h1>
-          <p className="text-gray-500 dark:text-gray-400">Your complete guide to top law colleges in Mumbai</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">Mumbai Law Colleges</h1>
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">Your complete guide to top law colleges in Mumbai</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div className="flex gap-1.5 md:gap-2 overflow-x-auto pb-2 -mx-1 px-1 no-scrollbar">
         {[
           { id: 'colleges', label: 'Colleges', icon: Building2 },
-          { id: 'predictor', label: 'Cutoff Predictor', icon: Calculator },
-          { id: 'timeline', label: 'Admission Timeline', icon: Calendar },
-          { id: 'documents', label: 'Documents', icon: FileText },
+          { id: 'predictor', label: 'Predictor', icon: Calculator },
+          { id: 'timeline', label: 'Timeline', icon: Calendar },
+          { id: 'documents', label: 'Docs', icon: FileText },
         ].map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
+            className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl font-medium whitespace-nowrap transition-all text-xs md:text-sm ${
               activeTab === tab.id
                 ? 'bg-indigo-600 text-white shadow-lg'
                 : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
             }`}
           >
-            <tab.icon className="w-4 h-4" />
-            {tab.label}
+            <tab.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="sm:hidden">{tab.id === 'predictor' ? 'Cut' : tab.id === 'documents' ? 'Docs' : tab.label}</span>
           </button>
         ))}
       </div>
 
       {/* Colleges Tab */}
       {activeTab === 'colleges' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {COLLEGES.map(college => (
             <div 
               key={college.id}
-              className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
               onClick={() => setSelectedCollege(college)}
             >
-              <div className={`p-6 ${
+              <div className={`p-4 md:p-6 ${
                 college.type === 'Government' ? 'bg-gradient-to-r from-emerald-500 to-teal-500' :
                 college.type === 'Aided' ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
                 'bg-gradient-to-r from-purple-500 to-pink-500'
               } text-white`}>
                 <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded">
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-bold bg-white/20 px-2 py-0.5 rounded">
                       {college.type}
                     </span>
-                    <h3 className="text-xl font-bold mt-2">{college.name}</h3>
-                    <p className="text-white/80 flex items-center gap-1 mt-1">
-                      <MapPin className="w-4 h-4" /> {college.location}
+                    <h3 className="text-base md:text-xl font-bold mt-2 leading-tight">{college.name}</h3>
+                    <p className="text-white/80 flex items-center gap-1 mt-1 text-xs md:text-sm">
+                      <MapPin className="w-3 h-3 md:w-4 md:h-4" /> {college.location}
                     </p>
                   </div>
-                  <div className="text-5xl opacity-80 group-hover:scale-110 transition-transform">
+                  <div className="text-3xl md:text-5xl opacity-80 group-hover:scale-110 transition-transform ml-2">
                     {college.image}
                   </div>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="flex flex-wrap gap-2 mb-4">
+              <div className="p-4 md:p-6">
+                <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-4">
                   {college.courses.map((c, i) => (
-                    <span key={i} className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+                    <span key={i} className="text-xs px-1.5 md:px-2 py-0.5 md:py-1 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
                       {c}
                     </span>
                   ))}
                 </div>
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Latest Cutoff (General)</p>
-                    <p className="text-2xl font-bold text-gray-800 dark:text-white">
-                      {college.cutoffs[0]?.general || 'N/A'}<span className="text-sm text-gray-500">/150</span>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Latest Cutoff (Gen)</p>
+                    <p className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">
+                      {college.cutoffs[0]?.general || 'N/A'}<span className="text-xs md:text-sm text-gray-500">/150</span>
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-500 dark:text-gray-400">Annual Fees</p>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                    <p className="text-base md:text-lg font-bold text-emerald-600 dark:text-emerald-400">
                       ₹{college.fees.total.toLocaleString()}
                     </p>
                   </div>
@@ -534,16 +535,16 @@ const CollegeHub: React.FC = () => {
 
       {/* Cutoff Predictor Tab */}
       {activeTab === 'predictor' && (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Input Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Calculator className="w-5 h-5 text-indigo-500" /> Check Your Admission Chances
+          <div className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="font-bold text-base md:text-lg mb-3 md:mb-4 flex items-center gap-2">
+              <Calculator className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" /> Check Your Admission Chances
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                  Expected Score (Out of 150)
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5 md:mb-2">
+                  Expected Score (/150)
                 </label>
                 <input
                   type="number"
@@ -552,19 +553,19 @@ const CollegeHub: React.FC = () => {
                   value={predictorScore}
                   onChange={(e) => setPredictorScore(e.target.value)}
                   placeholder="Enter score"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm md:text-base"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5 md:mb-2">
                   Category
                 </label>
                 <select
                   value={predictorCategory}
                   onChange={(e) => setPredictorCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-2 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500 text-xs md:text-base"
                 >
-                  <option value="general">General / Open</option>
+                  <option value="general">General</option>
                   <option value="obc">OBC</option>
                   <option value="sc">SC</option>
                   <option value="st">ST</option>
@@ -573,22 +574,22 @@ const CollegeHub: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5 md:mb-2">
                   Course
                 </label>
                 <select
                   value={predictorCourse}
                   onChange={(e) => setPredictorCourse(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-2 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-indigo-500 text-xs md:text-base"
                 >
-                  <option value="5-Year">BA-LL.B (5-Year)</option>
-                  <option value="3-Year">LL.B (3-Year)</option>
+                  <option value="5-Year">5-Year</option>
+                  <option value="3-Year">3-Year</option>
                 </select>
               </div>
-              <div className="flex items-end">
-                <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-xl p-4 w-full text-center">
+              <div className="flex items-end col-span-2 md:col-span-1">
+                <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-lg md:rounded-xl p-3 md:p-4 w-full text-center">
                   <p className="text-xs text-indigo-600 dark:text-indigo-400">Your Score</p>
-                  <p className="text-3xl font-bold text-indigo-700 dark:text-indigo-300">
+                  <p className="text-2xl md:text-3xl font-bold text-indigo-700 dark:text-indigo-300">
                     {predictorScore || '—'}
                   </p>
                 </div>
@@ -598,27 +599,27 @@ const CollegeHub: React.FC = () => {
 
           {/* Predictions */}
           {predictions && predictions.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="font-bold text-lg text-gray-800 dark:text-white">Your Admission Chances</h3>
+            <div className="space-y-3 md:space-y-4">
+              <h3 className="font-bold text-base md:text-lg text-gray-800 dark:text-white">Your Admission Chances</h3>
               {predictions.map((pred, i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 flex items-center justify-between"
+                  className="bg-white dark:bg-gray-800 rounded-lg md:rounded-xl p-3 md:p-4 border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-4"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="text-3xl">{pred.college.image}</div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800 dark:text-white">{pred.college.name}</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="text-2xl md:text-3xl">{pred.college.image}</div>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-sm md:text-base text-gray-800 dark:text-white truncate">{pred.college.name}</h4>
+                      <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                         Cutoff: {pred.college.cutoffs.find(c => c.course === predictorCourse)?.[predictorCategory as keyof CutoffData] || 'N/A'}
                       </p>
                     </div>
                   </div>
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium ${getChanceColor(pred.chance)}`}>
+                  <div className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl font-medium text-xs md:text-sm self-start sm:self-auto ${getChanceColor(pred.chance)}`}>
                     {getChanceIcon(pred.chance)}
-                    {pred.chance === 'high' ? 'High Chance' :
-                     pred.chance === 'medium' ? 'Good Chance' :
-                     pred.chance === 'low' ? 'Low Chance' : 'Unlikely'}
+                    {pred.chance === 'high' ? 'High' :
+                     pred.chance === 'medium' ? 'Good' :
+                     pred.chance === 'low' ? 'Low' : 'Unlikely'}
                   </div>
                 </div>
               ))}
@@ -627,9 +628,9 @@ const CollegeHub: React.FC = () => {
 
           {/* Motivational Message */}
           {predictorScore && parseInt(predictorScore) < 130 && (
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 text-white">
-              <h3 className="font-bold text-lg mb-2">📈 Don't Worry, Keep Practicing!</h3>
-              <p className="text-amber-100">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
+              <h3 className="font-bold text-base md:text-lg mb-2">📈 Don't Worry, Keep Practicing!</h3>
+              <p className="text-amber-100 text-sm md:text-base">
                 Even toppers started from lower scores. With consistent practice using this app, you can improve by 20-30 marks in just 2 months. Stay focused! 💪
               </p>
             </div>
@@ -639,24 +640,24 @@ const CollegeHub: React.FC = () => {
 
       {/* Timeline Tab */}
       {activeTab === 'timeline' && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
-          <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-500" /> MH CET Law 2026 - Important Dates
+        <div className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2">
+            <Calendar className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" /> MH CET Law 2026 - Important Dates
           </h3>
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-indigo-200 dark:bg-indigo-800"></div>
+            <div className="absolute left-3 md:left-4 top-0 bottom-0 w-0.5 bg-indigo-200 dark:bg-indigo-800"></div>
             
             {/* Timeline Items */}
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {ADMISSION_TIMELINE.map((item, i) => (
-                <div key={i} className="flex gap-4 relative">
-                  <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 z-10">
-                    <Clock className="w-4 h-4 text-white" />
+                <div key={i} className="flex gap-3 md:gap-4 relative">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0 z-10">
+                    <Clock className="w-3 h-3 md:w-4 md:h-4 text-white" />
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 flex-1">
-                    <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{item.date}</p>
-                    <p className="font-semibold text-gray-800 dark:text-white">{item.event}</p>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg md:rounded-xl p-3 md:p-4 flex-1">
+                    <p className="text-xs md:text-sm font-medium text-indigo-600 dark:text-indigo-400">{item.date}</p>
+                    <p className="font-semibold text-sm md:text-base text-gray-800 dark:text-white">{item.event}</p>
                   </div>
                 </div>
               ))}
@@ -667,27 +668,27 @@ const CollegeHub: React.FC = () => {
 
       {/* Documents Tab */}
       {activeTab === 'documents' && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
-          <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-500" /> Documents Required for Admission
+        <div className="bg-white dark:bg-gray-800 rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold text-base md:text-lg mb-4 md:mb-6 flex items-center gap-2">
+            <FileText className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" /> Documents Required for Admission
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
             {DOCUMENTS_REQUIRED.map((doc, i) => (
               <div 
                 key={i}
-                className={`flex items-center gap-3 p-4 rounded-xl ${
+                className={`flex items-center gap-2 md:gap-3 p-3 md:p-4 rounded-lg md:rounded-xl ${
                   doc.mandatory 
                     ? 'bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800' 
                     : 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600'
                 }`}
               >
                 {doc.mandatory ? (
-                  <AlertCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                  <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-rose-500 flex-shrink-0" />
                 ) : (
-                  <CheckCircle2 className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-gray-400 flex-shrink-0" />
                 )}
-                <div>
-                  <p className="font-medium text-gray-800 dark:text-white">{doc.name}</p>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm md:text-base text-gray-800 dark:text-white truncate">{doc.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {doc.mandatory ? 'Mandatory' : 'If Applicable'}
                   </p>
@@ -697,9 +698,9 @@ const CollegeHub: React.FC = () => {
           </div>
           
           {/* Pro Tips */}
-          <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800">
-            <h4 className="font-bold text-indigo-700 dark:text-indigo-300 mb-2">💡 Pro Tips</h4>
-            <ul className="text-sm text-indigo-600 dark:text-indigo-400 space-y-1">
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg md:rounded-xl border border-indigo-200 dark:border-indigo-800">
+            <h4 className="font-bold text-sm md:text-base text-indigo-700 dark:text-indigo-300 mb-2">💡 Pro Tips</h4>
+            <ul className="text-xs md:text-sm text-indigo-600 dark:text-indigo-400 space-y-1">
               <li>• Keep multiple photocopies of all documents</li>
               <li>• Get documents attested by Gazetted Officer</li>
               <li>• Domicile should be of Maharashtra only for state quota</li>
