@@ -227,6 +227,216 @@ const QUESTION_POOL: DailyQuestion[] = [
     correctAnswer: 1,
     subject: Subject.Math,
     explanation: 'CI = P[(1+R/100)^T - 1] = 8000[(1.1)² - 1] = 8000[1.21 - 1] = 8000 × 0.21 = ₹1680.'
+  },
+  
+  // ==================== MORE LEGAL APTITUDE ====================
+  {
+    id: 'dp-26',
+    question: 'Which writ is known as the "bulwark of personal liberty"?',
+    options: ['Mandamus', 'Habeas Corpus', 'Quo Warranto', 'Certiorari'],
+    correctAnswer: 1,
+    subject: Subject.LegalAptitude,
+    explanation: 'Habeas Corpus is the bulwark of personal liberty as it protects against illegal detention.'
+  },
+  {
+    id: 'dp-27',
+    question: 'The doctrine of "Severability" is related to:',
+    options: ['Contracts', 'Fundamental Rights', 'Property', 'Family Law'],
+    correctAnswer: 1,
+    subject: Subject.LegalAptitude,
+    explanation: 'Doctrine of Severability: If part of a law violates FRs, only that part is void, not the entire law.'
+  },
+  {
+    id: 'dp-28',
+    question: 'Article 32 is available for enforcement of:',
+    options: ['DPSPs', 'Fundamental Duties', 'Fundamental Rights', 'All Rights'],
+    correctAnswer: 2,
+    subject: Subject.LegalAptitude,
+    explanation: 'Article 32 provides remedy for enforcement of Fundamental Rights only. Dr. Ambedkar called it the "heart and soul of the Constitution".'
+  },
+  {
+    id: 'dp-29',
+    question: 'Attempt to murder is punishable under:',
+    options: ['Section 302 IPC', 'Section 307 IPC', 'Section 304 IPC', 'Section 309 IPC'],
+    correctAnswer: 1,
+    subject: Subject.LegalAptitude,
+    explanation: 'Section 307 IPC (now Section 109 BNS) deals with attempt to murder - up to 10 years imprisonment.'
+  },
+  {
+    id: 'dp-30',
+    question: 'What is the minimum age for becoming President of India?',
+    options: ['25 years', '30 years', '35 years', '40 years'],
+    correctAnswer: 2,
+    subject: Subject.LegalAptitude,
+    explanation: 'Under Article 58, the minimum age for becoming President is 35 years.'
+  },
+  {
+    id: 'dp-31',
+    question: 'The principle "Qui facit per alium facit per se" means:',
+    options: ['No one can be a judge in their own case', 'He who acts through another acts himself', 'Justice delayed is justice denied', 'Let the buyer beware'],
+    correctAnswer: 1,
+    subject: Subject.LegalAptitude,
+    explanation: 'This maxim establishes vicarious liability - a principal is liable for acts of their agent.'
+  },
+  {
+    id: 'dp-32',
+    question: 'Right to Property was removed from Fundamental Rights by:',
+    options: ['42nd Amendment', '44th Amendment', '52nd Amendment', '73rd Amendment'],
+    correctAnswer: 1,
+    subject: Subject.LegalAptitude,
+    explanation: '44th Amendment (1978) removed Right to Property from Fundamental Rights (Part III) and made it a legal right under Article 300A.'
+  },
+  
+  // ==================== MORE GK ====================
+  {
+    id: 'dp-33',
+    question: 'The "Blue Revolution" in India is related to:',
+    options: ['Dairy', 'Fisheries', 'Oil Seeds', 'Irrigation'],
+    correctAnswer: 1,
+    subject: Subject.GK,
+    explanation: 'Blue Revolution refers to the rapid development of fisheries and aquaculture in India.'
+  },
+  {
+    id: 'dp-34',
+    question: 'Who wrote "Discovery of India"?',
+    options: ['Mahatma Gandhi', 'Jawaharlal Nehru', 'Rabindranath Tagore', 'B.R. Ambedkar'],
+    correctAnswer: 1,
+    subject: Subject.GK,
+    explanation: 'Discovery of India was written by Jawaharlal Nehru during his imprisonment at Ahmednagar Fort (1942-46).'
+  },
+  {
+    id: 'dp-35',
+    question: 'What is the capital of Sikkim?',
+    options: ['Imphal', 'Gangtok', 'Kohima', 'Itanagar'],
+    correctAnswer: 1,
+    subject: Subject.GK,
+    explanation: 'Gangtok is the capital of Sikkim. Sikkim became the 22nd state of India in 1975.'
+  },
+  {
+    id: 'dp-36',
+    question: 'The "Green Revolution" in India was introduced by:',
+    options: ['M.S. Swaminathan', 'V. Kurien', 'C. Subramaniam', 'Norman Borlaug'],
+    correctAnswer: 0,
+    subject: Subject.GK,
+    explanation: 'M.S. Swaminathan is known as the "Father of Green Revolution in India".'
+  },
+  {
+    id: 'dp-37',
+    question: 'Which Indian state has the longest coastline?',
+    options: ['Gujarat', 'Maharashtra', 'Andhra Pradesh', 'Tamil Nadu'],
+    correctAnswer: 0,
+    subject: Subject.GK,
+    explanation: 'Gujarat has the longest coastline (about 1,600 km) among all Indian states.'
+  },
+  {
+    id: 'dp-38',
+    question: 'Who was the first Attorney General of India?',
+    options: ['M.C. Setalvad', 'C.K. Daphtary', 'Niren De', 'L.N. Sinha'],
+    correctAnswer: 0,
+    subject: Subject.GK,
+    explanation: 'M.C. Setalvad was the first Attorney General of India, serving from 1950 to 1963.'
+  },
+  
+  // ==================== MORE LOGICAL REASONING ====================
+  {
+    id: 'dp-39',
+    question: 'In a row, A is 8th from left and B is 12th from right. If they interchange, A becomes 15th from left. How many people are in the row?',
+    options: ['23', '24', '25', '26'],
+    correctAnswer: 3,
+    subject: Subject.LogicalReasoning,
+    explanation: 'After interchange, A is at B\'s position (15th from left). B was 12th from right. Total = 15 + 12 - 1 = 26.'
+  },
+  {
+    id: 'dp-40',
+    question: 'If DELHI is coded as 73541, how is HIDE coded?',
+    options: ['4173', '5. 4173', '4137', '1473'],
+    correctAnswer: 0,
+    subject: Subject.LogicalReasoning,
+    explanation: 'D=7, E=3, L=5, H=4, I=1. So HIDE = 4173.'
+  },
+  {
+    id: 'dp-41',
+    question: 'Which number should replace "?" : 3, 8, 15, 24, 35, ?',
+    options: ['46', '48', '47', '50'],
+    correctAnswer: 1,
+    subject: Subject.LogicalReasoning,
+    explanation: 'Differences: 5, 7, 9, 11, 13. Pattern: odd numbers. Next: 35 + 13 = 48.'
+  },
+  {
+    id: 'dp-42',
+    question: 'Statement: All doctors are lawyers. No lawyer is poor. Conclusion: No doctor is poor.',
+    options: ['Only I follows', 'Only II follows', 'Both follow', 'None follows'],
+    correctAnswer: 0,
+    subject: Subject.LogicalReasoning,
+    explanation: 'All doctors are lawyers (A⊂B). No lawyer is poor (B∩C=∅). Therefore, no doctor is poor (A∩C=∅). The conclusion follows.'
+  },
+  
+  // ==================== MORE ENGLISH ====================
+  {
+    id: 'dp-43',
+    question: 'The meaning of the idiom "To burn midnight oil" is:',
+    options: ['To waste resources', 'To work late into night', 'To destroy evidence', 'To start a fire'],
+    correctAnswer: 1,
+    subject: Subject.English,
+    explanation: 'To burn midnight oil means to work or study late into the night.'
+  },
+  {
+    id: 'dp-44',
+    question: 'Choose the correct spelling:',
+    options: ['Committment', 'Commitment', 'Comitment', 'Comittment'],
+    correctAnswer: 1,
+    subject: Subject.English,
+    explanation: 'The correct spelling is "Commitment" - single "t" before "ment".'
+  },
+  {
+    id: 'dp-45',
+    question: 'The synonym of "ALTRUISTIC" is:',
+    options: ['Selfish', 'Selfless', 'Ambitious', 'Arrogant'],
+    correctAnswer: 1,
+    subject: Subject.English,
+    explanation: 'Altruistic means showing unselfish concern for others; selfless.'
+  },
+  {
+    id: 'dp-46',
+    question: 'What is the one-word substitute for "a person who collects coins"?',
+    options: ['Philatelist', 'Numismatist', 'Bibliophile', 'Connoisseur'],
+    correctAnswer: 1,
+    subject: Subject.English,
+    explanation: 'Numismatist - a person who collects coins. Philatelist collects stamps.'
+  },
+  
+  // ==================== MORE MATHEMATICS ====================
+  {
+    id: 'dp-47',
+    question: 'A can complete a work in 10 days, B in 15 days. If they work together, in how many days will they complete the work?',
+    options: ['5 days', '6 days', '7 days', '8 days'],
+    correctAnswer: 1,
+    subject: Subject.Math,
+    explanation: 'A\'s rate = 1/10, B\'s rate = 1/15. Combined = 1/10 + 1/15 = 5/30 = 1/6. Time = 6 days.'
+  },
+  {
+    id: 'dp-48',
+    question: 'The average of 10 numbers is 15. If one number is excluded, the average becomes 14. What is the excluded number?',
+    options: ['20', '24', '25', '30'],
+    correctAnswer: 1,
+    subject: Subject.Math,
+    explanation: 'Sum of 10 numbers = 150. Sum of 9 numbers = 126. Excluded number = 150 - 126 = 24.'
+  },
+  {
+    id: 'dp-49',
+    question: 'A boat goes 12 km downstream in 48 minutes. Speed of stream is 2 km/hr. Find speed of boat in still water.',
+    options: ['10 km/hr', '11 km/hr', '13 km/hr', '15 km/hr'],
+    correctAnswer: 2,
+    subject: Subject.Math,
+    explanation: 'Downstream speed = 12/(48/60) = 15 km/hr. Speed of boat = 15 - 2 = 13 km/hr.'
+  },
+  {
+    id: 'dp-50',
+    question: 'If 40% of a number is 80, what is 75% of the number?',
+    options: ['120', '150', '160', '180'],
+    correctAnswer: 1,
+    subject: Subject.Math,
+    explanation: '40% of x = 80, so x = 200. 75% of 200 = 150.'
   }
 ];
 

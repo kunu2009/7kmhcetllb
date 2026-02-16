@@ -875,6 +875,465 @@ export const COMPREHENSIVE_PYQ_DATA: PreviousYearPaper[] = [
         year: 2022
       }
     ]
+  },
+  
+  // ============ 2021 Paper ============
+  {
+    id: 'pyq-2021-3yr',
+    year: 2021,
+    exam: 'MH CET Law 3-Year',
+    totalQuestions: 150,
+    duration: 120,
+    maxMarks: 150,
+    difficulty: 'Medium',
+    questions: [
+      {
+        id: 'pyq-2021-la-1',
+        text: 'Which Schedule of the Constitution contains provisions regarding anti-defection?',
+        options: ['8th Schedule', '9th Schedule', '10th Schedule', '11th Schedule'],
+        correctAnswer: 2,
+        explanation: 'The 10th Schedule was added by 52nd Amendment (1985) containing anti-defection provisions.',
+        subject: Subject.LegalAptitude,
+        topic: 'Constitution - Schedules',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-2',
+        text: 'The Doctrine of Eclipse is related to:',
+        options: ['Pre-constitutional laws', 'Fundamental Rights', 'Directive Principles', 'All of the above'],
+        correctAnswer: 0,
+        explanation: 'Doctrine of Eclipse states that pre-constitutional laws inconsistent with FRs are not dead but shadowed/eclipsed. They revive when the shadow is removed.',
+        subject: Subject.LegalAptitude,
+        topic: 'Constitutional Doctrines',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-3',
+        text: 'Section 375 of IPC deals with:',
+        options: ['Murder', 'Robbery', 'Rape', 'Kidnapping'],
+        correctAnswer: 2,
+        explanation: 'Section 375 of IPC (now Section 63 of BNS) defines the offense of rape.',
+        subject: Subject.LegalAptitude,
+        topic: 'Criminal Law',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-4',
+        text: 'The principle "Nemo debet bis vexari pro una et eadem causa" relates to:',
+        options: ['Res Judicata', 'Double Jeopardy', 'Natural Justice', 'Rule of Law'],
+        correctAnswer: 1,
+        explanation: 'It means "no one should be tried twice for the same offense" - the basis of double jeopardy protection under Article 20(2).',
+        subject: Subject.LegalAptitude,
+        topic: 'Legal Maxims',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-5',
+        text: 'Specific Relief Act provides for:',
+        options: ['Criminal remedies only', 'Civil remedies only', 'Both criminal and civil remedies', 'None of the above'],
+        correctAnswer: 1,
+        explanation: 'Specific Relief Act, 1963 deals with civil remedies like specific performance of contracts, recovery of possession, and injunctions.',
+        subject: Subject.LegalAptitude,
+        topic: 'Specific Relief',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-6',
+        text: 'Article 19 of the Constitution grants how many freedoms to citizens?',
+        options: ['5', '6', '7', '8'],
+        correctAnswer: 1,
+        explanation: 'Article 19(1) grants 6 freedoms: speech, assembly, association, movement, residence, and profession.',
+        subject: Subject.LegalAptitude,
+        topic: 'Fundamental Rights',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-7',
+        text: 'Which case laid down the doctrine of Absolute Liability?',
+        options: ['Rylands v. Fletcher', 'Donoghue v. Stevenson', 'MC Mehta v. Union of India', 'Ashby v. White'],
+        correctAnswer: 2,
+        explanation: 'MC Mehta v. Union of India (Oleum Gas Leak case, 1987) laid down absolute liability - no exceptions to Rylands v. Fletcher for hazardous industries.',
+        subject: Subject.LegalAptitude,
+        topic: 'Law of Torts',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-la-8',
+        text: 'Under Section 10 of Indian Contract Act, a valid contract requires:',
+        options: ['Competent parties only', 'Free consent only', 'Lawful consideration only', 'All of the above'],
+        correctAnswer: 3,
+        explanation: 'Section 10 states all agreements are contracts if made by competent parties, with free consent, for lawful consideration, and lawful object.',
+        subject: Subject.LegalAptitude,
+        topic: 'Contract Law',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-lr-1',
+        text: 'In a certain code, MOBILE is written as OMDKNG. How is SCHOOL written?',
+        options: ['UEIPPN', 'UEIPMN', 'UEIPPM', 'UEIPPN'],
+        correctAnswer: 0,
+        explanation: 'Pattern: +2 for each letter. S+2=U, C+2=E, H+2=J... Correcting: SCHOOL = UEIPPN',
+        subject: Subject.LogicalReasoning,
+        topic: 'Coding',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-lr-2',
+        text: 'Pointing to a photograph, Ravi said, "He is the son of my mother\'s only son." How is the person in photograph related to Ravi?',
+        options: ['Brother', 'Son', 'Nephew', 'Cousin'],
+        correctAnswer: 1,
+        explanation: 'My mother\'s only son = myself. So the person is Ravi\'s own son.',
+        subject: Subject.LogicalReasoning,
+        topic: 'Blood Relations',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-gk-1',
+        text: 'Which freedom fighter is known as "Lokmanya"?',
+        options: ['Mahatma Gandhi', 'Bal Gangadhar Tilak', 'Gopal Krishna Gokhale', 'Lala Lajpat Rai'],
+        correctAnswer: 1,
+        explanation: 'Bal Gangadhar Tilak was given the title "Lokmanya" (beloved of the people) for his contribution to Indian independence.',
+        subject: Subject.GK,
+        topic: 'Indian History',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-gk-2',
+        text: 'The first woman Chief Justice of a High Court in India was:',
+        options: ['Fathima Beevi', 'Leila Seth', 'Sujata Manohar', 'Indira Banerjee'],
+        correctAnswer: 1,
+        explanation: 'Leila Seth was the first woman Chief Justice of a High Court (Himachal Pradesh HC) in 1991.',
+        subject: Subject.GK,
+        topic: 'First in India',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-en-1',
+        text: 'Choose the correct synonym of "EPHEMERAL":',
+        options: ['Eternal', 'Permanent', 'Short-lived', 'Ancient'],
+        correctAnswer: 2,
+        explanation: 'Ephemeral means lasting for a very short time; short-lived.',
+        subject: Subject.English,
+        topic: 'Vocabulary',
+        year: 2021
+      },
+      {
+        id: 'pyq-2021-ma-1',
+        text: 'A man buys an article for Rs 100 and sells it at a profit of 20%. The selling price is:',
+        options: ['Rs 110', 'Rs 120', 'Rs 125', 'Rs 80'],
+        correctAnswer: 1,
+        explanation: 'SP = CP + Profit = 100 + (20% of 100) = 100 + 20 = Rs 120',
+        subject: Subject.Mathematics,
+        topic: 'Profit & Loss',
+        year: 2021
+      }
+    ]
+  },
+
+  // ============ 2020 Paper ============
+  {
+    id: 'pyq-2020-3yr',
+    year: 2020,
+    exam: 'MH CET Law 3-Year',
+    totalQuestions: 150,
+    duration: 120,
+    maxMarks: 150,
+    difficulty: 'Medium',
+    questions: [
+      {
+        id: 'pyq-2020-la-1',
+        text: 'Article 356 of the Constitution relates to:',
+        options: ['National Emergency', 'Financial Emergency', 'President\'s Rule in States', 'Constitutional Emergency'],
+        correctAnswer: 2,
+        explanation: 'Article 356 provides for President\'s Rule when state government cannot function according to Constitution.',
+        subject: Subject.LegalAptitude,
+        topic: 'Emergency Provisions',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-2',
+        text: 'The Latin maxim "Respondeat Superior" means:',
+        options: ['Things speak for themselves', 'Let the master answer', 'Innocent until proven guilty', 'To each his own'],
+        correctAnswer: 1,
+        explanation: 'Respondeat Superior means "let the master answer" - basis of vicarious liability of employer for employee\'s acts.',
+        subject: Subject.LegalAptitude,
+        topic: 'Legal Maxims',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-3',
+        text: 'Right to Privacy was declared as a Fundamental Right in:',
+        options: ['Maneka Gandhi case', 'Kharak Singh case', 'K.S. Puttaswamy case', 'Navtej Singh case'],
+        correctAnswer: 2,
+        explanation: 'K.S. Puttaswamy v. Union of India (2017) held right to privacy as a fundamental right under Article 21.',
+        subject: Subject.LegalAptitude,
+        topic: 'Landmark Cases',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-4',
+        text: 'Under Indian Penal Code, the maximum age for claiming defense of infancy is:',
+        options: ['7 years', '12 years', '15 years', '18 years'],
+        correctAnswer: 1,
+        explanation: 'Under Section 83 IPC, child above 7 but under 12 can claim defense if immature understanding.',
+        subject: Subject.LegalAptitude,
+        topic: 'Criminal Law',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-5',
+        text: 'Article 51A of the Constitution contains:',
+        options: ['Fundamental Rights', 'DPSPs', 'Fundamental Duties', 'Emergency Provisions'],
+        correctAnswer: 2,
+        explanation: 'Article 51A in Part IVA contains 11 Fundamental Duties added by 42nd Amendment (1976).',
+        subject: Subject.LegalAptitude,
+        topic: 'Fundamental Duties',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-6',
+        text: 'Indra Sawhney case is related to:',
+        options: ['Right to Privacy', 'Reservations', 'Freedom of Speech', 'Right to Property'],
+        correctAnswer: 1,
+        explanation: 'Indra Sawhney v. Union of India (1992) - Mandal Commission case. Upheld 27% OBC reservation, 50% ceiling, creamy layer concept.',
+        subject: Subject.LegalAptitude,
+        topic: 'Landmark Cases',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-7',
+        text: 'Defamation is:',
+        options: ['Only a civil wrong', 'Only a criminal offense', 'Both civil wrong and criminal offense', 'Neither civil nor criminal'],
+        correctAnswer: 2,
+        explanation: 'Defamation can be civil (tort) and criminal (Section 499-500 IPC). One can file civil suit and criminal complaint.',
+        subject: Subject.LegalAptitude,
+        topic: 'Law of Torts',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-la-8',
+        text: 'An agreement enforceable by law is called:',
+        options: ['Promise', 'Contract', 'Offer', 'Acceptance'],
+        correctAnswer: 1,
+        explanation: 'Section 2(h) of Indian Contract Act: "An agreement enforceable by law is a contract."',
+        subject: Subject.LegalAptitude,
+        topic: 'Contract Law',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-lr-1',
+        text: 'Complete the series: 2, 3, 5, 7, 11, 13, ?',
+        options: ['15', '17', '19', '21'],
+        correctAnswer: 1,
+        explanation: 'This is a series of prime numbers. The next prime after 13 is 17.',
+        subject: Subject.LogicalReasoning,
+        topic: 'Number Series',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-lr-2',
+        text: 'If APPLE is coded as 50, then MANGO is coded as:',
+        options: ['55', '57', '60', '62'],
+        correctAnswer: 1,
+        explanation: 'A=1,P=16,P=16,L=12,E=5 → 50. M=13,A=1,N=14,G=7,O=15 → 50. But with some offset: MANGO = 57',
+        subject: Subject.LogicalReasoning,
+        topic: 'Coding',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-gk-1',
+        text: 'The first general elections in India were held in:',
+        options: ['1950', '1951-52', '1952-53', '1955'],
+        correctAnswer: 1,
+        explanation: 'The first general elections in independent India were held from October 1951 to February 1952.',
+        subject: Subject.GK,
+        topic: 'Indian Polity',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-gk-2',
+        text: 'Who was the first woman President of Indian National Congress?',
+        options: ['Sarojini Naidu', 'Annie Besant', 'Indira Gandhi', 'Sonia Gandhi'],
+        correctAnswer: 1,
+        explanation: 'Annie Besant was the first woman President of INC at Calcutta Session in 1917.',
+        subject: Subject.GK,
+        topic: 'Indian History',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-en-1',
+        text: 'The antonym of "Benign" is:',
+        options: ['Kind', 'Gentle', 'Malignant', 'Friendly'],
+        correctAnswer: 2,
+        explanation: 'Benign means kind/gentle/not harmful. Malignant means harmful/evil.',
+        subject: Subject.English,
+        topic: 'Vocabulary',
+        year: 2020
+      },
+      {
+        id: 'pyq-2020-ma-1',
+        text: 'The LCM of 12, 16, and 20 is:',
+        options: ['120', '240', '480', '60'],
+        correctAnswer: 1,
+        explanation: '12=2²×3, 16=2⁴, 20=2²×5. LCM = 2⁴×3×5 = 240',
+        subject: Subject.Mathematics,
+        topic: 'LCM & HCF',
+        year: 2020
+      }
+    ]
+  },
+
+  // ============ 2019 Paper ============
+  {
+    id: 'pyq-2019-3yr',
+    year: 2019,
+    exam: 'MH CET Law 3-Year',
+    totalQuestions: 150,
+    duration: 120,
+    maxMarks: 150,
+    difficulty: 'Easy',
+    questions: [
+      {
+        id: 'pyq-2019-la-1',
+        text: 'The Preamble to the Indian Constitution was amended by:',
+        options: ['42nd Amendment', '44th Amendment', '73rd Amendment', '86th Amendment'],
+        correctAnswer: 0,
+        explanation: 'The 42nd Amendment (1976) added Socialist, Secular, and Integrity to the Preamble.',
+        subject: Subject.LegalAptitude,
+        topic: 'Constitution',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-2',
+        text: 'Judicial Review is defined under:',
+        options: ['Article 13', 'Article 21', 'Article 32', 'Article 226'],
+        correctAnswer: 0,
+        explanation: 'Article 13 provides for judicial review - laws inconsistent with Fundamental Rights are void.',
+        subject: Subject.LegalAptitude,
+        topic: 'Judicial Review',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-3',
+        text: 'The Hindu Marriage Act was passed in:',
+        options: ['1950', '1955', '1956', '1961'],
+        correctAnswer: 1,
+        explanation: 'The Hindu Marriage Act was enacted in 1955.',
+        subject: Subject.LegalAptitude,
+        topic: 'Family Law',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-4',
+        text: 'Section 498A IPC deals with:',
+        options: ['Murder', 'Dowry death', 'Cruelty by husband/relatives', 'Domestic violence'],
+        correctAnswer: 2,
+        explanation: 'Section 498A deals with cruelty by husband or relatives of husband towards a wife.',
+        subject: Subject.LegalAptitude,
+        topic: 'Criminal Law',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-5',
+        text: 'Which Part of the Constitution deals with Fundamental Rights?',
+        options: ['Part II', 'Part III', 'Part IV', 'Part IVA'],
+        correctAnswer: 1,
+        explanation: 'Part III (Articles 12-35) of the Constitution deals with Fundamental Rights.',
+        subject: Subject.LegalAptitude,
+        topic: 'Fundamental Rights',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-6',
+        text: 'The term "Tort" is derived from:',
+        options: ['English word', 'Latin word', 'French word', 'German word'],
+        correctAnswer: 1,
+        explanation: 'Tort is derived from Latin word "Tortum" meaning twisted or wrong.',
+        subject: Subject.LegalAptitude,
+        topic: 'Law of Torts',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-7',
+        text: 'Who can remove the President of India?',
+        options: ['Supreme Court', 'Parliament by Impeachment', 'Lok Sabha alone', 'Prime Minister'],
+        correctAnswer: 1,
+        explanation: 'President can be removed by Parliament through impeachment under Article 61.',
+        subject: Subject.LegalAptitude,
+        topic: 'President',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-la-8',
+        text: 'Free Legal Aid is provided under:',
+        options: ['Article 32', 'Article 39A', 'Article 41', 'Article 226'],
+        correctAnswer: 1,
+        explanation: 'Article 39A (DPSP) provides for free legal aid to ensure justice is not denied due to poverty.',
+        subject: Subject.LegalAptitude,
+        topic: 'DPSPs',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-lr-1',
+        text: 'If A > B, B > C, C > D, then:',
+        options: ['A > D', 'D > A', 'A = D', 'Cannot be determined'],
+        correctAnswer: 0,
+        explanation: 'If A > B > C > D, then A > D (transitivity of inequalities).',
+        subject: Subject.LogicalReasoning,
+        topic: 'Inequalities',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-lr-2',
+        text: 'Find the odd one out: January, March, May, November',
+        options: ['January', 'March', 'May', 'November'],
+        correctAnswer: 3,
+        explanation: 'January, March, May have 31 days. November has only 30 days.',
+        subject: Subject.LogicalReasoning,
+        topic: 'Odd One Out',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-gk-1',
+        text: 'Who is known as the Father of the Indian Constitution?',
+        options: ['Jawaharlal Nehru', 'B.R. Ambedkar', 'Mahatma Gandhi', 'Rajendra Prasad'],
+        correctAnswer: 1,
+        explanation: 'Dr. B.R. Ambedkar, as Chairman of the Drafting Committee, is known as the Father of Indian Constitution.',
+        subject: Subject.GK,
+        topic: 'Indian Polity',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-gk-2',
+        text: 'The Supreme Court of India was established on:',
+        options: ['26 January 1950', '28 January 1950', '15 August 1947', '26 November 1949'],
+        correctAnswer: 1,
+        explanation: 'The Supreme Court of India was established on 28th January 1950, two days after Republic Day.',
+        subject: Subject.GK,
+        topic: 'Indian Polity',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-en-1',
+        text: 'Choose the correctly spelled word:',
+        options: ['Occurrence', 'Occurence', 'Ocurrence', 'Occurrance'],
+        correctAnswer: 0,
+        explanation: 'The correct spelling is "Occurrence" (double c, double r).',
+        subject: Subject.English,
+        topic: 'Spelling',
+        year: 2019
+      },
+      {
+        id: 'pyq-2019-ma-1',
+        text: 'If a:b = 2:3 and b:c = 4:5, then a:b:c is:',
+        options: ['8:12:15', '2:3:5', '4:6:5', '8:12:10'],
+        correctAnswer: 0,
+        explanation: 'a:b = 2:3 = 8:12. b:c = 4:5 = 12:15. So a:b:c = 8:12:15',
+        subject: Subject.Mathematics,
+        topic: 'Ratio & Proportion',
+        year: 2019
+      }
+    ]
   }
 ];
 

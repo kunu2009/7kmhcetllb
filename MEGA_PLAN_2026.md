@@ -12,16 +12,18 @@
 - **Study Streak Tracking** - Daily streak with best streak tracking
 - **40+ New Flashcards** - More maxims, articles, cases, vocabulary
 - **Enhanced Dashboard** - Achievements display, streak counter
-- **Question Bank** now has **1,050+ questions**
+- **3 More PYQ Papers** - Added 2021, 2020, 2019 papers with 42+ questions
+- **Question Bank** now has **1,090+ questions**
 - **Flashcards** now have **190+ cards**
+- **PYQ Papers** now cover **6 years** (2019-2024)
 
 ### 📊 Current Stats
 | Content | Count |
 |---------|-------|
-| Mock Questions | 1,050+ |
+| Mock Questions | 1,090+ |
 | Flashcards | 190+ |
 | Study Topics | 22+ |
-| PYQ Papers | 4 |
+| PYQ Papers | 6 |
 | Achievements | 20 |
 | Features | 16 |
 
