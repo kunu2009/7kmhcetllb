@@ -946,6 +946,517 @@ export const MOCK_TEST_QUESTIONS: MCQQuestion[] = [
     difficulty: 'easy',
     topic: 'Indian Geography'
   },
+  
+  // ==================== NEW GK QUESTIONS (Feb 2026) ====================
+  {
+    id: 'gk-16',
+    question: 'Who is the current Vice President of India (2024)?',
+    options: ['M. Venkaiah Naidu', 'Jagdeep Dhankhar', 'Ram Nath Kovind', 'Hamid Ansari'],
+    correctAnswer: 1,
+    explanation: 'Jagdeep Dhankhar became the 14th Vice President of India in August 2022.',
+    subject: Subject.GK,
+    difficulty: 'easy',
+    topic: 'Indian Polity'
+  },
+  {
+    id: 'gk-17',
+    question: 'The Bharat Ratna 2024 was awarded to:',
+    options: ['Sachin Tendulkar', 'Lal Krishna Advani', 'P.V. Narasimha Rao', 'Both B and C'],
+    correctAnswer: 3,
+    explanation: 'In 2024, Bharat Ratna was awarded to L.K. Advani, P.V. Narasimha Rao (posthumously), Chaudhary Charan Singh (posthumously), M.S. Swaminathan (posthumously), and Karpoori Thakur (posthumously).',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    year: 2024,
+    topic: 'Awards'
+  },
+  {
+    id: 'gk-18',
+    question: 'The headquarters of the International Court of Justice is located in:',
+    options: ['New York', 'Geneva', 'The Hague', 'Vienna'],
+    correctAnswer: 2,
+    explanation: 'The International Court of Justice (ICJ), the principal judicial organ of the UN, is located at The Hague, Netherlands.',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    topic: 'International Organizations'
+  },
+  {
+    id: 'gk-19',
+    question: 'India\'s first indigenous aircraft carrier is:',
+    options: ['INS Vikrant', 'INS Vikramaditya', 'INS Viraat', 'INS Vishal'],
+    correctAnswer: 0,
+    explanation: 'INS Vikrant is India\'s first indigenously built aircraft carrier, commissioned in September 2022.',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    topic: 'Defense'
+  },
+  {
+    id: 'gk-20',
+    question: 'The longest river in India is:',
+    options: ['Ganga', 'Brahmaputra', 'Godavari', 'Yamuna'],
+    correctAnswer: 0,
+    explanation: 'Ganga is the longest river in India with a length of about 2,525 km within India. The Brahmaputra is longer overall but most of its length is outside India.',
+    subject: Subject.GK,
+    difficulty: 'easy',
+    topic: 'Indian Geography'
+  },
+  {
+    id: 'gk-21',
+    question: 'Who wrote the book "Arthashastra"?',
+    options: ['Aryabhata', 'Kautilya', 'Kalidasa', 'Valmiki'],
+    correctAnswer: 1,
+    explanation: 'Arthashastra was written by Kautilya (also known as Chanakya), the advisor to Chandragupta Maurya.',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    topic: 'Indian History'
+  },
+  {
+    id: 'gk-22',
+    question: 'The Battle of Plassey was fought in which year?',
+    options: ['1757', '1764', '1857', '1947'],
+    correctAnswer: 0,
+    explanation: 'The Battle of Plassey was fought on June 23, 1757, between the British East India Company and the Nawab of Bengal, Siraj-ud-Daulah.',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    topic: 'Indian History'
+  },
+  {
+    id: 'gk-23',
+    question: 'The Simon Commission visited India in:',
+    options: ['1927', '1928', '1930', '1935'],
+    correctAnswer: 1,
+    explanation: 'The Simon Commission arrived in India in 1928 to review the Government of India Act 1919.',
+    subject: Subject.GK,
+    difficulty: 'medium',
+    topic: 'Indian History'
+  },
+  {
+    id: 'gk-24',
+    question: 'Who gave the slogan "Jai Jawan, Jai Kisan"?',
+    options: ['Jawaharlal Nehru', 'Lal Bahadur Shastri', 'Indira Gandhi', 'Mahatma Gandhi'],
+    correctAnswer: 1,
+    explanation: 'Lal Bahadur Shastri gave the slogan "Jai Jawan, Jai Kisan" in 1965 during the Indo-Pakistan War.',
+    subject: Subject.GK,
+    difficulty: 'easy',
+    topic: 'Indian History'
+  },
+  {
+    id: 'gk-25',
+    question: 'The currency of Japan is:',
+    options: ['Yuan', 'Won', 'Yen', 'Ringgit'],
+    correctAnswer: 2,
+    explanation: 'The currency of Japan is the Yen (¥).',
+    subject: Subject.GK,
+    difficulty: 'easy',
+    topic: 'World Geography'
+  },
+
+  // ==================== NEW LOGICAL REASONING QUESTIONS ====================
+  {
+    id: 'lr-new-1',
+    question: 'If CLOUD is coded as ELQWF, how will RAIN be coded?',
+    options: ['TCKP', 'TCKO', 'TCKN', 'TDKP'],
+    correctAnswer: 0,
+    explanation: 'Each letter is moved +2 positions in the alphabet. R→T, A→C, I→K, N→P. So RAIN = TCKP',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'medium',
+    topic: 'Coding-Decoding'
+  },
+  {
+    id: 'lr-new-2',
+    question: 'A man walks 5 km towards South, then turns left and walks 3 km, then turns left again and walks 5 km. Which direction is he facing now?',
+    options: ['North', 'South', 'East', 'West'],
+    correctAnswer: 0,
+    explanation: 'Starting facing South → walks 5km → turns left (now facing East) → walks 3km → turns left (now facing North) → walks 5km. He is now facing North.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'medium',
+    topic: 'Direction Sense'
+  },
+  {
+    id: 'lr-new-3',
+    question: 'Find the odd one out: 8, 27, 64, 100, 125',
+    options: ['8', '27', '100', '125'],
+    correctAnswer: 2,
+    explanation: '8=2³, 27=3³, 64=4³, 125=5³. But 100 is 10² (not a perfect cube). So 100 is odd one out.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'easy',
+    topic: 'Number Series'
+  },
+  {
+    id: 'lr-new-4',
+    question: 'If P + Q means P is the mother of Q, P - Q means P is the brother of Q, P × Q means P is the father of Q, then which shows that A is the uncle of B?',
+    options: ['A - C + B', 'A - C × B', 'A + C - B', 'A × C + B'],
+    correctAnswer: 1,
+    explanation: 'A - C × B: A is brother of C, C is father of B. So A is the uncle of B.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'hard',
+    topic: 'Blood Relations'
+  },
+  {
+    id: 'lr-new-5',
+    question: 'Statement: All roses are flowers. All flowers are beautiful. Conclusions: I. All roses are beautiful. II. Some beautiful things are roses.',
+    options: ['Only I follows', 'Only II follows', 'Both I and II follow', 'Neither follows'],
+    correctAnswer: 2,
+    explanation: 'All roses → All flowers → All beautiful. So all roses are beautiful (I follows). Since some roses exist as beautiful things, II also follows.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'medium',
+    topic: 'Syllogism'
+  },
+  {
+    id: 'lr-new-6',
+    question: 'Complete the series: 2, 6, 12, 20, 30, ?',
+    options: ['40', '42', '44', '48'],
+    correctAnswer: 1,
+    explanation: 'Differences: 4, 6, 8, 10, ? (increasing by 2). Next difference = 12. So 30 + 12 = 42.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'medium',
+    topic: 'Number Series'
+  },
+  {
+    id: 'lr-new-7',
+    question: 'If FRIEND is coded as HUMJTF, then how is CANDLE coded?',
+    options: ['EDRIRL', 'ESJFNC', 'DCQFNG', 'ECPFNI'],
+    correctAnswer: 0,
+    explanation: 'Pattern: F+2=H, R+1=U, I+2=M, E+1=J, N+2=T, D+1=F. Similarly, C+2=E, A+1=D, N+2=R, D+1=I, L+2=R, E+1=L. CANDLE = EDRIRL',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'hard',
+    topic: 'Coding-Decoding'
+  },
+  {
+    id: 'lr-new-8',
+    question: 'Six friends A, B, C, D, E, F are sitting in a row. A is between F and B. B is not beside D. E is next to D. C is at one end. Who is at the other end?',
+    options: ['A', 'B', 'D', 'F'],
+    correctAnswer: 3,
+    explanation: 'One arrangement: C-D-E-B-A-F. C is at one end, F is at the other end.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'hard',
+    topic: 'Seating Arrangement'
+  },
+  {
+    id: 'lr-new-9',
+    question: 'In a certain code, CAT is written as 24. How is DOG written in that code?',
+    options: ['26', '27', '28', '30'],
+    correctAnswer: 0,
+    explanation: 'CAT = C(3) + A(1) + T(20) = 24. DOG = D(4) + O(15) + G(7) = 26.',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'easy',
+    topic: 'Coding-Decoding'
+  },
+  {
+    id: 'lr-new-10',
+    question: 'Pointing to a lady, a man said "She is the only daughter of the father of my mother\'s son". How is the lady related to the man?',
+    options: ['Sister', 'Mother', 'Aunt', 'Daughter'],
+    correctAnswer: 1,
+    explanation: 'My mother\'s son = me or my brother. Father of my (mother\'s son) = my father. Only daughter of my father = my sister or it could be me. But the lady is his mother (the only daughter of his grandfather).',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'hard',
+    topic: 'Blood Relations'
+  },
+
+  // ==================== NEW ENGLISH QUESTIONS ====================
+  {
+    id: 'eng-new-1',
+    question: 'Choose the correct synonym for "BENEVOLENT":',
+    options: ['Cruel', 'Kind', 'Angry', 'Selfish'],
+    correctAnswer: 1,
+    explanation: 'Benevolent means kind, generous, or wishing well to others.',
+    subject: Subject.English,
+    difficulty: 'easy',
+    topic: 'Vocabulary'
+  },
+  {
+    id: 'eng-new-2',
+    question: 'Select the correct antonym of "OPAQUE":',
+    options: ['Cloudy', 'Dense', 'Transparent', 'Dark'],
+    correctAnswer: 2,
+    explanation: 'Opaque means not transparent. Its antonym is transparent (allowing light to pass through).',
+    subject: Subject.English,
+    difficulty: 'easy',
+    topic: 'Vocabulary'
+  },
+  {
+    id: 'eng-new-3',
+    question: 'Identify the error: "Each of the students have submitted their assignment."',
+    options: ['Each of', 'have submitted', 'their', 'assignment'],
+    correctAnswer: 1,
+    explanation: '"Each" is singular, so the verb should be "has" not "have". Correct: "Each of the students has submitted their assignment."',
+    subject: Subject.English,
+    difficulty: 'medium',
+    topic: 'Grammar'
+  },
+  {
+    id: 'eng-new-4',
+    question: 'Choose the correct one-word substitution for "A person who loves collecting books":',
+    options: ['Bibliophile', 'Philologist', 'Bibliographer', 'Lexicographer'],
+    correctAnswer: 0,
+    explanation: 'Bibliophile is a person who loves collecting books. Philologist studies language, Bibliographer compiles lists of books, Lexicographer compiles dictionaries.',
+    subject: Subject.English,
+    difficulty: 'medium',
+    topic: 'One-Word Substitution'
+  },
+  {
+    id: 'eng-new-5',
+    question: 'The idiom "To beat around the bush" means:',
+    options: ['To attack someone', 'To avoid coming to the point', 'To work in a garden', 'To run fast'],
+    correctAnswer: 1,
+    explanation: '"To beat around the bush" means to avoid talking about what is important or to not come directly to the main point.',
+    subject: Subject.English,
+    difficulty: 'easy',
+    topic: 'Idioms'
+  },
+  {
+    id: 'eng-new-6',
+    question: 'Select the correctly spelled word:',
+    options: ['Accomodation', 'Accommodation', 'Acommodation', 'Acomodation'],
+    correctAnswer: 1,
+    explanation: 'The correct spelling is "Accommodation" (two c\'s and two m\'s).',
+    subject: Subject.English,
+    difficulty: 'easy',
+    topic: 'Spelling'
+  },
+  {
+    id: 'eng-new-7',
+    question: 'Which sentence is grammatically correct?',
+    options: ['Neither the teacher nor the students was present.', 'Neither the teacher nor the students were present.', 'Neither the teacher nor the students is present.', 'Neither teacher nor students were present.'],
+    correctAnswer: 1,
+    explanation: 'When using "neither...nor", the verb agrees with the subject closest to it. "Students" is plural, so "were" is correct.',
+    subject: Subject.English,
+    difficulty: 'medium',
+    topic: 'Grammar'
+  },
+  {
+    id: 'eng-new-8',
+    question: 'The phrase "In black and white" means:',
+    options: ['In dark colors', 'In writing', 'At night', 'Clearly visible'],
+    correctAnswer: 1,
+    explanation: '"In black and white" means in writing or in print, as opposed to verbal agreement.',
+    subject: Subject.English,
+    difficulty: 'easy',
+    topic: 'Idioms'
+  },
+  {
+    id: 'eng-new-9',
+    question: 'Choose the correct passive voice: "He is writing a letter."',
+    options: ['A letter is written by him.', 'A letter was being written by him.', 'A letter is being written by him.', 'A letter has been written by him.'],
+    correctAnswer: 2,
+    explanation: 'Present continuous active (is writing) becomes present continuous passive (is being written).',
+    subject: Subject.English,
+    difficulty: 'medium',
+    topic: 'Grammar'
+  },
+  {
+    id: 'eng-new-10',
+    question: 'The word "Ameliorate" means:',
+    options: ['To make worse', 'To make better', 'To remove', 'To destroy'],
+    correctAnswer: 1,
+    explanation: 'Ameliorate means to make something better or to improve.',
+    subject: Subject.English,
+    difficulty: 'hard',
+    topic: 'Vocabulary'
+  },
+
+  // ==================== NEW MATH QUESTIONS ====================
+  {
+    id: 'math-new-1',
+    question: 'If a number is increased by 20% and then decreased by 20%, the net change is:',
+    options: ['No change', '4% increase', '4% decrease', '2% decrease'],
+    correctAnswer: 2,
+    explanation: 'Let number = 100. After 20% increase = 120. After 20% decrease = 120 × 0.8 = 96. Net change = 4% decrease.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Percentages'
+  },
+  {
+    id: 'math-new-2',
+    question: 'A train 150m long passes a pole in 15 seconds. What is the speed of the train?',
+    options: ['36 km/hr', '40 km/hr', '30 km/hr', '45 km/hr'],
+    correctAnswer: 0,
+    explanation: 'Speed = Distance/Time = 150/15 = 10 m/s = 10 × 18/5 = 36 km/hr.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Speed and Distance'
+  },
+  {
+    id: 'math-new-3',
+    question: 'If the ratio of the ages of A and B is 3:5, and the sum of their ages is 48 years, find the age of A.',
+    options: ['18 years', '30 years', '20 years', '28 years'],
+    correctAnswer: 0,
+    explanation: '3x + 5x = 48. 8x = 48. x = 6. Age of A = 3 × 6 = 18 years.',
+    subject: Subject.Math,
+    difficulty: 'easy',
+    topic: 'Ratio and Proportion'
+  },
+  {
+    id: 'math-new-4',
+    question: 'A can do a work in 12 days and B can do it in 15 days. In how many days can they complete it together?',
+    options: ['6 days', '6.67 days', '7 days', '8 days'],
+    correctAnswer: 1,
+    explanation: 'A\'s 1 day work = 1/12. B\'s 1 day work = 1/15. Together = 1/12 + 1/15 = 9/60 = 3/20. Days = 20/3 = 6.67 days.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Time and Work'
+  },
+  {
+    id: 'math-new-5',
+    question: 'The simple interest on Rs 5000 at 8% per annum for 3 years is:',
+    options: ['Rs 1200', 'Rs 1000', 'Rs 1500', 'Rs 800'],
+    correctAnswer: 0,
+    explanation: 'SI = (P × R × T)/100 = (5000 × 8 × 3)/100 = Rs 1200.',
+    subject: Subject.Math,
+    difficulty: 'easy',
+    topic: 'Simple Interest'
+  },
+  {
+    id: 'math-new-6',
+    question: 'The HCF of 24 and 36 is:',
+    options: ['6', '12', '4', '8'],
+    correctAnswer: 1,
+    explanation: '24 = 2³ × 3, 36 = 2² × 3². HCF = 2² × 3 = 12.',
+    subject: Subject.Math,
+    difficulty: 'easy',
+    topic: 'Number System'
+  },
+  {
+    id: 'math-new-7',
+    question: 'If C.P. of 12 articles is equal to S.P. of 10 articles, find the profit percentage.',
+    options: ['20%', '25%', '15%', '10%'],
+    correctAnswer: 0,
+    explanation: 'Let C.P. of 1 article = Rs 1. C.P. of 12 = 12. This is S.P. of 10 articles. S.P. of 1 = 12/10 = 1.2. Profit = 0.2. Profit% = (0.2/1) × 100 = 20%.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Profit and Loss'
+  },
+  {
+    id: 'math-new-8',
+    question: 'The average of first 50 natural numbers is:',
+    options: ['25', '25.5', '26', '24.5'],
+    correctAnswer: 1,
+    explanation: 'Sum of first n natural numbers = n(n+1)/2 = 50×51/2 = 1275. Average = 1275/50 = 25.5.',
+    subject: Subject.Math,
+    difficulty: 'easy',
+    topic: 'Average'
+  },
+  {
+    id: 'math-new-9',
+    question: 'A boat travels 24 km upstream in 6 hours and 24 km downstream in 4 hours. Find the speed of the boat in still water.',
+    options: ['5 km/hr', '4 km/hr', '6 km/hr', '3 km/hr'],
+    correctAnswer: 0,
+    explanation: 'Upstream speed = 24/6 = 4 km/hr. Downstream speed = 24/4 = 6 km/hr. Speed in still water = (4+6)/2 = 5 km/hr.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Boats and Streams'
+  },
+  {
+    id: 'math-new-10',
+    question: 'Find the compound interest on Rs 8000 at 10% per annum for 2 years.',
+    options: ['Rs 1680', 'Rs 1600', 'Rs 1700', 'Rs 1650'],
+    correctAnswer: 0,
+    explanation: 'A = P(1 + R/100)^T = 8000(1.1)² = 8000 × 1.21 = 9680. CI = 9680 - 8000 = Rs 1680.',
+    subject: Subject.Math,
+    difficulty: 'medium',
+    topic: 'Compound Interest'
+  },
+
+  // ==================== MORE LEGAL APTITUDE QUESTIONS ====================
+  {
+    id: 'la-new-1',
+    question: 'Under the Indian Contract Act, an agreement made "without consideration" is:',
+    options: ['Always void', 'Always valid', 'Void except in certain cases', 'Voidable'],
+    correctAnswer: 2,
+    explanation: 'Generally, agreement without consideration is void. But Section 25 provides exceptions: natural love and affection, past voluntary service, promise to pay time-barred debt.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Contract Law'
+  },
+  {
+    id: 'la-new-2',
+    question: 'Which of the following is NOT a general exception under IPC?',
+    options: ['Act of a child under 7 years', 'Act done under intoxication', 'Act done in private defense', 'Act done under duress'],
+    correctAnswer: 1,
+    explanation: 'Voluntary intoxication is NOT a general exception under IPC. However, involuntary intoxication (Section 85) may be an exception.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'hard',
+    topic: 'Criminal Law'
+  },
+  {
+    id: 'la-new-3',
+    question: 'The Consumer Protection Act, 2019 provides for how many Consumer Dispute Redressal Forums?',
+    options: ['One', 'Two', 'Three', 'Four'],
+    correctAnswer: 2,
+    explanation: 'The Consumer Protection Act provides for three tiers: District Commission, State Commission, and National Commission.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Consumer Law'
+  },
+  {
+    id: 'la-new-4',
+    question: 'The principle "Nulla poena sine lege" means:',
+    options: ['No punishment without law', 'Justice delayed is justice denied', 'Ignorance is no excuse', 'Where there is right, there is remedy'],
+    correctAnswer: 0,
+    explanation: '"Nulla poena sine lege" is a Latin maxim meaning "No punishment without law". It is the foundation of the principle of legality in criminal law.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Legal Maxims'
+  },
+  {
+    id: 'la-new-5',
+    question: 'Under which Article can the President of India grant pardon in cases involving death sentence?',
+    options: ['Article 71', 'Article 72', 'Article 74', 'Article 75'],
+    correctAnswer: 1,
+    explanation: 'Article 72 gives the President power to grant pardons, reprieves, respites, or remissions of punishment including in cases of death sentence.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Constitutional Law'
+  },
+  {
+    id: 'la-new-6',
+    question: 'Which writ is issued to quash the order of a lower court or tribunal?',
+    options: ['Mandamus', 'Habeas Corpus', 'Certiorari', 'Quo Warranto'],
+    correctAnswer: 2,
+    explanation: 'Certiorari is issued by a higher court to a lower court to quash an order passed without jurisdiction or in excess of jurisdiction.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'easy',
+    topic: 'Writs'
+  },
+  {
+    id: 'la-new-7',
+    question: 'The concept of "Living Tree" doctrine in Constitutional interpretation means:',
+    options: ['Constitution cannot be changed', 'Constitution should be interpreted dynamically', 'Only literal interpretation allowed', 'Parliament is supreme'],
+    correctAnswer: 1,
+    explanation: 'The "Living Tree" doctrine means the Constitution should be interpreted dynamically to meet changing needs of society, not rigidly based on original text.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'hard',
+    topic: 'Constitutional Law'
+  },
+  {
+    id: 'la-new-8',
+    question: 'Nuisance in Law of Torts can be:',
+    options: ['Only public', 'Only private', 'Both public and private', 'Neither public nor private'],
+    correctAnswer: 2,
+    explanation: 'Nuisance can be both public (affecting community at large) and private (affecting particular individual\'s enjoyment of property).',
+    subject: Subject.LegalAptitude,
+    difficulty: 'easy',
+    topic: 'Law of Torts'
+  },
+  {
+    id: 'la-new-9',
+    question: 'The Specific Relief Act deals with:',
+    options: ['Criminal remedies', 'Recovery of property and specific performance', 'Tax disputes', 'Family matters'],
+    correctAnswer: 1,
+    explanation: 'The Specific Relief Act, 1963 provides for specific remedies like recovery of possession, specific performance of contracts, and injunctions.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Civil Law'
+  },
+  {
+    id: 'la-new-10',
+    question: 'Who appoints the judges of the High Court?',
+    options: ['Chief Justice of India', 'President alone', 'President after consultation with CJI', 'Parliament'],
+    correctAnswer: 2,
+    explanation: 'Under Article 217, HC judges are appointed by the President after consultation with CJI, Governor of the State, and Chief Justice of that High Court.',
+    subject: Subject.LegalAptitude,
+    difficulty: 'medium',
+    topic: 'Judiciary'
+  },
 ];
 
 export const FULL_MOCK_TESTS = [

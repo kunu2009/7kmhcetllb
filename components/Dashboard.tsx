@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Award, Clock, AlertCircle, ChevronRight, CheckCircle2, Circle, Activity, BookOpen, Target, Zap, Trophy, BrainCircuit, Plus, Scale, FileText, Layers, Building2, Flame, Calendar } from 'lucide-react';
+import { TrendingUp, Award, Clock, AlertCircle, ChevronRight, CheckCircle2, Circle, Activity, BookOpen, Target, Zap, Trophy, BrainCircuit, Plus, Scale, FileText, Layers, Building2, Flame, Calendar, Star, Lock, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -16,8 +16,14 @@ const DAILY_MAXIMS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { stats, todos, toggleTodo, addTodo } = useProgress();
+  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements } = useProgress();
   const [newGoal, setNewGoal] = useState('');
+  const [showAllAchievements, setShowAllAchievements] = useState(false);
+  
+  // Update streak on component mount
+  useEffect(() => {
+    checkAndUpdateStreak();
+  }, []);
   
   // Get maxim of the day based on date
   const today = new Date();
@@ -36,7 +42,7 @@ const Dashboard: React.FC = () => {
     { day: 'Thu', hours: 4.2 },
     { day: 'Fri', hours: 3.0 },
     { day: 'Sat', hours: 5.5 },
-    { day: 'Sun', hours: stats.studyHours > 5 ? stats.studyHours : 2.0 }, // Dynamic based on total for demo
+    { day: 'Sun', hours: stats.studyHours > 5 ? stats.studyHours : 2.0 },
   ];
 
   const handleAddGoal = (e: React.FormEvent) => {
@@ -46,6 +52,12 @@ const Dashboard: React.FC = () => {
       setNewGoal('');
     }
   };
+
+  const unlockedAchievements = getUnlockedAchievements();
+  const recentAchievements = achievements
+    .filter(a => a.unlocked)
+    .sort((a, b) => (b.unlockedAt || 0) - (a.unlockedAt || 0))
+    .slice(0, 3);
 
   return (
     <div className="space-y-8">
@@ -85,7 +97,7 @@ const Dashboard: React.FC = () => {
         {[
           { label: 'Accuracy', value: `${stats.accuracy}%`, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
           { label: 'Topics Mastered', value: stats.topicsMastered, icon: Award, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
-          { label: 'Study Hours', value: `${stats.studyHours}h`, icon: Clock, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+          { label: 'Study Streak', value: `${stats.dailyStreak} 🔥`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' },
           { label: 'Days to Exam', value: daysUntilExam, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
@@ -101,6 +113,57 @@ const Dashboard: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Achievements Banner */}
+      {unlockedAchievements.length > 0 && (
+        <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 rounded-xl md:rounded-2xl p-4 md:p-5 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 opacity-20 hidden md:block">
+            <Trophy className="w-32 h-32 transform rotate-12" />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                <h3 className="font-bold text-lg">Achievements ({unlockedAchievements.length}/{achievements.length})</h3>
+              </div>
+              <button 
+                onClick={() => setShowAllAchievements(!showAllAchievements)}
+                className="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors"
+              >
+                {showAllAchievements ? 'Show Less' : 'View All'}
+              </button>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 md:gap-3">
+              {(showAllAchievements ? achievements : achievements.slice(0, 8)).map(achievement => (
+                <div 
+                  key={achievement.id}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                    achievement.unlocked 
+                      ? 'bg-white/20 hover:bg-white/30' 
+                      : 'bg-black/20 opacity-60'
+                  }`}
+                  title={`${achievement.title}: ${achievement.description}${!achievement.unlocked ? ` (${achievement.progress}/${achievement.requirement})` : ''}`}
+                >
+                  <span className="text-xl">{achievement.icon}</span>
+                  <div className="hidden sm:block">
+                    <p className="text-xs font-bold">{achievement.title}</p>
+                    {!achievement.unlocked && (
+                      <div className="w-16 h-1 bg-white/30 rounded-full mt-1">
+                        <div 
+                          className="h-full bg-white rounded-full" 
+                          style={{ width: `${(achievement.progress / achievement.requirement) * 100}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {!achievement.unlocked && <Lock className="w-3 h-3 opacity-60" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Access Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
