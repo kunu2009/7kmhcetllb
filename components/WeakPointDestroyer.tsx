@@ -25,6 +25,8 @@ const WeakPointDestroyer: React.FC = () => {
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
+  const [isRetryMode, setIsRetryMode] = useState(false);
+  const [lastIncorrectQuestions, setLastIncorrectQuestions] = useState<MCQQuestion[]>([]);
   const [sessionStreak, setSessionStreak] = useState(() => Number(localStorage.getItem('weakPointStreak') || '0'));
   const [bestSessionStreak, setBestSessionStreak] = useState(() => Number(localStorage.getItem('weakPointBestStreak') || '0'));
   const [recentSessions, setRecentSessions] = useState<WeakPointSessionRecord[]>(() => {
@@ -99,6 +101,8 @@ const WeakPointDestroyer: React.FC = () => {
   };
 
   const finishSession = () => {
+    const incorrectQuestions = questions.filter((question, index) => answers[index] !== question.correctAnswer);
+    setLastIncorrectQuestions(incorrectQuestions);
     setIsFinished(true);
 
     const today = new Date().toDateString();
@@ -153,6 +157,8 @@ const WeakPointDestroyer: React.FC = () => {
     setShowExplanation(false);
     setScore(0);
     setIsFinished(false);
+    setIsRetryMode(false);
+    setLastIncorrectQuestions([]);
     
     // Get new questions
     if (weakestSubject) {
@@ -162,6 +168,19 @@ const WeakPointDestroyer: React.FC = () => {
       setQuestions(selected);
       setAnswers(new Array(selected.length).fill(null));
     }
+  };
+
+  const retryIncorrectQuestions = () => {
+    if (lastIncorrectQuestions.length === 0) return;
+
+    setQuestions(lastIncorrectQuestions);
+    setAnswers(new Array(lastIncorrectQuestions.length).fill(null));
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+    setScore(0);
+    setIsFinished(false);
+    setIsRetryMode(true);
   };
 
   const handleClearHistory = () => {
@@ -179,6 +198,7 @@ const WeakPointDestroyer: React.FC = () => {
 
   if (isFinished) {
     const percentage = Math.round((score / questions.length) * 100);
+    const incorrectCount = questions.length - score;
     return (
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-sm border border-gray-100 dark:border-gray-700">
@@ -192,6 +212,7 @@ const WeakPointDestroyer: React.FC = () => {
             <div className="text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Score</p>
               <p className="text-3xl font-bold text-gray-800 dark:text-white">{score}/{questions.length}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Missed: {incorrectCount}</p>
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Accuracy</p>
@@ -206,13 +227,24 @@ const WeakPointDestroyer: React.FC = () => {
             </div>
           </div>
 
-          <button
-            onClick={resetSession}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
-          >
-            <RefreshCw className="w-5 h-5" />
-            Destroy Another Weak Point
-          </button>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            {lastIncorrectQuestions.length > 0 && (
+              <button
+                onClick={retryIncorrectQuestions}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-medium transition-colors"
+              >
+                <Target className="w-5 h-5" />
+                Retry Incorrect ({lastIncorrectQuestions.length})
+              </button>
+            )}
+            <button
+              onClick={resetSession}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Destroy Another Weak Point
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -232,6 +264,9 @@ const WeakPointDestroyer: React.FC = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Weak Point Destroyer</h2>
           </div>
           <p className="text-gray-500 dark:text-gray-400">Targeted practice for your lowest scoring subject: <span className="font-semibold text-indigo-600 dark:text-indigo-400">{weakestSubject}</span></p>
+          {isRetryMode && (
+            <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 mt-1">Retry Mode: Incorrect questions only</p>
+          )}
         </div>
         <div className="flex items-center gap-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="text-center">
