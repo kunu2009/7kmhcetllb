@@ -6,6 +6,22 @@ export enum Subject {
   Math = 'Mathematics'
 }
 
+export enum CourseTrack {
+  LLB3 = 'MH CET Law 3-Year LLB',
+  LLB5 = 'MH CET Law 5-Year (BA/BBA LLB)',
+  BBA_BMS = 'MH CET BBA/BMS',
+  HOTEL_MGMT = 'MH CET Hotel Management',
+  OTHER = 'Other MHCET Track'
+}
+
+export interface LearnerProfile {
+  name: string;
+  targetCourse: CourseTrack;
+  examYear: string;
+  dailyStudyHoursGoal: number;
+  onboardingCompleted: boolean;
+}
+
 export interface Topic {
   id: string;
   title: string;

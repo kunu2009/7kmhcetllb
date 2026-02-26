@@ -3,6 +3,7 @@ import { TrendingUp, Award, Clock, AlertCircle, ChevronRight, CheckCircle2, Circ
 import { Link } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import OnboardingWizard from './OnboardingWizard';
 
 // Legal Maxims for "Maxim of the Day"
 const DAILY_MAXIMS = [
@@ -16,7 +17,7 @@ const DAILY_MAXIMS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements } = useProgress();
+  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile } = useProgress();
   const [newGoal, setNewGoal] = useState('');
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   
@@ -59,6 +60,10 @@ const Dashboard: React.FC = () => {
     .sort((a, b) => (b.unlockedAt || 0) - (a.unlockedAt || 0))
     .slice(0, 3);
 
+  if (!learnerProfile.onboardingCompleted) {
+    return <OnboardingWizard />;
+  }
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -71,6 +76,9 @@ const Dashboard: React.FC = () => {
             <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Mission Rank 1 🚀</h2>
             <p className="text-indigo-100 max-w-lg text-sm md:text-lg">
               "Consistency is what transforms average into excellence."
+            </p>
+            <p className="text-indigo-200 text-xs md:text-sm">
+              Track: {learnerProfile.targetCourse} • Exam {learnerProfile.examYear} • Goal {learnerProfile.dailyStudyHoursGoal}h/day
             </p>
           </div>
           <div className="flex gap-2 md:gap-3 w-full md:w-auto">

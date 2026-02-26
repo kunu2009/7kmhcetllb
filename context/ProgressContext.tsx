@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Subject } from '../types';
+import { CourseTrack, LearnerProfile, Subject } from '../types';
 
 export interface TodoItem {
   id: string;
@@ -44,6 +44,7 @@ interface ProgressState {
   subjectMastery: Record<Subject, number>;
   achievements: Achievement[];
   lastActiveDate: string;
+  learnerProfile: LearnerProfile;
 }
 
 interface ProgressContextType extends ProgressState {
@@ -55,7 +56,17 @@ interface ProgressContextType extends ProgressState {
   checkAndUpdateStreak: () => void;
   getUnlockedAchievements: () => Achievement[];
   getLockedAchievements: () => Achievement[];
+  updateLearnerProfile: (updates: Partial<LearnerProfile>) => void;
+  completeOnboarding: () => void;
 }
+
+const DEFAULT_LEARNER_PROFILE: LearnerProfile = {
+  name: '',
+  targetCourse: CourseTrack.LLB3,
+  examYear: '2026',
+  dailyStudyHoursGoal: 2,
+  onboardingCompleted: false
+};
 
 const ACHIEVEMENTS_TEMPLATE: Omit<Achievement, 'progress' | 'unlocked' | 'unlockedAt'>[] = [
   // Study Achievements
@@ -125,6 +136,11 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (!parsed.stats.totalTestsTaken) parsed.stats.totalTestsTaken = parsed.testHistory?.length || 0;
           if (!parsed.stats.perfectScores) parsed.stats.perfectScores = 0;
           if (!parsed.lastActiveDate) parsed.lastActiveDate = '';
+          if (!parsed.learnerProfile) parsed.learnerProfile = DEFAULT_LEARNER_PROFILE;
+          if (!parsed.learnerProfile.targetCourse) parsed.learnerProfile.targetCourse = CourseTrack.LLB3;
+          if (!parsed.learnerProfile.examYear) parsed.learnerProfile.examYear = '2026';
+          if (!parsed.learnerProfile.dailyStudyHoursGoal) parsed.learnerProfile.dailyStudyHoursGoal = 2;
+          if (parsed.learnerProfile.onboardingCompleted === undefined) parsed.learnerProfile.onboardingCompleted = false;
           return parsed;
         }
         return {
@@ -148,7 +164,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               [Subject.Math]: 0
             },
             achievements: initializeAchievements(),
-            lastActiveDate: ''
+            lastActiveDate: '',
+            learnerProfile: DEFAULT_LEARNER_PROFILE
           };
     } catch {
         return {
@@ -172,7 +189,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               [Subject.Math]: 0
             },
             achievements: initializeAchievements(),
-            lastActiveDate: ''
+            lastActiveDate: '',
+            learnerProfile: DEFAULT_LEARNER_PROFILE
           };
     }
   });
@@ -401,6 +419,26 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const updateLearnerProfile = (updates: Partial<LearnerProfile>) => {
+    setState(prev => ({
+      ...prev,
+      learnerProfile: {
+        ...prev.learnerProfile,
+        ...updates
+      }
+    }));
+  };
+
+  const completeOnboarding = () => {
+    setState(prev => ({
+      ...prev,
+      learnerProfile: {
+        ...prev.learnerProfile,
+        onboardingCompleted: true
+      }
+    }));
+  };
+
   return (
     <ProgressContext.Provider value={{ 
       ...state, 
@@ -411,7 +449,9 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       markTopicMastered,
       checkAndUpdateStreak,
       getUnlockedAchievements,
-      getLockedAchievements
+      getLockedAchievements,
+      updateLearnerProfile,
+      completeOnboarding
     }}>
       {children}
     </ProgressContext.Provider>
