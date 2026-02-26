@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Quick Access Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
         <Link to="/daily" className="bg-gradient-to-br from-yellow-500 to-amber-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
           <Zap className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
           <h3 className="font-bold text-sm md:text-base">Daily Challenge</h3>
@@ -186,6 +186,11 @@ const Dashboard: React.FC = () => {
           <Building2 className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
           <h3 className="font-bold text-sm md:text-base">Colleges</h3>
           <p className="text-[10px] md:text-xs text-emerald-200 hidden sm:block">Cutoff Predictor</p>
+        </Link>
+        <Link to={`/weak-point?subject=${encodeURIComponent(stats.weakArea)}`} className="bg-gradient-to-br from-red-500 to-rose-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group">
+          <AlertCircle className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
+          <h3 className="font-bold text-sm md:text-base">Weak Point</h3>
+          <p className="text-[10px] md:text-xs text-rose-200 hidden sm:block">Focused fix mode</p>
         </Link>
         <Link to="/mentor" className="bg-gradient-to-br from-rose-500 to-pink-600 p-4 md:p-5 rounded-xl md:rounded-2xl text-white hover:shadow-xl transition-all hover:scale-[1.02] group col-span-2 sm:col-span-1">
           <BrainCircuit className="w-6 h-6 md:w-8 md:h-8 mb-2 group-hover:scale-110 transition-transform" />
@@ -255,8 +260,8 @@ const Dashboard: React.FC = () => {
                     <p className="text-rose-100 text-sm mb-4">
                         Your performance in {stats.weakArea} is slightly below target. Boost your score now.
                     </p>
-                    <Link to="/practice" className="inline-block bg-white text-rose-600 text-xs font-bold px-4 py-2 rounded-lg hover:bg-rose-50 transition-colors">
-                        Practice {stats.weakArea}
+                    <Link to={`/weak-point?subject=${encodeURIComponent(stats.weakArea)}`} className="inline-block bg-white text-rose-600 text-xs font-bold px-4 py-2 rounded-lg hover:bg-rose-50 transition-colors">
+                      Attack {stats.weakArea}
                     </Link>
                 </div>
                 <div className="absolute -bottom-4 -right-4 opacity-20">
