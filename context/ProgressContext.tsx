@@ -116,6 +116,47 @@ const INITIAL_TODOS: TodoItem[] = [
   { id: '4', task: "Reading Comprehension: Tone Analysis", subject: Subject.English, completed: false },
 ];
 
+const getStarterTodosByTrack = (track: CourseTrack): TodoItem[] => {
+  const starterMap: Record<CourseTrack, Omit<TodoItem, 'id' | 'completed'>[]> = {
+    [CourseTrack.LLB3]: [
+      { task: 'Constitution Basics: Preamble + Fundamental Rights', subject: Subject.LegalAptitude },
+      { task: 'Legal Maxims Practice Set 1', subject: Subject.LegalAptitude },
+      { task: 'Daily Current Affairs: Legal + Polity', subject: Subject.GK },
+      { task: 'Syllogisms + Critical Reasoning Drill', subject: Subject.LogicalReasoning }
+    ],
+    [CourseTrack.LLB5]: [
+      { task: 'Legal Aptitude Foundation Set', subject: Subject.LegalAptitude },
+      { task: 'English Comprehension Starter', subject: Subject.English },
+      { task: 'Logical Reasoning Mixed Drill', subject: Subject.LogicalReasoning },
+      { task: 'Static GK + Current Affairs Round', subject: Subject.GK }
+    ],
+    [CourseTrack.BBA_BMS]: [
+      { task: 'Quant Foundation: Percentage + Ratio', subject: Subject.Math },
+      { task: 'Business Aptitude Reasoning Set', subject: Subject.LogicalReasoning },
+      { task: 'English Vocabulary + RC Starter', subject: Subject.English },
+      { task: 'GK: Economy + Business News', subject: Subject.GK }
+    ],
+    [CourseTrack.HOTEL_MGMT]: [
+      { task: 'Service Aptitude Communication Practice', subject: Subject.English },
+      { task: 'Reasoning Set: Arrangement + Puzzles', subject: Subject.LogicalReasoning },
+      { task: 'Basic Numerical Ability Drill', subject: Subject.Math },
+      { task: 'Hospitality GK: Tourism + Current Affairs', subject: Subject.GK }
+    ],
+    [CourseTrack.OTHER]: [
+      { task: 'General Aptitude Baseline Test', subject: Subject.LogicalReasoning },
+      { task: 'English Comprehension Starter', subject: Subject.English },
+      { task: 'Quant Basics Drill', subject: Subject.Math },
+      { task: 'Current Affairs Snapshot', subject: Subject.GK }
+    ]
+  };
+
+  return starterMap[track].map((todo, index) => ({
+    ...todo,
+    id: `${Date.now()}-${index}`,
+    completed: false
+  }));
+};
+
 const getToday = () => new Date().toISOString().split('T')[0];
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
@@ -430,13 +471,18 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const completeOnboarding = () => {
-    setState(prev => ({
-      ...prev,
-      learnerProfile: {
-        ...prev.learnerProfile,
-        onboardingCompleted: true
-      }
-    }));
+    setState(prev => {
+      if (prev.learnerProfile.onboardingCompleted) return prev;
+
+      return {
+        ...prev,
+        todos: getStarterTodosByTrack(prev.learnerProfile.targetCourse),
+        learnerProfile: {
+          ...prev.learnerProfile,
+          onboardingCompleted: true
+        }
+      };
+    });
   };
 
   return (
