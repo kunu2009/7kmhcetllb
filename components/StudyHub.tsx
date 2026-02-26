@@ -24,7 +24,7 @@ import {
   ShieldAlert,
   List
 } from 'lucide-react';
-import { Subject } from '../types';
+import { CourseTrack, Subject } from '../types';
 import { 
   explainConcept, 
   generateStudyPlan, 
@@ -1609,8 +1609,26 @@ Elements to prove:
 ];
 
 const StudyHub: React.FC = () => {
-  const { markTopicMastered } = useProgress();
+  const { markTopicMastered, learnerProfile } = useProgress();
   const [activeTab, setActiveTab] = useState<'library' | 'news' | 'plan'>('library');
+
+  const trackSubjectsMap: Record<CourseTrack, Subject[]> = {
+    [CourseTrack.LLB3]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math],
+    [CourseTrack.LLB5]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English],
+    [CourseTrack.BBA_BMS]: [Subject.Math, Subject.LogicalReasoning, Subject.English, Subject.GK],
+    [CourseTrack.HOTEL_MGMT]: [Subject.English, Subject.GK, Subject.LogicalReasoning, Subject.Math],
+    [CourseTrack.OTHER]: [Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math]
+  };
+
+  const trackQuickTopicIdsMap: Record<CourseTrack, string[]> = {
+    [CourseTrack.LLB3]: ['la-1', 'la-2', 'la-3'],
+    [CourseTrack.LLB5]: ['la-1', 'eng-1', 'lr-1'],
+    [CourseTrack.BBA_BMS]: ['math-1', 'lr-1', 'eng-1'],
+    [CourseTrack.HOTEL_MGMT]: ['eng-1', 'gk-1', 'lr-1'],
+    [CourseTrack.OTHER]: ['gk-1', 'lr-1', 'eng-1']
+  };
+
+  const trackSubjects = trackSubjectsMap[learnerProfile.targetCourse] || trackSubjectsMap[CourseTrack.LLB3];
   
   // --- Library State ---
   const [searchQuery, setSearchQuery] = useState('');
@@ -1639,15 +1657,23 @@ const StudyHub: React.FC = () => {
   // --- Filtering Logic ---
   const filteredTopics = useMemo(() => {
     return STUDY_DATA.filter(topic => {
+      const matchesTrack = trackSubjects.includes(topic.subject);
       const matchesSearch = topic.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             topic.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesDiff = filterDifficulty === 'All' || topic.difficulty === filterDifficulty;
       const matchesTime = filterTime === 'All' || 
                           (filterTime === 'Short' && topic.readTime < 15) || 
                           (filterTime === 'Long' && topic.readTime >= 15);
-      return matchesSearch && matchesDiff && matchesTime;
+      return matchesTrack && matchesSearch && matchesDiff && matchesTime;
     });
-  }, [searchQuery, filterDifficulty, filterTime]);
+  }, [searchQuery, filterDifficulty, filterTime, trackSubjects]);
+
+  const quickTopics = useMemo(() => {
+    const ids = trackQuickTopicIdsMap[learnerProfile.targetCourse] || trackQuickTopicIdsMap[CourseTrack.LLB3];
+    return ids
+      .map(id => STUDY_DATA.find(topic => topic.id === id))
+      .filter((topic): topic is StaticTopic => Boolean(topic));
+  }, [learnerProfile.targetCourse]);
 
   // --- ToC Logic ---
   const toc = useMemo(() => {
@@ -1914,43 +1940,23 @@ const StudyHub: React.FC = () => {
         )}
       </div>
       
-      {/* Quick Access - Legal Aptitude */}
+      {/* Quick Access - Track Starter */}
       <div className="mb-2">
         <div className="flex items-center gap-2 mb-2 md:mb-3">
            <Gavel className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
-           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: Legal</span>
+           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: {learnerProfile.targetCourse}</span>
         </div>
         <div className="flex flex-wrap gap-1.5 md:gap-2">
-           <button
-             onClick={() => {
-                const t = STUDY_DATA.find(i => i.id === 'la-1');
-                if(t) setSelectedTopic(t);
-             }}
-             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
-           >
-             <Scale className="w-3 h-3 md:w-3.5 md:h-3.5" />
-             <span className="hidden sm:inline">Constitution:</span> Preamble
-           </button>
-           <button
-             onClick={() => {
-                const t = STUDY_DATA.find(i => i.id === 'la-2');
-                if(t) setSelectedTopic(t);
-             }}
-             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
-           >
-             <ShieldAlert className="w-3 h-3 md:w-3.5 md:h-3.5" />
-             <span className="hidden sm:inline">Torts:</span> Vicarious
-           </button>
-           <button
-             onClick={() => {
-                const t = STUDY_DATA.find(i => i.id === 'la-3');
-                if(t) setSelectedTopic(t);
-             }}
-             className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
-           >
-             <Gavel className="w-3 h-3 md:w-3.5 md:h-3.5" />
-             <span className="hidden sm:inline">IPC:</span> Exceptions
-           </button>
+          {quickTopics.map(topic => (
+            <button
+              key={topic.id}
+              onClick={() => setSelectedTopic(topic)}
+              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
+            >
+              {topic.subject === Subject.LegalAptitude ? <Scale className="w-3 h-3 md:w-3.5 md:h-3.5" /> : topic.subject === Subject.LogicalReasoning ? <ShieldAlert className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <Gavel className="w-3 h-3 md:w-3.5 md:h-3.5" />}
+              <span className="line-clamp-1">{topic.title}</span>
+            </button>
+          ))}
         </div>
       </div>
 
