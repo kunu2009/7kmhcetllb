@@ -278,6 +278,7 @@ const WeakPointDestroyer: React.FC = () => {
   const recentAverageAccuracy = recentSessions.length > 0
     ? Math.round(recentSessions.reduce((sum, session) => sum + session.accuracy, 0) / recentSessions.length)
     : 0;
+  const miniChartData = [...recentSessions].slice(0, 5).reverse();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -319,6 +320,26 @@ const WeakPointDestroyer: React.FC = () => {
               </button>
             </div>
           </div>
+
+          <div className="mb-3">
+            <div className="flex items-end gap-1 h-14">
+              {miniChartData.map((session, idx) => (
+                <div key={session.id} className="flex-1 flex flex-col items-center justify-end gap-1">
+                  <div
+                    className={`w-full rounded-sm ${session.accuracy >= 70 ? 'bg-green-500/80' : session.accuracy >= 50 ? 'bg-yellow-500/80' : 'bg-red-500/80'}`}
+                    style={{ height: `${Math.max(10, Math.round((session.accuracy / 100) * 48))}px` }}
+                    title={`Session ${idx + 1}: ${session.accuracy}%`}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between mt-1 text-[10px] text-gray-400 dark:text-gray-500">
+              <span>Older</span>
+              <span>Last 5 Accuracy</span>
+              <span>Latest</span>
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-2">
             {recentSessions.map(session => (
               <span
