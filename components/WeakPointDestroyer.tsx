@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { Subject } from '../types';
 import { MCQQuestion, MOCK_TEST_QUESTIONS } from '../data/mockTestQuestions';
 import { Target, ShieldAlert, ArrowRight, CheckCircle, XCircle, RefreshCw, Brain } from 'lucide-react';
 
 const WeakPointDestroyer: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const { subjectMastery, addTestResult } = useProgress();
   const [weakestSubject, setWeakestSubject] = useState<Subject | null>(null);
   const [questions, setQuestions] = useState<MCQQuestion[]>([]);
@@ -14,8 +16,20 @@ const WeakPointDestroyer: React.FC = () => {
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
+  const [sessionStreak, setSessionStreak] = useState(() => Number(localStorage.getItem('weakPointStreak') || '0'));
+  const [bestSessionStreak, setBestSessionStreak] = useState(() => Number(localStorage.getItem('weakPointBestStreak') || '0'));
+
+  const parseSubjectFromQuery = (): Subject | null => {
+    const subjectParam = searchParams.get('subject');
+    if (!subjectParam) return null;
+
+    const subjects = Object.values(Subject);
+    return subjects.includes(subjectParam as Subject) ? (subjectParam as Subject) : null;
+  };
 
   useEffect(() => {
+    const preferredSubject = parseSubjectFromQuery();
+
     // Find weakest subject
     let minScore = 100;
     let weakest: Subject | null = null;
@@ -32,6 +46,10 @@ const WeakPointDestroyer: React.FC = () => {
       weakest = Subject.LegalAptitude;
     }
 
+    if (preferredSubject) {
+      weakest = preferredSubject;
+    }
+
     setWeakestSubject(weakest);
 
     // Get 10 random questions for the weakest subject
@@ -41,7 +59,7 @@ const WeakPointDestroyer: React.FC = () => {
     
     setQuestions(selected);
     setAnswers(new Array(selected.length).fill(null));
-  }, [subjectMastery]);
+  }, [subjectMastery, searchParams]);
 
   const handleAnswer = (optionIndex: number) => {
     if (selectedAnswer !== null) return;
@@ -69,6 +87,23 @@ const WeakPointDestroyer: React.FC = () => {
 
   const finishSession = () => {
     setIsFinished(true);
+
+    const today = new Date().toDateString();
+    const lastCompletedDate = localStorage.getItem('weakPointLastDate') || '';
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayString = yesterday.toDateString();
+
+    if (lastCompletedDate !== today) {
+      const updatedStreak = lastCompletedDate === yesterdayString ? sessionStreak + 1 : 1;
+      const updatedBest = Math.max(updatedStreak, bestSessionStreak);
+
+      setSessionStreak(updatedStreak);
+      setBestSessionStreak(updatedBest);
+      localStorage.setItem('weakPointStreak', updatedStreak.toString());
+      localStorage.setItem('weakPointBestStreak', updatedBest.toString());
+      localStorage.setItem('weakPointLastDate', today);
+    }
     
     if (weakestSubject) {
       addTestResult({
@@ -129,6 +164,11 @@ const WeakPointDestroyer: React.FC = () => {
               <p className={`text-3xl font-bold ${percentage >= 80 ? 'text-green-500' : percentage >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
                 {percentage}%
               </p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Streak</p>
+              <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{sessionStreak}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Best: {bestSessionStreak}</p>
             </div>
           </div>
 

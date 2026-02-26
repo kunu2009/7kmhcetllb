@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend,
@@ -9,6 +10,7 @@ import { useProgress } from '../context/ProgressContext';
 import { Subject } from '../types';
 
 const Analytics: React.FC = () => {
+  const navigate = useNavigate();
   const { testHistory, subjectMastery, stats } = useProgress();
 
   const subjectData = Object.keys(subjectMastery).map(key => ({
@@ -125,6 +127,14 @@ const Analytics: React.FC = () => {
                 <p className="text-sm md:text-base font-bold text-gray-800 dark:text-white truncate" title={insights.weakestSubject}>
                   {insights.weakestSubject || 'N/A'}
                 </p>
+                {insights.weakestSubject && (
+                  <button
+                    onClick={() => navigate(`/weak-point?subject=${encodeURIComponent(insights.weakestSubject)}`)}
+                    className="mt-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    Attack Weak Point
+                  </button>
+                )}
               </div>
             </div>
           )}
