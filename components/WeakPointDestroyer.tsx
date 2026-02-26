@@ -26,6 +26,7 @@ const WeakPointDestroyer: React.FC = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [isRetryMode, setIsRetryMode] = useState(false);
+  const [retryBaselineAccuracy, setRetryBaselineAccuracy] = useState<number | null>(null);
   const [lastIncorrectQuestions, setLastIncorrectQuestions] = useState<MCQQuestion[]>([]);
   const [sessionStreak, setSessionStreak] = useState(() => Number(localStorage.getItem('weakPointStreak') || '0'));
   const [bestSessionStreak, setBestSessionStreak] = useState(() => Number(localStorage.getItem('weakPointBestStreak') || '0'));
@@ -158,6 +159,7 @@ const WeakPointDestroyer: React.FC = () => {
     setScore(0);
     setIsFinished(false);
     setIsRetryMode(false);
+    setRetryBaselineAccuracy(null);
     setLastIncorrectQuestions([]);
     
     // Get new questions
@@ -173,6 +175,8 @@ const WeakPointDestroyer: React.FC = () => {
   const retryIncorrectQuestions = () => {
     if (lastIncorrectQuestions.length === 0) return;
 
+    const baselineAccuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+
     setQuestions(lastIncorrectQuestions);
     setAnswers(new Array(lastIncorrectQuestions.length).fill(null));
     setCurrentIndex(0);
@@ -181,6 +185,7 @@ const WeakPointDestroyer: React.FC = () => {
     setScore(0);
     setIsFinished(false);
     setIsRetryMode(true);
+    setRetryBaselineAccuracy(baselineAccuracy);
   };
 
   const handleClearHistory = () => {
@@ -199,6 +204,8 @@ const WeakPointDestroyer: React.FC = () => {
   if (isFinished) {
     const percentage = Math.round((score / questions.length) * 100);
     const incorrectCount = questions.length - score;
+    const retryDelta = isRetryMode && retryBaselineAccuracy !== null ? percentage - retryBaselineAccuracy : null;
+    const retryDeltaText = retryDelta !== null ? `${retryDelta >= 0 ? '+' : ''}${retryDelta}% vs previous run` : '';
     return (
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-sm border border-gray-100 dark:border-gray-700">
@@ -219,6 +226,11 @@ const WeakPointDestroyer: React.FC = () => {
               <p className={`text-3xl font-bold ${percentage >= 80 ? 'text-green-500' : percentage >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
                 {percentage}%
               </p>
+              {retryDelta !== null && (
+                <p className={`text-xs font-semibold mt-1 ${retryDelta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {retryDeltaText}
+                </p>
+              )}
             </div>
             <div className="text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Streak</p>
