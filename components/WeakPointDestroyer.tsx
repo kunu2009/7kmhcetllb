@@ -203,6 +203,24 @@ const WeakPointDestroyer: React.FC = () => {
     setRecentSessions([]);
   };
 
+  const startSessionForSubject = (subject: Subject) => {
+    const subjectQuestions = MOCK_TEST_QUESTIONS.filter(q => q.subject === subject);
+    const shuffled = [...subjectQuestions].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 10);
+
+    setWeakestSubject(subject);
+    setQuestions(selected);
+    setAnswers(new Array(selected.length).fill(null));
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
+    setScore(0);
+    setIsFinished(false);
+    setIsRetryMode(false);
+    setRetryBaselineAccuracy(null);
+    setLastIncorrectQuestions([]);
+  };
+
   if (!weakestSubject || questions.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -325,10 +343,12 @@ const WeakPointDestroyer: React.FC = () => {
             <div className="flex items-end gap-1 h-14">
               {miniChartData.map((session, idx) => (
                 <div key={session.id} className="flex-1 flex flex-col items-center justify-end gap-1">
-                  <div
-                    className={`w-full rounded-sm ${session.accuracy >= 70 ? 'bg-green-500/80' : session.accuracy >= 50 ? 'bg-yellow-500/80' : 'bg-red-500/80'}`}
+                  <button
+                    onClick={() => startSessionForSubject(session.subject)}
+                    className={`w-full rounded-sm transition-opacity hover:opacity-80 ${session.accuracy >= 70 ? 'bg-green-500/80' : session.accuracy >= 50 ? 'bg-yellow-500/80' : 'bg-red-500/80'}`}
                     style={{ height: `${Math.max(10, Math.round((session.accuracy / 100) * 48))}px` }}
-                    title={`Session ${idx + 1}: ${session.accuracy}%`}
+                    title={`Subject: ${session.subject}\nAccuracy: ${session.accuracy}%\nScore: ${session.score}/${session.total}\nCompleted: ${new Date(session.completedAt).toLocaleString()}\nClick to start focused session for this subject`}
+                    aria-label={`Start ${session.subject} session from history item ${idx + 1}`}
                   />
                 </div>
               ))}
