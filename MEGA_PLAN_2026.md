@@ -4,28 +4,26 @@
 
 ---
 
-## � LATEST UPDATE (February 17, 2026)
+## � LATEST UPDATE (February 26, 2026)
 
 ### ✅ Just Completed!
-- **50+ New Mock Questions** added across all subjects (GK, English, Reasoning, Math, Legal)
-- **Achievements/Badges System** - 20+ achievements to unlock
-- **Study Streak Tracking** - Daily streak with best streak tracking
-- **40+ New Flashcards** - More maxims, articles, cases, vocabulary
-- **Enhanced Dashboard** - Achievements display, streak counter
+- **Weak Point Destroyer** - Focused practice on weakest subject using real question bank
+- **Enhanced Analytics** - Added insight cards + trend signal + upgraded score chart
+- **25+ New Daily Practice Questions** added for stronger daily rotation
 - **3 More PYQ Papers** - Added 2021, 2020, 2019 papers with 42+ questions
-- **Question Bank** now has **1,090+ questions**
+- **Question Bank** now has **1,115+ questions**
 - **Flashcards** now have **190+ cards**
 - **PYQ Papers** now cover **6 years** (2019-2024)
 
 ### 📊 Current Stats
 | Content | Count |
 |---------|-------|
-| Mock Questions | 1,090+ |
+| Mock Questions | 1,115+ |
 | Flashcards | 190+ |
 | Study Topics | 22+ |
 | PYQ Papers | 6 |
 | Achievements | 20 |
-| Features | 16 |
+| Features | 18 |
 
 ---
 

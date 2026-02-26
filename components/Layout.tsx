@@ -24,7 +24,8 @@ import {
   Scale,
   BookText,
   Calculator,
-  Lightbulb
+  Lightbulb,
+  ShieldAlert
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -59,6 +60,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/study', label: 'Study Hub', icon: BookOpen },
     { path: '/practice', label: 'Test Arena', icon: Swords },
+    { path: '/weak-point', label: 'Weak Point Destroyer', icon: ShieldAlert },
     { path: '/daily', label: 'Daily Challenge', icon: Zap },
     { path: '/planner', label: 'Study Planner', icon: CalendarDays },
     { path: '/notes', label: 'Quick Notes', icon: StickyNote },

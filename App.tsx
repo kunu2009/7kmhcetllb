@@ -17,6 +17,7 @@ import LegalReasoning from './components/LegalReasoning';
 import ReadingComprehension from './components/ReadingComprehension';
 import FormulaSheet from './components/FormulaSheet';
 import StudyTips from './components/StudyTips';
+import WeakPointDestroyer from './components/WeakPointDestroyer';
 import { ProgressProvider } from './context/ProgressContext';
 
 const App: React.FC = () => {
@@ -36,6 +37,7 @@ const App: React.FC = () => {
             <Route path="/reading-comprehension" element={<ReadingComprehension />} />
             <Route path="/formulas" element={<FormulaSheet />} />
             <Route path="/study-tips" element={<StudyTips />} />
+            <Route path="/weak-point" element={<WeakPointDestroyer />} />
             <Route path="/pyq" element={<PreviousYearPapers />} />
             <Route path="/flashcards" element={<Flashcards />} />
             <Route path="/colleges" element={<CollegeHub />} />
