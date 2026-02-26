@@ -164,6 +164,11 @@ const WeakPointDestroyer: React.FC = () => {
     }
   };
 
+  const handleClearHistory = () => {
+    localStorage.removeItem('weakPointHistory');
+    setRecentSessions([]);
+  };
+
   if (!weakestSubject || questions.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -214,6 +219,9 @@ const WeakPointDestroyer: React.FC = () => {
   }
 
   const currentQuestion = questions[currentIndex];
+  const recentAverageAccuracy = recentSessions.length > 0
+    ? Math.round(recentSessions.reduce((sum, session) => sum + session.accuracy, 0) / recentSessions.length)
+    : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -240,7 +248,18 @@ const WeakPointDestroyer: React.FC = () => {
 
       {recentSessions.length > 0 && (
         <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-700">
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Recent Focus Sessions</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Recent Focus Sessions</p>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Avg: {recentAverageAccuracy}%</span>
+              <button
+                onClick={handleClearHistory}
+                className="text-xs text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
           <div className="flex flex-wrap gap-2">
             {recentSessions.map(session => (
               <span
