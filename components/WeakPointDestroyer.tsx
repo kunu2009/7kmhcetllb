@@ -30,6 +30,7 @@ const WeakPointDestroyer: React.FC = () => {
   const [lastIncorrectQuestions, setLastIncorrectQuestions] = useState<MCQQuestion[]>([]);
   const [sessionStreak, setSessionStreak] = useState(() => Number(localStorage.getItem('weakPointStreak') || '0'));
   const [bestSessionStreak, setBestSessionStreak] = useState(() => Number(localStorage.getItem('weakPointBestStreak') || '0'));
+  const [bestRetryImprovement, setBestRetryImprovement] = useState(() => Number(localStorage.getItem('weakPointBestRetryImprovement') || '0'));
   const [recentSessions, setRecentSessions] = useState<WeakPointSessionRecord[]>(() => {
     const stored = localStorage.getItem('weakPointHistory');
     return stored ? JSON.parse(stored) : [];
@@ -125,6 +126,15 @@ const WeakPointDestroyer: React.FC = () => {
     
     if (weakestSubject) {
       const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+
+      if (isRetryMode && retryBaselineAccuracy !== null) {
+        const retryImprovement = accuracy - retryBaselineAccuracy;
+        if (retryImprovement > bestRetryImprovement) {
+          setBestRetryImprovement(retryImprovement);
+          localStorage.setItem('weakPointBestRetryImprovement', retryImprovement.toString());
+        }
+      }
+
       const newRecord: WeakPointSessionRecord = {
         id: `wps-${Date.now()}`,
         subject: weakestSubject,
@@ -206,6 +216,7 @@ const WeakPointDestroyer: React.FC = () => {
     const incorrectCount = questions.length - score;
     const retryDelta = isRetryMode && retryBaselineAccuracy !== null ? percentage - retryBaselineAccuracy : null;
     const retryDeltaText = retryDelta !== null ? `${retryDelta >= 0 ? '+' : ''}${retryDelta}% vs previous run` : '';
+    const bestRetryText = `${bestRetryImprovement >= 0 ? '+' : ''}${bestRetryImprovement}%`;
     return (
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center shadow-sm border border-gray-100 dark:border-gray-700">
@@ -236,6 +247,7 @@ const WeakPointDestroyer: React.FC = () => {
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Streak</p>
               <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{sessionStreak}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">Best: {bestSessionStreak}</p>
+              <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold">Best Retry: {bestRetryText}</p>
             </div>
           </div>
 
