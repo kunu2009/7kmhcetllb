@@ -5,6 +5,15 @@ import { Subject } from '../types';
 import { MCQQuestion, MOCK_TEST_QUESTIONS } from '../data/mockTestQuestions';
 import { Target, ShieldAlert, ArrowRight, CheckCircle, XCircle, RefreshCw, Brain } from 'lucide-react';
 
+interface WeakPointSessionRecord {
+  id: string;
+  subject: Subject;
+  score: number;
+  total: number;
+  accuracy: number;
+  completedAt: number;
+}
+
 const WeakPointDestroyer: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { subjectMastery, addTestResult } = useProgress();
@@ -18,6 +27,10 @@ const WeakPointDestroyer: React.FC = () => {
   const [answers, setAnswers] = useState<(number | null)[]>([]);
   const [sessionStreak, setSessionStreak] = useState(() => Number(localStorage.getItem('weakPointStreak') || '0'));
   const [bestSessionStreak, setBestSessionStreak] = useState(() => Number(localStorage.getItem('weakPointBestStreak') || '0'));
+  const [recentSessions, setRecentSessions] = useState<WeakPointSessionRecord[]>(() => {
+    const stored = localStorage.getItem('weakPointHistory');
+    return stored ? JSON.parse(stored) : [];
+  });
 
   const parseSubjectFromQuery = (): Subject | null => {
     const subjectParam = searchParams.get('subject');
@@ -106,6 +119,22 @@ const WeakPointDestroyer: React.FC = () => {
     }
     
     if (weakestSubject) {
+      const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+      const newRecord: WeakPointSessionRecord = {
+        id: `wps-${Date.now()}`,
+        subject: weakestSubject,
+        score,
+        total: questions.length,
+        accuracy,
+        completedAt: Date.now()
+      };
+
+      setRecentSessions(prev => {
+        const updated = [newRecord, ...prev].slice(0, 5);
+        localStorage.setItem('weakPointHistory', JSON.stringify(updated));
+        return updated;
+      });
+
       addTestResult({
         id: `wpd-${Date.now()}`,
         date: Date.now(),
@@ -208,6 +237,23 @@ const WeakPointDestroyer: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {recentSessions.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-700">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Recent Focus Sessions</p>
+          <div className="flex flex-wrap gap-2">
+            {recentSessions.map(session => (
+              <span
+                key={session.id}
+                className="text-xs px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                title={new Date(session.completedAt).toLocaleString()}
+              >
+                {session.subject}: {session.score}/{session.total} ({session.accuracy}%)
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
