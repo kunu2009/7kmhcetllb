@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import OnboardingWizard from './OnboardingWizard';
+import { CourseTrack } from '../types';
 
 // Legal Maxims for "Maxim of the Day"
 const DAILY_MAXIMS = [
@@ -17,14 +18,19 @@ const DAILY_MAXIMS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile } = useProgress();
+  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile, updateLearnerProfile, applyStarterGoalsByTrack } = useProgress();
   const [newGoal, setNewGoal] = useState('');
   const [showAllAchievements, setShowAllAchievements] = useState(false);
+  const [selectedTrack, setSelectedTrack] = useState<CourseTrack>(learnerProfile.targetCourse);
   
   // Update streak on component mount
   useEffect(() => {
     checkAndUpdateStreak();
   }, []);
+
+  useEffect(() => {
+    setSelectedTrack(learnerProfile.targetCourse);
+  }, [learnerProfile.targetCourse]);
   
   // Get maxim of the day based on date
   const today = new Date();
@@ -97,6 +103,40 @@ const Dashboard: React.FC = () => {
               Study
             </Link>
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">Switch Track</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Change your MHCET stream anytime and optionally refresh starter goals.</p>
+          </div>
+          <div className="flex-1" />
+          <select
+            value={selectedTrack}
+            onChange={(e) => setSelectedTrack(e.target.value as CourseTrack)}
+            className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm text-gray-800 dark:text-white"
+          >
+            {Object.values(CourseTrack).map(track => (
+              <option key={track} value={track}>{track}</option>
+            ))}
+          </select>
+          <button
+            onClick={() => {
+              updateLearnerProfile({ targetCourse: selectedTrack });
+              applyStarterGoalsByTrack(selectedTrack);
+            }}
+            className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+          >
+            Apply + Refresh Goals
+          </button>
+          <button
+            onClick={() => updateLearnerProfile({ onboardingCompleted: false })}
+            className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600"
+          >
+            Reopen Setup
+          </button>
         </div>
       </div>
 

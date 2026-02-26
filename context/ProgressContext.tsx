@@ -58,6 +58,7 @@ interface ProgressContextType extends ProgressState {
   getLockedAchievements: () => Achievement[];
   updateLearnerProfile: (updates: Partial<LearnerProfile>) => void;
   completeOnboarding: () => void;
+  applyStarterGoalsByTrack: (track: CourseTrack) => void;
 }
 
 const DEFAULT_LEARNER_PROFILE: LearnerProfile = {
@@ -485,6 +486,13 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const applyStarterGoalsByTrack = (track: CourseTrack) => {
+    setState(prev => ({
+      ...prev,
+      todos: getStarterTodosByTrack(track)
+    }));
+  };
+
   return (
     <ProgressContext.Provider value={{ 
       ...state, 
@@ -497,7 +505,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       getUnlockedAchievements,
       getLockedAchievements,
       updateLearnerProfile,
-      completeOnboarding
+      completeOnboarding,
+      applyStarterGoalsByTrack
     }}>
       {children}
     </ProgressContext.Provider>
