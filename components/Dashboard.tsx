@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import OnboardingWizard from './OnboardingWizard';
-import { CourseTrack, Subject } from '../types';
+import { CourseTrack } from '../types';
 import { getDefaultExamIdByTrack, getExamById } from '../data/cetExamData';
-import { LLB5_SUBJECT_BLUEPRINTS } from '../data/llb5SubjectBlueprint';
+import { getTrackSubjectBlueprints } from '../data/trackSubjectBlueprints';
 
 // Legal Maxims for "Maxim of the Day"
 const DAILY_MAXIMS = [
@@ -40,6 +40,7 @@ const Dashboard: React.FC = () => {
   const todaysMaxim = DAILY_MAXIMS[dayOfYear % DAILY_MAXIMS.length];
 
   const selectedExam = getExamById(learnerProfile.selectedExamId || getDefaultExamIdByTrack(learnerProfile.targetCourse));
+  const trackBlueprints = getTrackSubjectBlueprints(learnerProfile.targetCourse);
   const examDate = learnerProfile.examYear === '2026' ? new Date(selectedExam.examDate2026) : null;
   const daysUntilExam = examDate ? Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
@@ -178,18 +179,18 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {learnerProfile.targetCourse === CourseTrack.LLB5 && (
+      {trackBlueprints.length > 0 && (
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-gray-800 dark:text-white">LLB 5-Year Subject Mastery Lanes</p>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">{selectedExam.shortTitle} Subject Mastery Lanes</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">Each lane includes concept coverage + tips/tricks + direct study and MCQ practice links.</p>
             </div>
             <span className="text-[10px] px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 uppercase tracking-wider font-bold">Detailed</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-            {LLB5_SUBJECT_BLUEPRINTS.map((lane) => (
+            {trackBlueprints.map((lane) => (
               <div key={lane.subject} className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-bold text-gray-800 dark:text-white">{lane.subject}</h3>
@@ -212,7 +213,7 @@ const Dashboard: React.FC = () => {
 
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    to={`/llb5-subjects?subject=${encodeURIComponent(lane.subject)}`}
+                    to={`/exam-subjects?subject=${encodeURIComponent(lane.subject)}`}
                     className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold"
                   >
                     Open Subject Hub

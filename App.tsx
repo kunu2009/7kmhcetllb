@@ -20,6 +20,7 @@ import StudyTips from './components/StudyTips';
 import WeakPointDestroyer from './components/WeakPointDestroyer';
 import ReelsHub from './components/ReelsHub';
 import LLB5SubjectHub from './components/LLB5SubjectHub';
+import ExamSubjectHub from './components/ExamSubjectHub';
 import { ProgressProvider } from './context/ProgressContext';
 
 const App: React.FC = () => {
@@ -42,6 +43,7 @@ const App: React.FC = () => {
             <Route path="/weak-point" element={<WeakPointDestroyer />} />
             <Route path="/reels" element={<ReelsHub />} />
             <Route path="/llb5-subjects" element={<LLB5SubjectHub />} />
+            <Route path="/exam-subjects" element={<ExamSubjectHub />} />
             <Route path="/pyq" element={<PreviousYearPapers />} />
             <Route path="/flashcards" element={<Flashcards />} />
             <Route path="/colleges" element={<CollegeHub />} />
