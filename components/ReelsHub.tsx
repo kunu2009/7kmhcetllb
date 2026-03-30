@@ -4,6 +4,20 @@ import { ReelNewsItem, fetchReelNews } from '../services/geminiService';
 
 const PAGE_SIZE = 12;
 
+const formatDateInput = (date: Date) => date.toISOString().split('T')[0];
+
+const getYesterday = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  return formatDateInput(date);
+};
+
+const getLast7DayStart = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 7);
+  return formatDateInput(date);
+};
+
 const ReelsHub: React.FC = () => {
   const [category, setCategory] = useState<'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world'>('all');
   const [selectedDate, setSelectedDate] = useState('');
@@ -144,6 +158,34 @@ const ReelsHub: React.FC = () => {
             className="inline-flex items-center justify-center gap-2 bg-yellow-400 text-indigo-900 font-bold px-4 py-2.5 rounded-lg hover:bg-yellow-300 transition-colors text-sm"
           >
             <RefreshCw className={`w-4 h-4 ${(loading || loadingMore) ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-3">
+          <button
+            onClick={() => setSelectedDate(formatDateInput(new Date()))}
+            className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
+          >
+            Today
+          </button>
+          <button
+            onClick={() => setSelectedDate(getYesterday())}
+            className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
+          >
+            Yesterday
+          </button>
+          <button
+            onClick={() => setSelectedDate(getLast7DayStart())}
+            className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
+            title="Shows results from this date filter baseline"
+          >
+            Last 7 Days
+          </button>
+          <button
+            onClick={() => setSelectedDate('')}
+            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium border border-white/20"
+          >
+            Clear Date
           </button>
         </div>
       </div>

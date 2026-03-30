@@ -31,6 +31,7 @@ import { CourseTrack, Subject } from '../types';
 import { explainConcept, generateStudyPlan, fetchReelNews, ReelNewsItem } from '../services/geminiService';
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
+import { useSearchParams } from 'react-router-dom';
 
 // --- Types ---
 
@@ -1878,12 +1879,13 @@ Memorize multipliers to reduce calculation time.
 ];
 
 const StudyHub: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const { markTopicMastered, learnerProfile } = useProgress();
   const [activeTab, setActiveTab] = useState<'library' | 'news' | 'plan'>('library');
 
   const trackSubjectsMap: Record<CourseTrack, Subject[]> = {
     [CourseTrack.LLB3]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math],
-    [CourseTrack.LLB5]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English],
+    [CourseTrack.LLB5]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math],
     [CourseTrack.BBA_BMS]: [Subject.Math, Subject.LogicalReasoning, Subject.English, Subject.GK],
     [CourseTrack.HOTEL_MGMT]: [Subject.English, Subject.GK, Subject.LogicalReasoning, Subject.Math],
     [CourseTrack.OTHER]: [Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math]
@@ -1891,7 +1893,7 @@ const StudyHub: React.FC = () => {
 
   const trackQuickTopicIdsMap: Record<CourseTrack, string[]> = {
     [CourseTrack.LLB3]: ['la-1', 'la-2', 'la-3'],
-    [CourseTrack.LLB5]: ['la-1', 'eng-3', 'lr-1'],
+    [CourseTrack.LLB5]: ['la-1', 'eng-3', 'lr-1', 'math-8'],
     [CourseTrack.BBA_BMS]: ['math-7', 'lr-4', 'eng-3'],
     [CourseTrack.HOTEL_MGMT]: ['eng-4', 'gk-7', 'lr-5'],
     [CourseTrack.OTHER]: ['gk-8', 'lr-4', 'eng-3']
@@ -2019,6 +2021,25 @@ const StudyHub: React.FC = () => {
       handleNewsFetch();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'library' || tabParam === 'news' || tabParam === 'plan') {
+      setActiveTab(tabParam);
+    }
+
+    const subjectParam = searchParams.get('subject');
+    if (subjectParam && (Object.values(Subject) as string[]).includes(subjectParam)) {
+      setFilterSubject(subjectParam as Subject);
+      setActiveTab('library');
+    }
+
+    const queryParam = searchParams.get('q');
+    if (queryParam) {
+      setSearchQuery(queryParam);
+      setActiveTab('library');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (activeReelIndex === null) return;

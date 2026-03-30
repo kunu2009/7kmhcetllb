@@ -4,6 +4,7 @@ import { generateQuestion } from '../services/geminiService';
 import { Timer, CheckCircle2, XCircle, RefreshCw, ArrowRight, BarChart2, Gauge, Layers, Shuffle, Target, Save, Play, Trash2, FileText, AlertTriangle, Award, X, Clock, CheckSquare, BookOpen, Library, Database } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 import { MOCK_TEST_QUESTIONS, FULL_MOCK_TESTS, PREVIOUS_YEAR_PAPERS, MCQQuestion } from '../data/mockTestQuestions';
+import { useSearchParams } from 'react-router-dom';
 
 type PracticeMode = 'classic' | 'topic' | 'mixed' | 'exam' | 'bank' | 'fullMock';
 
@@ -17,7 +18,7 @@ const TOPICS: Record<Subject, string[]> = {
 
 const TRACK_SUBJECTS: Record<CourseTrack, Subject[]> = {
   [CourseTrack.LLB3]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math],
-  [CourseTrack.LLB5]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English],
+  [CourseTrack.LLB5]: [Subject.LegalAptitude, Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math],
   [CourseTrack.BBA_BMS]: [Subject.Math, Subject.LogicalReasoning, Subject.English, Subject.GK],
   [CourseTrack.HOTEL_MGMT]: [Subject.English, Subject.GK, Subject.LogicalReasoning, Subject.Math],
   [CourseTrack.OTHER]: [Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math]
@@ -69,6 +70,7 @@ const getFallbackQuestion = (
 };
 
 const TestArena: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const { addTestResult, learnerProfile } = useProgress();
   const availableSubjects = TRACK_SUBJECTS[learnerProfile.targetCourse] || TRACK_SUBJECTS[CourseTrack.LLB3];
   const [mode, setMode] = useState<PracticeMode>('classic');
@@ -117,6 +119,34 @@ const TestArena: React.FC = () => {
       setBankFilterSubject('all');
     }
   }, [learnerProfile.targetCourse]);
+
+  useEffect(() => {
+    const modeParam = searchParams.get('mode');
+    if (modeParam && ['classic', 'topic', 'mixed', 'exam', 'bank', 'fullMock'].includes(modeParam)) {
+      setMode(modeParam as PracticeMode);
+    }
+
+    const subjectParam = searchParams.get('subject');
+    const validSubject = subjectParam && (Object.values(Subject) as string[]).includes(subjectParam)
+      ? (subjectParam as Subject)
+      : null;
+
+    if (validSubject && availableSubjects.includes(validSubject)) {
+      setActiveSubject(validSubject);
+      setSelectedTopic(TOPICS[validSubject][0]);
+    }
+
+    const difficultyParam = searchParams.get('difficulty');
+    if (difficultyParam && ['Easy', 'Medium', 'Hard'].includes(difficultyParam)) {
+      setDifficulty(difficultyParam as 'Easy' | 'Medium' | 'Hard');
+    }
+
+    const topicParam = searchParams.get('topic');
+    if (topicParam && validSubject && TOPICS[validSubject].includes(topicParam)) {
+      setSelectedTopic(topicParam);
+      setMode('topic');
+    }
+  }, [searchParams, availableSubjects]);
 
   useEffect(() => {
     const saved = localStorage.getItem('lawranker_test_progress');

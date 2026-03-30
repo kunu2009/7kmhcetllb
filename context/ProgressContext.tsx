@@ -131,7 +131,8 @@ const getStarterTodosByTrack = (track: CourseTrack): TodoItem[] => {
       { task: 'Legal Aptitude Foundation Set', subject: Subject.LegalAptitude },
       { task: 'English Comprehension Starter', subject: Subject.English },
       { task: 'Logical Reasoning Mixed Drill', subject: Subject.LogicalReasoning },
-      { task: 'Static GK + Current Affairs Round', subject: Subject.GK }
+      { task: 'Static GK + Current Affairs Round', subject: Subject.GK },
+      { task: 'Basic Mathematics Quick Drill (Percentages + Ratio)', subject: Subject.Math }
     ],
     [CourseTrack.BBA_BMS]: [
       { task: 'Quant Foundation: Percentage + Ratio', subject: Subject.Math },
