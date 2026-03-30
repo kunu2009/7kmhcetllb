@@ -31,6 +31,43 @@ const TRACK_HINT: Record<CourseTrack, string> = {
   [CourseTrack.OTHER]: 'General aptitude starter flow enabled.'
 };
 
+const getFallbackQuestion = (
+  querySubject: Subject,
+  queryDifficulty: 'Easy' | 'Medium' | 'Hard',
+  queryTopic?: string
+): Question => {
+  const normalizedDifficulty = queryDifficulty.toLowerCase();
+
+  let candidates = MOCK_TEST_QUESTIONS.filter((question) => {
+    const matchesSubject = question.subject === querySubject;
+    const matchesDifficulty = question.difficulty === normalizedDifficulty;
+    const matchesTopic = queryTopic
+      ? question.topic.toLowerCase().includes(queryTopic.toLowerCase())
+      : true;
+    return matchesSubject && matchesDifficulty && matchesTopic;
+  });
+
+  if (candidates.length === 0) {
+    candidates = MOCK_TEST_QUESTIONS.filter((question) => question.subject === querySubject);
+  }
+
+  if (candidates.length === 0) {
+    candidates = [...MOCK_TEST_QUESTIONS];
+  }
+
+  const picked = candidates[Math.floor(Math.random() * candidates.length)];
+
+  return {
+    id: `${picked.id}-${Date.now()}`,
+    text: picked.question,
+    options: picked.options,
+    correctAnswer: picked.correctAnswer,
+    explanation: picked.explanation,
+    subject: picked.subject,
+    topic: picked.topic
+  };
+};
+
 const TestArena: React.FC = () => {
   const { addTestResult, learnerProfile } = useProgress();
   const availableSubjects = TRACK_SUBJECTS[learnerProfile.targetCourse] || TRACK_SUBJECTS[CourseTrack.LLB3];
@@ -236,21 +273,7 @@ const TestArena: React.FC = () => {
       });
     } catch (e) {
       console.error("Parsing error", e);
-      // Fallback
-      setCurrentQuestion({
-        id: 'mock-1',
-        text: 'Principle: Volenti non fit injuria implies that a person who consents to a risk cannot complain. \nFacts: A spectator at a cricket match is hit by a ball.',
-        options: [
-          'The stadium is liable for negligence',
-          'The batsman is liable for assault',
-          'The spectator cannot claim damages as he consented to implied risk',
-          'The cricket board must pay compensation'
-        ],
-        correctAnswer: 2,
-        explanation: 'By entering the stadium, the spectator impliedly consents to the ordinary risks of the game (Volenti non fit injuria).',
-        subject: Subject.LegalAptitude,
-        topic: 'Law of Torts'
-      });
+      setCurrentQuestion(getFallbackQuestion(querySubject, queryDifficulty, queryTopic));
     } finally {
       setLoading(false);
     }
