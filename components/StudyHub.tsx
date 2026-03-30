@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   BookOpen, 
   Zap, 
@@ -30,7 +30,8 @@ import {
   generateStudyPlan, 
   generateTopicQuiz, 
   fetchCurrentAffairs, 
-  SearchResult 
+  fetchReelNews,
+  ReelNewsItem
 } from '../services/geminiService';
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
@@ -1917,10 +1918,10 @@ const StudyHub: React.FC = () => {
   const [showToC, setShowToC] = useState(false);
 
   // --- News State ---
-  const [newsYear, setNewsYear] = useState('2024');
-  const [newsTopic, setNewsTopic] = useState('Legal Developments');
+  const [newsCategory, setNewsCategory] = useState<'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world'>('all');
   const [newsLoading, setNewsLoading] = useState(false);
-  const [newsResult, setNewsResult] = useState<SearchResult | null>(null);
+  const [newsResult, setNewsResult] = useState<ReelNewsItem[]>([]);
+  const [newsError, setNewsError] = useState<string | null>(null);
 
   // --- Plan State ---
   const [planLoading, setPlanLoading] = useState(false);
@@ -1983,10 +1984,20 @@ const StudyHub: React.FC = () => {
 
   const handleNewsFetch = async () => {
     setNewsLoading(true);
-    const result = await fetchCurrentAffairs(newsYear, newsTopic);
+    setNewsError(null);
+    const result = await fetchReelNews(newsCategory, 18);
+    if (!result.length) {
+      setNewsError('Could not load news right now. Please try again in a moment.');
+    }
     setNewsResult(result);
     setNewsLoading(false);
   };
+
+  useEffect(() => {
+    if (activeTab === 'news' && newsResult.length === 0 && !newsLoading) {
+      handleNewsFetch();
+    }
+  }, [activeTab]);
 
   const handleGeneratePlan = async () => {
     setPlanLoading(true);
@@ -2293,30 +2304,29 @@ const StudyHub: React.FC = () => {
       <div className="bg-indigo-900 text-white p-4 md:p-6 rounded-xl md:rounded-2xl shadow-lg relative overflow-hidden">
         <div className="relative z-10">
            <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 flex items-center gap-2">
-             <Newspaper className="w-5 h-5 md:w-6 md:h-6" /> Archive & Current Affairs
+             <Newspaper className="w-5 h-5 md:w-6 md:h-6" /> News Reels
            </h2>
            <p className="text-indigo-200 text-xs md:text-sm mb-4 md:mb-6 max-w-lg">
-             Powered by Google Search Grounding. Travel back to 2014 or get today's updates.
+             Short-scroll current affairs using free APIs (Inshorts + RSS fallback).
            </p>
            
            <div className="flex flex-col gap-2 md:gap-3">
              <div className="flex gap-2 md:gap-3">
                <select 
-                 value={newsYear} 
-                 onChange={(e) => setNewsYear(e.target.value)}
-                 className="bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base w-24 md:w-auto"
+                 value={newsCategory} 
+                 onChange={(e) => setNewsCategory(e.target.value as typeof newsCategory)}
+                 className="bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base"
                >
-                 {Array.from({length: 12}, (_, i) => 2025 - i).map(year => (
-                   <option key={year} value={year} className="text-gray-900">{year}</option>
-                 ))}
+                 <option value="all" className="text-gray-900">All</option>
+                 <option value="legal" className="text-gray-900">Legal</option>
+                 <option value="business" className="text-gray-900">Business</option>
+                 <option value="tech" className="text-gray-900">Tech</option>
+                 <option value="sports" className="text-gray-900">Sports</option>
+                 <option value="world" className="text-gray-900">World</option>
                </select>
-               <input 
-                 type="text" 
-                 value={newsTopic}
-                 onChange={(e) => setNewsTopic(e.target.value)}
-                 placeholder="Enter topic..."
-                 className="flex-1 bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm md:text-base"
-               />
+               <div className="flex-1 bg-white/10 border border-indigo-400/30 rounded-lg px-3 md:px-4 py-2.5 md:py-3 text-indigo-100 text-xs md:text-sm flex items-center">
+                 Swipe/scroll vertically for reel view
+               </div>
              </div>
              <button 
                onClick={handleNewsFetch}
@@ -2324,7 +2334,7 @@ const StudyHub: React.FC = () => {
                className="bg-yellow-400 text-indigo-900 font-bold px-4 md:px-6 py-2.5 md:py-3 rounded-lg hover:bg-yellow-300 transition-colors shadow-lg flex items-center justify-center gap-2 text-sm md:text-base"
              >
                {newsLoading ? <div className="w-4 h-4 border-2 border-indigo-900 border-t-transparent rounded-full animate-spin" /> : <Search className="w-4 h-4" />}
-               Fetch Data
+               Refresh Reels
              </button>
            </div>
         </div>
@@ -2333,42 +2343,61 @@ const StudyHub: React.FC = () => {
         </div>
       </div>
 
-      {newsResult && (
-        <div className="space-y-4 md:space-y-6 animate-in slide-in-from-bottom-4">
-           {/* Summary Card */}
-           <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-             <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white mb-3 md:mb-4">
-               AI Summary: {newsTopic} ({newsYear})
-             </h3>
-             <ReactMarkdown className="prose dark:prose-invert max-w-none text-xs md:text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-               {newsResult.text}
-             </ReactMarkdown>
-           </div>
+      {newsError && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-4 text-sm">
+          {newsError}
+        </div>
+      )}
 
-           {/* Sources */}
-           {newsResult.sources.length > 0 && (
-             <div>
-               <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 md:mb-3">Verified Sources</h4>
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
-                 {newsResult.sources.map((source, idx) => (
-                   <a 
-                     key={idx} 
-                     href={source.uri} 
-                     target="_blank" 
-                     rel="noreferrer"
-                     className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors group"
-                   >
-                     <div className="p-1.5 md:p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                       <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                     </div>
-                     <span className="text-xs md:text-sm font-medium text-gray-700 dark:text-gray-200 truncate flex-1">
-                       {source.title}
-                     </span>
-                   </a>
-                 ))}
-               </div>
-             </div>
-           )}
+      {newsResult.length > 0 && (
+        <div className="animate-in slide-in-from-bottom-4">
+          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
+            {newsResult.length} reels loaded • Category: {newsCategory}
+          </div>
+
+          <div className="h-[68vh] md:h-[74vh] overflow-y-auto snap-y snap-mandatory space-y-4 pr-1 custom-scrollbar">
+            {newsResult.map((item) => (
+              <article
+                key={item.id}
+                className="snap-start min-h-[62vh] bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col"
+              >
+                {item.imageUrl && (
+                  <div className="h-44 md:h-56 w-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                )}
+
+                <div className="p-4 md:p-6 flex-1 flex flex-col">
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    <span className="px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">
+                      {item.category || newsCategory}
+                    </span>
+                    <span>{item.publishedAt || 'Latest'}</span>
+                  </div>
+
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-snug mb-3">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-5 flex-1">
+                    {item.summary}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">Source: {item.source || 'News Feed'}</span>
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs md:text-sm font-medium hover:bg-indigo-700 transition-colors"
+                    >
+                      Open <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -2419,7 +2448,7 @@ const StudyHub: React.FC = () => {
            onClick={() => setActiveTab('news')}
            className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-3 md:py-4 border-b-2 font-medium transition-colors whitespace-nowrap text-sm md:text-base ${activeTab === 'news' ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
          >
-           <Newspaper className="w-4 h-4" /> Archive
+           <Newspaper className="w-4 h-4" /> Reels
          </button>
          <button 
            onClick={() => setActiveTab('plan')}

@@ -181,6 +181,17 @@ export interface SearchResult {
   sources: Source[];
 }
 
+export interface ReelNewsItem {
+  id: string;
+  title: string;
+  summary: string;
+  source: string;
+  url: string;
+  imageUrl?: string;
+  publishedAt?: string;
+  category?: string;
+}
+
 export const fetchCurrentAffairs = async (year: string, topic: string): Promise<SearchResult> => {
   try {
     const response = await ai.models.generateContent({
@@ -220,5 +231,117 @@ export const fetchCurrentAffairs = async (year: string, topic: string): Promise<
   } catch (error) {
     console.error("Gemini API Search Error:", error);
     return { text: "Error retrieving current affairs. Please check your internet connection.", sources: [] };
+  }
+};
+
+const INSHORTS_CATEGORY_MAP: Record<string, string> = {
+  all: 'all',
+  legal: 'national',
+  business: 'business',
+  tech: 'technology',
+  sports: 'sports',
+  world: 'world'
+};
+
+const RSS_QUERY_MAP: Record<string, string> = {
+  all: 'India current affairs',
+  legal: 'India law legal policy supreme court',
+  business: 'India economy business market RBI',
+  tech: 'India technology AI startups',
+  sports: 'India sports cricket olympics',
+  world: 'global current affairs geopolitics'
+};
+
+const normalizeText = (value: unknown): string => {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\s+/g, ' ').trim();
+};
+
+const dedupeNews = (items: ReelNewsItem[]): ReelNewsItem[] => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = `${item.url}|${item.title}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+export const fetchReelNews = async (
+  category: 'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world' = 'all',
+  limit = 15
+): Promise<ReelNewsItem[]> => {
+  const inshortsCategory = INSHORTS_CATEGORY_MAP[category] || 'all';
+
+  const mapInshortsItem = (item: any, index: number): ReelNewsItem => {
+    const title = normalizeText(item.title || item.heading || `News ${index + 1}`);
+    const summary = normalizeText(item.content || item.summary || item.description || 'Tap to read full article.');
+    const url = normalizeText(item.readMoreUrl || item.url || '#');
+
+    return {
+      id: `inshorts-${category}-${index}-${title.slice(0, 24)}`,
+      title,
+      summary,
+      source: normalizeText(item.author || item.source || 'Inshorts'),
+      url,
+      imageUrl: normalizeText(item.imageUrl || item.image || item.thumbnailUrl) || undefined,
+      publishedAt: normalizeText(item.date || item.time) || undefined,
+      category
+    };
+  };
+
+  try {
+    const res = await fetch(`https://inshortsapi.vercel.app/news?category=${encodeURIComponent(inshortsCategory)}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (Array.isArray(json?.data)) {
+        const items = dedupeNews(json.data.map(mapInshortsItem)).slice(0, limit);
+        if (items.length > 0) return items;
+      }
+    }
+  } catch (error) {
+    console.warn('Inshorts API (vercel) unavailable, trying fallback.', error);
+  }
+
+  try {
+    const res = await fetch(`https://inshorts.deta.dev/news?category=${encodeURIComponent(inshortsCategory)}`);
+    if (res.ok) {
+      const json = await res.json();
+      if (Array.isArray(json?.data)) {
+        const items = dedupeNews(json.data.map(mapInshortsItem)).slice(0, limit);
+        if (items.length > 0) return items;
+      }
+    }
+  } catch (error) {
+    console.warn('Inshorts API (deta) unavailable, trying RSS fallback.', error);
+  }
+
+  const query = RSS_QUERY_MAP[category] || RSS_QUERY_MAP.all;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+
+  const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+  try {
+    const res = await fetch(rssJsonUrl);
+    if (!res.ok) throw new Error('RSS feed unavailable');
+
+    const json = await res.json();
+    const items = Array.isArray(json?.items) ? json.items : [];
+
+    const mapped: ReelNewsItem[] = items.map((item: any, index: number) => ({
+      id: `rss-${category}-${index}-${normalizeText(item.title).slice(0, 24)}`,
+      title: normalizeText(item.title || `News ${index + 1}`),
+      summary: normalizeText(item.description || item.contentSnippet || 'Tap to read full article.'),
+      source: normalizeText(item.author || item.source || 'Google News'),
+      url: normalizeText(item.link || '#'),
+      imageUrl: normalizeText(item.thumbnail) || undefined,
+      publishedAt: normalizeText(item.pubDate) || undefined,
+      category
+    }));
+
+    return dedupeNews(mapped).slice(0, limit);
+  } catch (error) {
+    console.error('All free news sources failed.', error);
+    return [];
   }
 };
