@@ -1905,6 +1905,7 @@ const StudyHub: React.FC = () => {
   
   // --- Library State ---
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterSubject, setFilterSubject] = useState<'All' | Subject>('All');
   const [filterDifficulty, setFilterDifficulty] = useState<'All' | 'Easy' | 'Medium' | 'Hard'>('All');
   const [filterTime, setFilterTime] = useState<'All' | 'Short' | 'Long'>('All'); // Short < 15m
   const [showFilters, setShowFilters] = useState(false);
@@ -1931,15 +1932,16 @@ const StudyHub: React.FC = () => {
   const filteredTopics = useMemo(() => {
     return STUDY_DATA.filter(topic => {
       const matchesTrack = trackSubjects.includes(topic.subject);
+      const matchesSubject = filterSubject === 'All' || topic.subject === filterSubject;
       const matchesSearch = topic.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             topic.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesDiff = filterDifficulty === 'All' || topic.difficulty === filterDifficulty;
       const matchesTime = filterTime === 'All' || 
                           (filterTime === 'Short' && topic.readTime < 15) || 
                           (filterTime === 'Long' && topic.readTime >= 15);
-      return matchesTrack && matchesSearch && matchesDiff && matchesTime;
+      return matchesTrack && matchesSubject && matchesSearch && matchesDiff && matchesTime;
     });
-  }, [searchQuery, filterDifficulty, filterTime, trackSubjects]);
+  }, [searchQuery, filterSubject, filterDifficulty, filterTime, trackSubjects]);
 
   const quickTopics = useMemo(() => {
     const ids = trackQuickTopicIdsMap[learnerProfile.targetCourse] || trackQuickTopicIdsMap[CourseTrack.LLB3];
@@ -2225,6 +2227,38 @@ const StudyHub: React.FC = () => {
       
       {/* Quick Access - Track Starter */}
       <div className="mb-2">
+        <div className="mb-3 md:mb-4">
+          <div className="flex items-center gap-2 mb-2 md:mb-3">
+            <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dedicated Sections</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5 md:gap-2">
+            <button
+              onClick={() => setFilterSubject('All')}
+              className={`px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
+                filterSubject === 'All'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
+              }`}
+            >
+              All Subjects
+            </button>
+            {trackSubjects.map((subject) => (
+              <button
+                key={subject}
+                onClick={() => setFilterSubject(subject)}
+                className={`px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
+                  filterSubject === subject
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
+                }`}
+              >
+                {subject}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex items-center gap-2 mb-2 md:mb-3">
            <Gavel className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: {learnerProfile.targetCourse}</span>
@@ -2288,7 +2322,7 @@ const StudyHub: React.FC = () => {
             <h3 className="text-base md:text-lg font-medium text-gray-600 dark:text-gray-300">No topics found</h3>
             <p className="text-gray-400 text-xs md:text-sm">Try adjusting your search or filters</p>
             <button 
-              onClick={() => { setSearchQuery(''); setFilterDifficulty('All'); setFilterTime('All'); }}
+              onClick={() => { setSearchQuery(''); setFilterSubject('All'); setFilterDifficulty('All'); setFilterTime('All'); }}
               className="mt-3 md:mt-4 text-indigo-600 font-bold text-sm hover:underline"
             >
               Clear all filters

@@ -17,6 +17,7 @@ export enum CourseTrack {
 export interface LearnerProfile {
   name: string;
   targetCourse: CourseTrack;
+  selectedExamId: string;
   examYear: string;
   dailyStudyHoursGoal: number;
   onboardingCompleted: boolean;

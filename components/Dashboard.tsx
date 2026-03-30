@@ -5,6 +5,7 @@ import { useProgress } from '../context/ProgressContext';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import OnboardingWizard from './OnboardingWizard';
 import { CourseTrack } from '../types';
+import { getDefaultExamIdByTrack, getExamById } from '../data/cetExamData';
 
 // Legal Maxims for "Maxim of the Day"
 const DAILY_MAXIMS = [
@@ -37,9 +38,9 @@ const Dashboard: React.FC = () => {
   const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
   const todaysMaxim = DAILY_MAXIMS[dayOfYear % DAILY_MAXIMS.length];
 
-  // Days until MH CET Law 2026 (assuming May 2026)
-  const examDate = new Date('2026-05-15');
-  const daysUntilExam = Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const selectedExam = getExamById(learnerProfile.selectedExamId || getDefaultExamIdByTrack(learnerProfile.targetCourse));
+  const examDate = learnerProfile.examYear === '2026' ? new Date(selectedExam.examDate2026) : null;
+  const daysUntilExam = examDate ? Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
   // Mock data for consistency chart
   const activityData = [
@@ -84,7 +85,7 @@ const Dashboard: React.FC = () => {
               "Consistency is what transforms average into excellence."
             </p>
             <p className="text-indigo-200 text-xs md:text-sm">
-              Track: {learnerProfile.targetCourse} • Exam {learnerProfile.examYear} • Goal {learnerProfile.dailyStudyHoursGoal}h/day
+              Track: {learnerProfile.targetCourse} • {selectedExam.shortTitle} • Exam {learnerProfile.examYear} • Goal {learnerProfile.dailyStudyHoursGoal}h/day
             </p>
           </div>
           <div className="flex gap-2 md:gap-3 w-full md:w-auto">
@@ -124,7 +125,10 @@ const Dashboard: React.FC = () => {
           </select>
           <button
             onClick={() => {
-              updateLearnerProfile({ targetCourse: selectedTrack });
+              updateLearnerProfile({ 
+                targetCourse: selectedTrack,
+                selectedExamId: getDefaultExamIdByTrack(selectedTrack)
+              });
               applyStarterGoalsByTrack(selectedTrack);
             }}
             className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
@@ -140,13 +144,46 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">{selectedExam.title}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {selectedExam.totalQuestions} Questions • {selectedExam.totalMarks} Marks • {selectedExam.durationMinutes} mins • {selectedExam.negativeMarking}
+            </p>
+          </div>
+          <div className="text-left md:text-right">
+            <p className="text-xs uppercase tracking-wider text-gray-400">{learnerProfile.examYear} Exam Countdown</p>
+            <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{learnerProfile.examYear === '2026' ? `${Math.max(daysUntilExam, 0)} days` : 'TBD'}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {selectedExam.sections.map((section) => (
+            <div key={section.name} className="p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">{section.name}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{section.questions} Q • {section.marks} Marks</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{section.syllabus.slice(0, 3).join(' • ')}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-3 text-xs">
+          {selectedExam.officialLinks.map((link) => (
+            <a key={link.label} href={link.url} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline">
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {[
           { label: 'Accuracy', value: `${stats.accuracy}%`, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
           { label: 'Topics Mastered', value: stats.topicsMastered, icon: Award, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
           { label: 'Study Streak', value: `${stats.dailyStreak} 🔥`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' },
-          { label: 'Days to Exam', value: daysUntilExam, icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
+          { label: 'Days to Exam', value: learnerProfile.examYear === '2026' ? Math.max(daysUntilExam, 0) : 'TBD', icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
         ].map((item, idx) => (
           <div key={idx} className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
             <div className="flex justify-between items-start">

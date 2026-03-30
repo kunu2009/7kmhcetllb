@@ -1,35 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, Target, CheckCircle2, ArrowRight, GraduationCap, Lightbulb } from 'lucide-react';
+import { BookOpen, Target, CheckCircle2, ArrowRight, GraduationCap, Lightbulb, CalendarDays, ExternalLink, Timer } from 'lucide-react';
 import { CourseTrack } from '../types';
 import { useProgress } from '../context/ProgressContext';
-
-const COURSE_OPTIONS: { value: CourseTrack; status: 'active' | 'starting'; note: string }[] = [
-  {
-    value: CourseTrack.LLB3,
-    status: 'active',
-    note: 'Fully active now with strongest content depth.'
-  },
-  {
-    value: CourseTrack.LLB5,
-    status: 'starting',
-    note: 'Support started. More dedicated modules coming.'
-  },
-  {
-    value: CourseTrack.BBA_BMS,
-    status: 'starting',
-    note: 'Support started. Foundation prep will expand first.'
-  },
-  {
-    value: CourseTrack.HOTEL_MGMT,
-    status: 'starting',
-    note: 'Support started. Course-specific content is planned next.'
-  },
-  {
-    value: CourseTrack.OTHER,
-    status: 'starting',
-    note: 'Choose this for custom MHCET track setup.'
-  }
-];
+import { CET_EXAMS, getDefaultExamIdByTrack, getExamById } from '../data/cetExamData';
 
 const TRACK_TUTORIAL_CONTENT: Record<CourseTrack, {
   steps: { title: string; description: string }[];
@@ -102,15 +75,21 @@ const OnboardingWizard: React.FC = () => {
   const [step, setStep] = useState(1);
   const [name, setName] = useState(learnerProfile.name || '');
   const [targetCourse, setTargetCourse] = useState<CourseTrack>(learnerProfile.targetCourse || CourseTrack.LLB3);
+  const [selectedExamId, setSelectedExamId] = useState(learnerProfile.selectedExamId || getDefaultExamIdByTrack(learnerProfile.targetCourse || CourseTrack.LLB3));
   const [examYear, setExamYear] = useState(learnerProfile.examYear || '2026');
   const [dailyGoal, setDailyGoal] = useState(learnerProfile.dailyStudyHoursGoal || 2);
   const tutorialContent = TRACK_TUTORIAL_CONTENT[targetCourse] || TRACK_TUTORIAL_CONTENT[CourseTrack.LLB3];
+  const selectedExam = getExamById(selectedExamId);
+  const selectedExamDate = examYear === '2026' ? new Date(selectedExam.examDate2026) : null;
+  const today = new Date();
+  const daysToExam = selectedExamDate ? Math.ceil((selectedExamDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null;
 
   const handleProfileNext = (e: React.FormEvent) => {
     e.preventDefault();
     updateLearnerProfile({
       name: name.trim(),
       targetCourse,
+      selectedExamId,
       examYear,
       dailyStudyHoursGoal: dailyGoal
     });
@@ -159,40 +138,52 @@ const OnboardingWizard: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Choose MHCET Course Track</label>
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Choose CET Exam (Official CET Cell options)</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {COURSE_OPTIONS.map((course) => (
+                {CET_EXAMS.map((exam) => (
                   <button
-                    key={course.value}
+                    key={exam.id}
                     type="button"
-                    onClick={() => setTargetCourse(course.value)}
+                    onClick={() => {
+                      setSelectedExamId(exam.id);
+                      setTargetCourse(exam.mappedTrack);
+                    }}
                     className={`text-left p-4 rounded-xl border transition-all ${
-                      targetCourse === course.value
+                      selectedExamId === exam.id
                         ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
                         : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <p className="font-semibold text-sm text-gray-800 dark:text-white">{course.value}</p>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${course.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}`}>
-                        {course.status === 'active' ? 'Active' : 'Starting'}
+                      <p className="font-semibold text-sm text-gray-800 dark:text-white">{exam.shortTitle}</p>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                        {exam.category}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{course.note}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{exam.title}</p>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500">Track in app: {exam.mappedTrack}</p>
                   </button>
                 ))}
+              </div>
+              <div className="mt-3 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <ExternalLink className="w-3.5 h-3.5" />
+                <a href="https://cetcell.mahacet.org/" target="_blank" rel="noreferrer" className="hover:underline text-indigo-600 dark:text-indigo-400">
+                  Official CET Cell portal (all exams)
+                </a>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Exam Year</label>
-                <input
+                <select
                   value={examYear}
                   onChange={(e) => setExamYear(e.target.value)}
-                  placeholder="2026"
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                >
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                </select>
               </div>
 
               <div>
@@ -227,6 +218,76 @@ const OnboardingWizard: React.FC = () => {
               Your track is set to <span className="font-semibold text-indigo-600 dark:text-indigo-400">{targetCourse}</span>. Start with this simple flow:
             </p>
 
+            <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold text-gray-800 dark:text-white">Selected Exam: {selectedExam.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Paper: {selectedExam.totalQuestions} Q • {selectedExam.totalMarks} marks • {selectedExam.durationMinutes} mins • {selectedExam.negativeMarking}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs uppercase tracking-wider text-gray-400">{examYear} Countdown</p>
+                  <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{daysToExam !== null ? `${Math.max(daysToExam, 0)} days` : 'TBD'}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                  <CalendarDays className="w-3.5 h-3.5" /> Exam Date: {examYear === '2026' ? selectedExam.examDate2026 : 'To be announced'}
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                  <Timer className="w-3.5 h-3.5" /> Duration: {selectedExam.durationMinutes} mins
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-3 text-xs">
+                {selectedExam.officialLinks.map((link) => (
+                  <a key={link.label} href={link.url} target="_blank" rel="noreferrer" className="text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1">
+                    {link.label} <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <p className="text-sm font-semibold text-gray-800 dark:text-white mb-3">Section-wise Syllabus & Marks</p>
+              <div className="space-y-2">
+                {selectedExam.sections.map((section) => (
+                  <div key={section.name} className="p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">{section.name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{section.questions} Q • {section.marks} marks</p>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{section.syllabus.join(' • ')}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-3 rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
+                <p className="text-xs font-bold text-green-700 dark:text-green-300 mb-2">Already in App</p>
+                <ul className="space-y-1">
+                  {selectedExam.appCoverage.availableSections.map((item) => (
+                    <li key={item} className="text-xs text-green-700/90 dark:text-green-300/90">• {item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="p-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+                <p className="text-xs font-bold text-amber-700 dark:text-amber-300 mb-2">Not Fully Built Yet</p>
+                <ul className="space-y-1">
+                  {selectedExam.appCoverage.missingSections.map((item) => (
+                    <li key={item} className="text-xs text-amber-700/90 dark:text-amber-300/90">• {item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20">
+                <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-2">Next Planned</p>
+                <ul className="space-y-1">
+                  {selectedExam.appCoverage.nextUp.map((item) => (
+                    <li key={item} className="text-xs text-indigo-700/90 dark:text-indigo-300/90">• {item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/40">
                 <BookOpen className="w-5 h-5 text-indigo-500 mb-2" />
@@ -257,9 +318,9 @@ const OnboardingWizard: React.FC = () => {
               </ul>
             </div>
 
-            {targetCourse !== CourseTrack.LLB3 && (
+            {selectedExam.id === 'mah-llb-5y' && (
               <div className="p-3 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-sm">
-                We’ve started onboarding for this track. You can begin with daily practice + weak-point mode now while we expand full dedicated content modules.
+                LLB 5-Year update: You already have Legal Aptitude, Logical Reasoning, GK/CA, English and Math practice support in app. Missing part is a fully separate subject-by-subject LLB5-only roadmap lane, which is now marked and planned above.
               </div>
             )}
 

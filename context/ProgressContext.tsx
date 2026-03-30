@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CourseTrack, LearnerProfile, Subject } from '../types';
+import { getDefaultExamIdByTrack } from '../data/cetExamData';
 
 export interface TodoItem {
   id: string;
@@ -64,6 +65,7 @@ interface ProgressContextType extends ProgressState {
 const DEFAULT_LEARNER_PROFILE: LearnerProfile = {
   name: '',
   targetCourse: CourseTrack.LLB3,
+  selectedExamId: getDefaultExamIdByTrack(CourseTrack.LLB3),
   examYear: '2026',
   dailyStudyHoursGoal: 2,
   onboardingCompleted: false
@@ -180,6 +182,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           if (!parsed.lastActiveDate) parsed.lastActiveDate = '';
           if (!parsed.learnerProfile) parsed.learnerProfile = DEFAULT_LEARNER_PROFILE;
           if (!parsed.learnerProfile.targetCourse) parsed.learnerProfile.targetCourse = CourseTrack.LLB3;
+          if (!parsed.learnerProfile.selectedExamId) parsed.learnerProfile.selectedExamId = getDefaultExamIdByTrack(parsed.learnerProfile.targetCourse || CourseTrack.LLB3);
           if (!parsed.learnerProfile.examYear) parsed.learnerProfile.examYear = '2026';
           if (!parsed.learnerProfile.dailyStudyHoursGoal) parsed.learnerProfile.dailyStudyHoursGoal = 2;
           if (parsed.learnerProfile.onboardingCompleted === undefined) parsed.learnerProfile.onboardingCompleted = false;
