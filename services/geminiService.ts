@@ -257,6 +257,57 @@ const normalizeText = (value: unknown): string => {
   return value.replace(/\s+/g, ' ').trim();
 };
 
+const decodeHtmlEntities = (value: string): string => {
+  if (!value) return '';
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+};
+
+const stripHtml = (value: unknown): string => {
+  const text = typeof value === 'string' ? value : '';
+  const noTags = text
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+  return normalizeText(decodeHtmlEntities(noTags));
+};
+
+const buildSummary = (value: unknown): string => {
+  const clean = stripHtml(value);
+  if (!clean) return 'Tap to read full article.';
+  const sentenceChunks = clean.split(/(?<=[.!?])\s+/).filter(Boolean);
+  const preview = sentenceChunks.slice(0, 2).join(' ');
+  const trimmed = preview || clean;
+  return trimmed.length > 260 ? `${trimmed.slice(0, 257)}...` : trimmed;
+};
+
+const sanitizeUrl = (value: unknown): string => {
+  const raw = normalizeText(value);
+  if (!raw) return '#';
+
+  const decoded = decodeHtmlEntities(raw).replace(/\s/g, '');
+
+  if (decoded.startsWith('http://') || decoded.startsWith('https://')) {
+    return decoded;
+  }
+
+  if (decoded.startsWith('//')) {
+    return `https:${decoded}`;
+  }
+
+  return '#';
+};
+
+const sanitizeImageUrl = (value: unknown): string | undefined => {
+  const cleaned = sanitizeUrl(value);
+  return cleaned === '#' ? undefined : cleaned;
+};
+
 const dedupeNews = (items: ReelNewsItem[]): ReelNewsItem[] => {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -274,18 +325,18 @@ export const fetchReelNews = async (
   const inshortsCategory = INSHORTS_CATEGORY_MAP[category] || 'all';
 
   const mapInshortsItem = (item: any, index: number): ReelNewsItem => {
-    const title = normalizeText(item.title || item.heading || `News ${index + 1}`);
-    const summary = normalizeText(item.content || item.summary || item.description || 'Tap to read full article.');
-    const url = normalizeText(item.readMoreUrl || item.url || '#');
+    const title = stripHtml(item.title || item.heading || `News ${index + 1}`);
+    const summary = buildSummary(item.content || item.summary || item.description);
+    const url = sanitizeUrl(item.readMoreUrl || item.url || '#');
 
     return {
       id: `inshorts-${category}-${index}-${title.slice(0, 24)}`,
       title,
       summary,
-      source: normalizeText(item.author || item.source || 'Inshorts'),
+      source: stripHtml(item.author || item.source || 'Inshorts'),
       url,
-      imageUrl: normalizeText(item.imageUrl || item.image || item.thumbnailUrl) || undefined,
-      publishedAt: normalizeText(item.date || item.time) || undefined,
+      imageUrl: sanitizeImageUrl(item.imageUrl || item.image || item.thumbnailUrl),
+      publishedAt: stripHtml(item.date || item.time) || undefined,
       category
     };
   };
@@ -329,17 +380,17 @@ export const fetchReelNews = async (
     const items = Array.isArray(json?.items) ? json.items : [];
 
     const mapped: ReelNewsItem[] = items.map((item: any, index: number) => ({
-      id: `rss-${category}-${index}-${normalizeText(item.title).slice(0, 24)}`,
-      title: normalizeText(item.title || `News ${index + 1}`),
-      summary: normalizeText(item.description || item.contentSnippet || 'Tap to read full article.'),
-      source: normalizeText(item.author || item.source || 'Google News'),
-      url: normalizeText(item.link || '#'),
-      imageUrl: normalizeText(item.thumbnail) || undefined,
-      publishedAt: normalizeText(item.pubDate) || undefined,
+      id: `rss-${category}-${index}-${stripHtml(item.title).slice(0, 24)}`,
+      title: stripHtml(item.title || `News ${index + 1}`),
+      summary: buildSummary(item.description || item.content || item.contentSnippet),
+      source: stripHtml(item.author || item.source || json?.feed?.title || 'Google News'),
+      url: sanitizeUrl(item.link || item.guid || '#'),
+      imageUrl: sanitizeImageUrl(item.thumbnail || item?.enclosure?.link || item?.media_thumbnail || item?.image),
+      publishedAt: stripHtml(item.pubDate) || undefined,
       category
     }));
 
-    return dedupeNews(mapped).slice(0, limit);
+    return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(0, limit);
   } catch (error) {
     console.error('All free news sources failed.', error);
     return [];

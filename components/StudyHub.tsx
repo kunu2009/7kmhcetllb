@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   BookOpen, 
   Zap, 
@@ -22,17 +22,13 @@ import {
   Gavel,
   Scale,
   ShieldAlert,
-  List
+  List,
+  Maximize2,
+  Minimize2,
+  ChevronLeft
 } from 'lucide-react';
 import { CourseTrack, Subject } from '../types';
-import { 
-  explainConcept, 
-  generateStudyPlan, 
-  generateTopicQuiz, 
-  fetchCurrentAffairs, 
-  fetchReelNews,
-  ReelNewsItem
-} from '../services/geminiService';
+import { explainConcept, generateStudyPlan, fetchReelNews, ReelNewsItem } from '../services/geminiService';
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
 
@@ -1923,6 +1919,9 @@ const StudyHub: React.FC = () => {
   const [newsLoading, setNewsLoading] = useState(false);
   const [newsResult, setNewsResult] = useState<ReelNewsItem[]>([]);
   const [newsError, setNewsError] = useState<string | null>(null);
+  const [activeReelIndex, setActiveReelIndex] = useState<number | null>(null);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
+  const reelListRef = useRef<HTMLDivElement | null>(null);
 
   // --- Plan State ---
   const [planLoading, setPlanLoading] = useState(false);
@@ -1995,11 +1994,42 @@ const StudyHub: React.FC = () => {
     setNewsLoading(false);
   };
 
+  const openReelFullscreen = (index: number) => {
+    setActiveReelIndex(index);
+  };
+
+  const closeReelFullscreen = () => {
+    setActiveReelIndex(null);
+  };
+
+  const stepReel = (step: 1 | -1) => {
+    if (activeReelIndex === null) return;
+    const nextIndex = activeReelIndex + step;
+    if (nextIndex < 0 || nextIndex >= newsResult.length) return;
+    setActiveReelIndex(nextIndex);
+  };
+
+  const getDisplaySummary = (text: string) => {
+    const clean = text.trim();
+    return clean.length > 360 ? `${clean.slice(0, 357)}...` : clean;
+  };
+
   useEffect(() => {
     if (activeTab === 'news' && newsResult.length === 0 && !newsLoading) {
       handleNewsFetch();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    if (activeReelIndex === null) return;
+    const keyHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeReelFullscreen();
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') stepReel(1);
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') stepReel(-1);
+    };
+    window.addEventListener('keydown', keyHandler);
+    return () => window.removeEventListener('keydown', keyHandler);
+  }, [activeReelIndex, newsResult.length]);
 
   const handleGeneratePlan = async () => {
     setPlanLoading(true);
@@ -2385,19 +2415,38 @@ const StudyHub: React.FC = () => {
 
       {newsResult.length > 0 && (
         <div className="animate-in slide-in-from-bottom-4">
-          <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-            {newsResult.length} reels loaded • Category: {newsCategory}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+              {newsResult.length} reels loaded • Category: {newsCategory}
+            </div>
+            <button
+              onClick={() => openReelFullscreen(0)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition-colors"
+            >
+              <Maximize2 className="w-3.5 h-3.5" /> Full Screen
+            </button>
           </div>
 
-          <div className="h-[68vh] md:h-[74vh] overflow-y-auto snap-y snap-mandatory space-y-4 pr-1 custom-scrollbar">
-            {newsResult.map((item) => (
+          <div ref={reelListRef} className="h-[68vh] md:h-[74vh] overflow-y-auto snap-y snap-mandatory space-y-4 pr-1 custom-scrollbar">
+            {newsResult.map((item, index) => (
               <article
                 key={item.id}
                 className="snap-start min-h-[62vh] bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col"
               >
-                {item.imageUrl && (
+                {item.imageUrl && !failedImages[item.id] && (
                   <div className="h-44 md:h-56 w-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" loading="lazy" />
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={() => setFailedImages(prev => ({ ...prev, [item.id]: true }))}
+                    />
+                  </div>
+                )}
+                {(!item.imageUrl || failedImages[item.id]) && (
+                  <div className="h-44 md:h-56 w-full bg-gradient-to-br from-indigo-100 to-violet-100 dark:from-indigo-900/40 dark:to-violet-900/20 flex items-center justify-center">
+                    <Newspaper className="w-12 h-12 text-indigo-500/70" />
                   </div>
                 )}
 
@@ -2414,23 +2463,96 @@ const StudyHub: React.FC = () => {
                   </h3>
 
                   <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-5 flex-1">
-                    {item.summary}
+                    {getDisplaySummary(item.summary)}
                   </p>
 
                   <div className="flex items-center justify-between gap-2 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <span className="text-xs text-gray-500 dark:text-gray-400 truncate">Source: {item.source || 'News Feed'}</span>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs md:text-sm font-medium hover:bg-indigo-700 transition-colors"
-                    >
-                      Open <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openReelFullscreen(index)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-xs md:text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" /> Full
+                      </button>
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-xs md:text-sm font-medium transition-colors ${item.url === '#' ? 'bg-gray-400 cursor-not-allowed pointer-events-none' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                      >
+                        Read Full <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      )}
+
+      {activeReelIndex !== null && newsResult[activeReelIndex] && (
+        <div className="fixed inset-0 z-[90] bg-black text-white flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/15 backdrop-blur-sm bg-black/70">
+            <div className="text-xs uppercase tracking-wider text-gray-300">Reel {activeReelIndex + 1} / {newsResult.length}</div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => stepReel(-1)}
+                disabled={activeReelIndex === 0}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => stepReel(1)}
+                disabled={activeReelIndex === newsResult.length - 1}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={closeReelFullscreen}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20"
+                title="Exit full screen"
+              >
+                <Minimize2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            <article className="min-h-full max-w-3xl mx-auto flex flex-col">
+              {newsResult[activeReelIndex].imageUrl && !failedImages[`fs-${newsResult[activeReelIndex].id}`] && (
+                <div className="h-[42vh] w-full bg-gray-900 overflow-hidden">
+                  <img
+                    src={newsResult[activeReelIndex].imageUrl}
+                    alt={newsResult[activeReelIndex].title}
+                    className="w-full h-full object-cover"
+                    onError={() => setFailedImages(prev => ({ ...prev, [`fs-${newsResult[activeReelIndex].id}`]: true }))}
+                  />
+                </div>
+              )}
+              <div className="p-5 md:p-7 flex-1 flex flex-col bg-gray-950">
+                <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                  <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-300">{newsResult[activeReelIndex].category || newsCategory}</span>
+                  <span>{newsResult[activeReelIndex].publishedAt || 'Latest'}</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold leading-tight mb-4">{newsResult[activeReelIndex].title}</h3>
+                <p className="text-sm md:text-base text-gray-200 leading-relaxed mb-8 flex-1">{newsResult[activeReelIndex].summary}</p>
+                <div className="flex items-center justify-between gap-3 pt-4 border-t border-white/15">
+                  <span className="text-xs text-gray-400">Source: {newsResult[activeReelIndex].source || 'News Feed'}</span>
+                  <a
+                    href={newsResult[activeReelIndex].url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${newsResult[activeReelIndex].url === '#' ? 'bg-gray-500 cursor-not-allowed pointer-events-none' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                  >
+                    Read Full Article <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            </article>
           </div>
         </div>
       )}
