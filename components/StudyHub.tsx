@@ -1605,6 +1605,278 @@ Elements to prove:
 - Residuaries (remaining)
 - Distant kindred
     `
+  },
+  {
+    id: 'eng-3',
+    title: 'Business Communication Essentials',
+    subject: Subject.English,
+    difficulty: 'Easy',
+    readTime: 14,
+    summary: 'Formal email style, meeting language, and concise writing for entrance tests.',
+    tags: ['Business', 'Communication', 'Writing'],
+    content: `
+# Business Communication Essentials
+
+## 1) Formal Email Structure
+- Subject line: clear and specific
+- Opening: **Dear Sir/Madam** or named recipient
+- Body: Purpose, key details, requested action
+- Closing: **Regards / Sincerely**
+
+## 2) Tone Rules for Competitive Exams
+- Prefer neutral and professional tone
+- Avoid slang and emotional exaggeration
+- Use active voice for clarity
+
+## 3) High-Impact Connectors
+- Addition: *Moreover, Furthermore*
+- Contrast: *However, On the other hand*
+- Result: *Therefore, Consequently*
+
+## 4) Common Error Traps
+- Verb agreement: *The team is...*
+- Parallel structure: *planning, preparing, and presenting*
+- Ambiguous pronouns: replace with explicit nouns
+
+## 5) Quick Practice Pattern
+Convert informal text into formal text:
+- "Send me the file ASAP" → "Kindly share the file at the earliest convenience."
+
+Strong communication improves section scores and interview readiness.
+    `
+  },
+  {
+    id: 'eng-4',
+    title: 'Reading Speed and Accuracy Strategy',
+    subject: Subject.English,
+    difficulty: 'Medium',
+    readTime: 16,
+    summary: 'A timed method for comprehension passages used in CET-style exams.',
+    tags: ['Comprehension', 'Speed', 'Exam Strategy'],
+    content: `
+# Reading Speed and Accuracy Strategy
+
+## 3-Step Method (8-10 min per passage)
+1. **Preview (45 sec):** identify topic, tone, and structure.
+2. **Purpose Read (4-5 min):** mark claims, examples, and conclusion.
+3. **Question Match (3-4 min):** answer from text evidence only.
+
+## Tone Keywords
+- Positive: supportive, optimistic
+- Neutral: analytical, objective
+- Critical: skeptical, argumentative
+
+## Accuracy Rules
+- Eliminate options with extreme words: *always, never, completely*
+- Prefer options that match the author’s exact claim
+- For inference questions, choose the safest supported option
+
+## Time Discipline
+- Do not re-read full passage for each question
+- Mark uncertain questions and return later
+
+Consistency with this method improves both speed and score stability.
+    `
+  },
+  {
+    id: 'lr-4',
+    title: 'Arrangements and Seating: Fast Setup Templates',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Medium',
+    readTime: 18,
+    summary: 'Standard templates for linear and circular seating questions with elimination shortcuts.',
+    tags: ['Arrangements', 'LR', 'Templates'],
+    content: `
+# Arrangements and Seating: Fast Setup Templates
+
+## Template A: Linear Arrangement
+- Draw fixed slots: 1 to n
+- Place absolute clues first: *A is at one end*
+- Add relative clues: *B sits second to the right of C*
+
+## Template B: Circular Arrangement
+- Fix one person to remove rotation ambiguity
+- Mark clockwise direction clearly
+- Convert "opposite" into +n/2 position logic
+
+## Elimination Shortcuts
+- If one clue contradicts all possibilities, reject that branch immediately
+- Use mini-cases only when clue uses *either/or*
+- Keep each case in separate row to avoid mixing states
+
+## Frequent Mistakes
+- Switching left/right reference person
+- Ignoring "facing center" vs "facing outside"
+- Not updating constraints after each placement
+
+Use templates to reduce setup time and avoid rework under exam pressure.
+    `
+  },
+  {
+    id: 'lr-5',
+    title: 'Critical Reasoning for HM/BMS Tracks',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Hard',
+    readTime: 15,
+    summary: 'Assumption, strengthen, and weaken patterns for management-style aptitude sections.',
+    tags: ['Critical Reasoning', 'Assumption', 'Argument'],
+    content: `
+# Critical Reasoning for HM/BMS Tracks
+
+## Core Question Types
+- Identify assumption
+- Strengthen argument
+- Weaken argument
+- Find conclusion
+
+## Assumption Test
+Use **negation test**:
+If negating the statement destroys the argument, it is a necessary assumption.
+
+## Strengthen vs Weaken
+- Strengthen adds supporting evidence to premise → conclusion link
+- Weaken introduces alternative cause or missing condition
+
+## Exam Pattern Tip
+- First locate conclusion, then inspect premises
+- Ignore factual familiarity; judge logic only
+
+## Mini Example
+Claim: "Customer complaints fell after training. Therefore training improved service quality."
+- Strengthen: Complaint audits confirmed higher satisfaction.
+- Weaken: Complaint channel was temporarily disabled.
+
+Practice reasoning structure, not content trivia.
+    `
+  },
+  {
+    id: 'gk-7',
+    title: 'Hospitality and Tourism GK Capsule',
+    subject: Subject.GK,
+    difficulty: 'Easy',
+    readTime: 12,
+    summary: 'Core hospitality terms, tourism bodies, and India-focused factual revision.',
+    tags: ['Hospitality', 'Tourism', 'GK'],
+    content: `
+# Hospitality and Tourism GK Capsule
+
+## Core Terms
+- **ADR**: Average Daily Rate
+- **RevPAR**: Revenue Per Available Room
+- **Occupancy Rate**: Rooms sold / rooms available
+
+## Institutions and Bodies
+- Ministry of Tourism (India)
+- India Tourism Development Corporation (ITDC)
+- UN Tourism (formerly UNWTO)
+
+## High-Yield India Facts
+- Key gateways: Delhi, Mumbai, Bengaluru
+- Major circuits: Golden Triangle, Kerala backwaters, Rajasthan heritage
+- High tourism states often tested through culture-festival pairings
+
+## Memory Trick
+Learn facts in clusters: *State + Festival + Cuisine + Monument*.
+
+This capsule supports HM aspirants with exam-relevant GK framing.
+    `
+  },
+  {
+    id: 'gk-8',
+    title: 'Business & Economy GK Essentials',
+    subject: Subject.GK,
+    difficulty: 'Medium',
+    readTime: 13,
+    summary: 'Banking, inflation, GDP basics, and policy vocabulary for BBA/BMS/Other tracks.',
+    tags: ['Economy', 'Business GK', 'Current Affairs'],
+    content: `
+# Business & Economy GK Essentials
+
+## Banking Basics
+- **Repo Rate**: Rate at which RBI lends to banks
+- **Reverse Repo**: Rate RBI pays banks for parked funds
+- **CRR/SLR**: Liquidity control tools
+
+## Macro Basics
+- **GDP**: Value of final goods/services produced domestically
+- **Inflation**: Sustained rise in general price levels
+- **Fiscal Deficit**: Government expenditure minus revenue (excluding borrowings)
+
+## Market Vocabulary
+- Bull market: broad upward trend
+- Bear market: broad downward trend
+- IPO: first public offer of company shares
+
+## Exam Tip
+Track major RBI policy announcements and Union Budget highlights in short weekly notes.
+    `
+  },
+  {
+    id: 'math-7',
+    title: 'Data Interpretation: Tables and Percent Change',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 17,
+    summary: 'Fast DI workflow for table/chart questions common in BBA/BMS entrances.',
+    tags: ['DI', 'Percentages', 'Aptitude'],
+    content: `
+# Data Interpretation: Tables and Percent Change
+
+## Fast DI Workflow
+1. Read units first (thousands, lakhs, %)
+2. Mark base values and totals
+3. Solve direct questions before ratio/percentage questions
+
+## Key Formulas
+- Percentage change = $\frac{New-Old}{Old} \times 100$
+- Ratio conversion to percent: $\frac{a}{b} \times 100$
+- Average = $\frac{\text{sum}}{\text{count}}$
+
+## Approximation Rule
+Use controlled approximation for long divisions when options are far apart.
+
+## Trap Alerts
+- Comparing absolute increase vs percentage increase
+- Ignoring different base years in trend tables
+- Mixing row-total and column-total references
+
+DI speed improves with disciplined sequence, not random calculation.
+    `
+  },
+  {
+    id: 'math-8',
+    title: 'Profit, Discount, and Simple Interest Toolkit',
+    subject: Subject.Math,
+    difficulty: 'Easy',
+    readTime: 15,
+    summary: 'Compact formula toolkit for retail-math questions in aptitude tracks.',
+    tags: ['Profit-Loss', 'Discount', 'Interest'],
+    content: `
+# Profit, Discount, and Simple Interest Toolkit
+
+## Profit-Loss Basics
+- Profit = SP - CP
+- Loss = CP - SP
+- Profit% = $\frac{Profit}{CP} \times 100$
+- Loss% = $\frac{Loss}{CP} \times 100$
+
+## Discount Basics
+- Discount = MP - SP
+- Discount% = $\frac{Discount}{MP} \times 100$
+- Successive discount formula:
+  $$Net\,Discount\% = a + b - \frac{ab}{100}$$
+
+## Simple Interest
+- SI = $\frac{P \times R \times T}{100}$
+- Amount = Principal + SI
+
+## Exam Shortcuts
+- 20% profit means SP = 1.2 CP
+- 20% loss means SP = 0.8 CP
+- 25% discount means SP = 0.75 MP
+
+Memorize multipliers to reduce calculation time.
+    `
   }
 ];
 
@@ -1622,10 +1894,10 @@ const StudyHub: React.FC = () => {
 
   const trackQuickTopicIdsMap: Record<CourseTrack, string[]> = {
     [CourseTrack.LLB3]: ['la-1', 'la-2', 'la-3'],
-    [CourseTrack.LLB5]: ['la-1', 'eng-1', 'lr-1'],
-    [CourseTrack.BBA_BMS]: ['math-1', 'lr-1', 'eng-1'],
-    [CourseTrack.HOTEL_MGMT]: ['eng-1', 'gk-1', 'lr-1'],
-    [CourseTrack.OTHER]: ['gk-1', 'lr-1', 'eng-1']
+    [CourseTrack.LLB5]: ['la-1', 'eng-3', 'lr-1'],
+    [CourseTrack.BBA_BMS]: ['math-7', 'lr-4', 'eng-3'],
+    [CourseTrack.HOTEL_MGMT]: ['eng-4', 'gk-7', 'lr-5'],
+    [CourseTrack.OTHER]: ['gk-8', 'lr-4', 'eng-3']
   };
 
   const trackSubjects = trackSubjectsMap[learnerProfile.targetCourse] || trackSubjectsMap[CourseTrack.LLB3];
