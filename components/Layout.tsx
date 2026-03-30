@@ -18,6 +18,7 @@ import {
   FileText,
   Layers,
   Zap,
+  Play,
   CalendarDays,
   StickyNote,
   ListChecks,
@@ -57,10 +58,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
-  const navItems = [
+  const navItems: { path: string; label: string; icon: React.ComponentType<{ className?: string }>; isNew?: boolean }[] = [
     { path: '/', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/study', label: 'Study Hub', icon: BookOpen },
     { path: '/practice', label: 'Test Arena', icon: Swords },
+    { path: '/reels', label: 'Reels', icon: Play, isNew: true },
     { path: '/weak-point', label: 'Weak Point Destroyer', icon: ShieldAlert },
     { path: '/daily', label: 'Daily Challenge', icon: Zap },
     { path: '/planner', label: 'Study Planner', icon: CalendarDays },
@@ -116,7 +118,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 } ${isCollapsed ? 'justify-center px-2' : ''}`}
               >
                 <Icon className={`w-6 h-6 flex-shrink-0 ${isActive ? 'text-yellow-400' : 'group-hover:text-white'} transition-colors`} />
-                {!isCollapsed && <span className="font-medium whitespace-nowrap">{item.label}</span>}
+                {!isCollapsed && (
+                  <span className="font-medium whitespace-nowrap flex items-center gap-2">
+                    {item.label}
+                    {item.isNew && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-400 text-indigo-900 font-bold">NEW</span>}
+                  </span>
+                )}
                 
                 {/* Active Indicator Strip for Collapsed Mode */}
                 {isCollapsed && isActive && (
@@ -214,6 +221,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-indigo-600 dark:text-yellow-400' : ''}`}>
                   {item.label.split(' ')[0]}
                 </span>
+                {item.isNew && <span className="text-[8px] leading-none px-1 py-0.5 rounded-full bg-yellow-400 text-indigo-900 font-bold mt-1">NEW</span>}
               </Link>
             );
           })}
@@ -263,6 +271,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     >
                       <Icon className="w-6 h-6 mb-1" />
                       <span className="text-[10px] font-medium text-center leading-tight">{item.label}</span>
+                      {item.isNew && <span className="text-[8px] leading-none px-1 py-0.5 rounded-full bg-yellow-400 text-indigo-900 font-bold mt-1">NEW</span>}
                     </Link>
                   );
                 })}

@@ -1986,7 +1986,7 @@ const StudyHub: React.FC = () => {
   const handleNewsFetch = async () => {
     setNewsLoading(true);
     setNewsError(null);
-    const result = await fetchReelNews(newsCategory, 18);
+    const result = await fetchReelNews({ category: newsCategory, limit: 18, offset: 0 });
     if (!result.length) {
       setNewsError('Could not load news right now. Please try again in a moment.');
     }

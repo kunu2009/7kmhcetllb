@@ -192,6 +192,13 @@ export interface ReelNewsItem {
   category?: string;
 }
 
+export interface ReelNewsQueryOptions {
+  category?: 'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world';
+  limit?: number;
+  offset?: number;
+  date?: string;
+}
+
 export const fetchCurrentAffairs = async (year: string, topic: string): Promise<SearchResult> => {
   try {
     const response = await ai.models.generateContent({
@@ -319,10 +326,15 @@ const dedupeNews = (items: ReelNewsItem[]): ReelNewsItem[] => {
 };
 
 export const fetchReelNews = async (
-  category: 'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world' = 'all',
-  limit = 15
+  options: ReelNewsQueryOptions = {}
 ): Promise<ReelNewsItem[]> => {
+  const category = options.category || 'all';
+  const limit = options.limit ?? 15;
+  const offset = options.offset ?? 0;
+  const date = options.date;
   const inshortsCategory = INSHORTS_CATEGORY_MAP[category] || 'all';
+
+  const hasDateFilter = Boolean(date);
 
   const mapInshortsItem = (item: any, index: number): ReelNewsItem => {
     const title = stripHtml(item.title || item.heading || `News ${index + 1}`);
@@ -342,12 +354,14 @@ export const fetchReelNews = async (
   };
 
   try {
-    const res = await fetch(`https://inshortsapi.vercel.app/news?category=${encodeURIComponent(inshortsCategory)}`);
-    if (res.ok) {
-      const json = await res.json();
-      if (Array.isArray(json?.data)) {
-        const items = dedupeNews(json.data.map(mapInshortsItem)).slice(0, limit);
-        if (items.length > 0) return items;
+    if (!hasDateFilter) {
+      const res = await fetch(`https://inshortsapi.vercel.app/news?category=${encodeURIComponent(inshortsCategory)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json?.data)) {
+          const items = dedupeNews(json.data.map(mapInshortsItem)).slice(offset, offset + limit);
+          if (items.length > 0) return items;
+        }
       }
     }
   } catch (error) {
@@ -355,12 +369,14 @@ export const fetchReelNews = async (
   }
 
   try {
-    const res = await fetch(`https://inshorts.deta.dev/news?category=${encodeURIComponent(inshortsCategory)}`);
-    if (res.ok) {
-      const json = await res.json();
-      if (Array.isArray(json?.data)) {
-        const items = dedupeNews(json.data.map(mapInshortsItem)).slice(0, limit);
-        if (items.length > 0) return items;
+    if (!hasDateFilter) {
+      const res = await fetch(`https://inshorts.deta.dev/news?category=${encodeURIComponent(inshortsCategory)}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (Array.isArray(json?.data)) {
+          const items = dedupeNews(json.data.map(mapInshortsItem)).slice(offset, offset + limit);
+          if (items.length > 0) return items;
+        }
       }
     }
   } catch (error) {
@@ -368,9 +384,11 @@ export const fetchReelNews = async (
   }
 
   const query = RSS_QUERY_MAP[category] || RSS_QUERY_MAP.all;
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
+  const dateFilterQuery = date ? `${query} after:${date} before:${date}` : query;
+  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(dateFilterQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
 
-  const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+  const rssCount = Math.max(offset + limit, 20);
+  const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${rssCount}`;
 
   try {
     const res = await fetch(rssJsonUrl);
@@ -390,7 +408,7 @@ export const fetchReelNews = async (
       category
     }));
 
-    return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(0, limit);
+    return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(offset, offset + limit);
   } catch (error) {
     console.error('All free news sources failed.', error);
     return [];
