@@ -25,7 +25,8 @@ import {
   BookText,
   Calculator,
   Lightbulb,
-  ShieldAlert
+  ShieldAlert,
+  ExternalLink
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -128,6 +129,43 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-indigo-800 dark:border-gray-800 flex flex-col gap-2">
+          {/* More / External Links */}
+          {!isCollapsed && (
+            <div className="mb-2 pb-2 border-b border-indigo-800 dark:border-gray-800">
+              <p className="text-xs text-indigo-300 uppercase tracking-widest font-semibold mb-2 px-2">More</p>
+              <a 
+                href="https://www.7kc.me" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 transition-colors group text-sm"
+                title="Visit Portfolio"
+              >
+                <ExternalLink className="w-4 h-4 group-hover:text-yellow-400" />
+                <span>Portfolio</span>
+              </a>
+              <a 
+                href="https://www.7kc.me/shop" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 transition-colors group text-sm"
+                title="Visit Shop"
+              >
+                <ExternalLink className="w-4 h-4 group-hover:text-yellow-400" />
+                <span>Shop</span>
+              </a>
+              <a 
+                href="https://www.7kc.me/service" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-2 rounded-lg text-indigo-200 hover:bg-indigo-800 dark:hover:bg-gray-800 transition-colors group text-sm"
+                title="Visit Services"
+              >
+                <ExternalLink className="w-4 h-4 group-hover:text-yellow-400" />
+                <span>Services</span>
+              </a>
+            </div>
+          )}
+
           {/* Dark Mode Toggle */}
           <button 
             onClick={toggleTheme}
@@ -239,6 +277,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                   <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
                 </button>
+              </div>
+
+              {/* External Links */}
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold mb-3">More</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <a 
+                    href="https://www.7kc.me" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                  >
+                    <ExternalLink className="w-5 h-5 mb-1 text-indigo-600 dark:text-yellow-400" />
+                    <span className="text-[10px] font-medium text-center">Portfolio</span>
+                  </a>
+                  <a 
+                    href="https://www.7kc.me/shop" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                  >
+                    <ExternalLink className="w-5 h-5 mb-1 text-indigo-600 dark:text-yellow-400" />
+                    <span className="text-[10px] font-medium text-center">Shop</span>
+                  </a>
+                  <a 
+                    href="https://www.7kc.me/service" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                  >
+                    <ExternalLink className="w-5 h-5 mb-1 text-indigo-600 dark:text-yellow-400" />
+                    <span className="text-[10px] font-medium text-center">Services</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
