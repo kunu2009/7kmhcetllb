@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'rechar
 import OnboardingWizard from './OnboardingWizard';
 import { CourseTrack, Subject } from '../types';
 import { getDefaultExamIdByTrack, getExamById } from '../data/cetExamData';
+import { LLB5_SUBJECT_BLUEPRINTS } from '../data/llb5SubjectBlueprint';
 
 // Legal Maxims for "Maxim of the Day"
 const DAILY_MAXIMS = [
@@ -16,50 +17,6 @@ const DAILY_MAXIMS = [
   { latin: 'Volenti non fit injuria', meaning: 'To one who consents, no injury is done', usage: 'Defense in Law of Torts' },
   { latin: 'Res ipsa loquitur', meaning: 'The thing speaks for itself', usage: 'Negligence - when accident itself proves negligence' },
   { latin: 'Nemo judex in causa sua', meaning: 'No one can be judge in their own cause', usage: 'Principle of Natural Justice' },
-];
-
-const LLB5_SUBJECT_MASTER_LANES: {
-  subject: Subject;
-  weightHint: string;
-  concepts: string[];
-  tips: string[];
-  defaultTopic: string;
-}[] = [
-  {
-    subject: Subject.LegalAptitude,
-    weightHint: 'High-weight core section',
-    concepts: ['Constitution basics', 'Law of Torts', 'Contracts', 'Criminal law basics', 'Legal maxims'],
-    tips: ['Solve principle-fact questions daily', 'Memorize 2-3 maxims per day', 'Revise landmark case triggers'],
-    defaultTopic: 'Indian Constitution'
-  },
-  {
-    subject: Subject.LogicalReasoning,
-    weightHint: 'Speed + accuracy driver',
-    concepts: ['Syllogisms', 'Direction Sense', 'Blood Relations', 'Coding-Decoding', 'Critical Reasoning'],
-    tips: ['Use elimination-first method', 'Timebox puzzle branches', 'Track recurring trap patterns'],
-    defaultTopic: 'Syllogisms'
-  },
-  {
-    subject: Subject.GK,
-    weightHint: 'Daily current affairs edge',
-    concepts: ['Current Affairs', 'Polity', 'History', 'Geography', 'Economics basics'],
-    tips: ['Maintain 1-page daily CA notes', 'Weekly revision by theme', 'Use factual flash-recall'],
-    defaultTopic: 'Current Affairs'
-  },
-  {
-    subject: Subject.English,
-    weightHint: 'Stable score booster',
-    concepts: ['Reading Comprehension', 'Vocabulary', 'Grammar spotting', 'Sentence correction', 'Idioms/Phrases'],
-    tips: ['Do timed RC sets', 'Revise error logs', 'Use context-based vocab memory'],
-    defaultTopic: 'Reading Comprehension'
-  },
-  {
-    subject: Subject.Math,
-    weightHint: 'Basic maths (high ROI)',
-    concepts: ['Arithmetic basics', 'Percentages', 'Ratio/Proportion', 'Profit-Loss', 'Simple Interest'],
-    tips: ['Memorize multipliers', 'Practice no-calculator shortcuts', 'Finish easy quant first in mocks'],
-    defaultTopic: 'Arithmetic'
-  }
 ];
 
 const Dashboard: React.FC = () => {
@@ -232,7 +189,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
-            {LLB5_SUBJECT_MASTER_LANES.map((lane) => (
+            {LLB5_SUBJECT_BLUEPRINTS.map((lane) => (
               <div key={lane.subject} className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-sm font-bold text-gray-800 dark:text-white">{lane.subject}</h3>
@@ -254,6 +211,12 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  <Link
+                    to={`/llb5-subjects?subject=${encodeURIComponent(lane.subject)}`}
+                    className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold"
+                  >
+                    Open Subject Hub
+                  </Link>
                   <Link
                     to={`/study?tab=library&subject=${encodeURIComponent(lane.subject)}`}
                     className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
