@@ -32,31 +32,111 @@ const TRACK_HINT: Record<CourseTrack, string> = {
   [CourseTrack.OTHER]: 'General aptitude starter flow enabled.'
 };
 
+interface ParsedGeneratedQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+  topic?: string;
+}
+
+const normalizeDifficulty = (value: 'Easy' | 'Medium' | 'Hard') => value.toLowerCase() as 'easy' | 'medium' | 'hard';
+
+const cleanModelJson = (raw: string): string => {
+  const trimmed = raw.trim();
+  const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenceMatch?.[1]) return fenceMatch[1].trim();
+  return trimmed;
+};
+
+const parseGeneratedQuestion = (raw: string): ParsedGeneratedQuestion | null => {
+  if (!raw) return null;
+
+  const candidates: string[] = [];
+  const cleaned = cleanModelJson(raw);
+  candidates.push(cleaned);
+
+  const jsonObjectMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (jsonObjectMatch?.[0] && jsonObjectMatch[0] !== cleaned) {
+    candidates.push(jsonObjectMatch[0]);
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (
+        typeof parsed?.question !== 'string' ||
+        !Array.isArray(parsed?.options) ||
+        parsed.options.length < 4 ||
+        typeof parsed?.correctIndex !== 'number'
+      ) {
+        continue;
+      }
+
+      const options = parsed.options.map((opt: unknown) => String(opt)).slice(0, 4);
+      const correctIndex = Math.max(0, Math.min(3, parsed.correctIndex));
+
+      return {
+        question: parsed.question,
+        options,
+        correctIndex,
+        explanation: typeof parsed.explanation === 'string' && parsed.explanation.trim().length > 0
+          ? parsed.explanation
+          : 'Use elimination: remove extreme or irrelevant options first, then match core concept.',
+        topic: typeof parsed.topic === 'string' ? parsed.topic : undefined,
+      };
+    } catch {
+      // Keep trying candidate variants.
+    }
+  }
+
+  return null;
+};
+
+const pickBestTopicCandidates = (
+  questions: MCQQuestion[],
+  topic?: string
+): MCQQuestion[] => {
+  if (!topic) return questions;
+  const topicLower = topic.toLowerCase();
+
+  const strict = questions.filter((question) =>
+    question.topic.toLowerCase().includes(topicLower)
+  );
+  if (strict.length > 0) return strict;
+
+  const topicWords = topicLower.split(/\s+/).filter((word) => word.length > 2);
+  const soft = questions.filter((question) =>
+    topicWords.some((word) => question.topic.toLowerCase().includes(word))
+  );
+  return soft.length > 0 ? soft : questions;
+};
+
 const getFallbackQuestion = (
+  recentIds: Set<string>,
   querySubject: Subject,
   queryDifficulty: 'Easy' | 'Medium' | 'Hard',
   queryTopic?: string
 ): Question => {
-  const normalizedDifficulty = queryDifficulty.toLowerCase();
+  const normalizedDifficulty = normalizeDifficulty(queryDifficulty);
 
-  let candidates = MOCK_TEST_QUESTIONS.filter((question) => {
-    const matchesSubject = question.subject === querySubject;
-    const matchesDifficulty = question.difficulty === normalizedDifficulty;
-    const matchesTopic = queryTopic
-      ? question.topic.toLowerCase().includes(queryTopic.toLowerCase())
-      : true;
-    return matchesSubject && matchesDifficulty && matchesTopic;
-  });
+  let candidates = MOCK_TEST_QUESTIONS.filter((question) =>
+    question.subject === querySubject && question.difficulty === normalizedDifficulty
+  );
 
   if (candidates.length === 0) {
     candidates = MOCK_TEST_QUESTIONS.filter((question) => question.subject === querySubject);
   }
 
+  candidates = pickBestTopicCandidates(candidates, queryTopic);
+
   if (candidates.length === 0) {
-    candidates = [...MOCK_TEST_QUESTIONS];
+    candidates = pickBestTopicCandidates([...MOCK_TEST_QUESTIONS], queryTopic);
   }
 
-  const picked = candidates[Math.floor(Math.random() * candidates.length)];
+  const nonRecentCandidates = candidates.filter((question) => !recentIds.has(question.id));
+  const selectionPool = nonRecentCandidates.length > 0 ? nonRecentCandidates : candidates;
+  const picked = selectionPool[Math.floor(Math.random() * selectionPool.length)];
 
   return {
     id: `${picked.id}-${Date.now()}`,
@@ -93,6 +173,9 @@ const TestArena: React.FC = () => {
   const [examStage, setExamStage] = useState<'intro' | 'active' | 'summary'>('intro');
   const [timeLeft, setTimeLeft] = useState(120 * 60); 
   const [examAnswers, setExamAnswers] = useState<{question: Question, selected: number, isCorrect: boolean}[]>([]);
+  const [examSectionTimeSpent, setExamSectionTimeSpent] = useState<Record<string, number>>({});
+  const examSectionTimeSpentRef = useRef<Record<string, number>>({});
+  const examQuestionStartedAtRef = useRef<number | null>(null);
   const examTimerRef = useRef<number | null>(null);
   
   // Question Bank Mode state
@@ -109,6 +192,45 @@ const TestArena: React.FC = () => {
   const [mockTestIndex, setMockTestIndex] = useState(0);
   const [mockTestAnswers, setMockTestAnswers] = useState<Map<string, number>>(new Map());
   const [mockTestStage, setMockTestStage] = useState<'select' | 'active' | 'review'>('select');
+  const [mockSectionTimeSpent, setMockSectionTimeSpent] = useState<Record<string, number>>({});
+  const mockSectionTimeSpentRef = useRef<Record<string, number>>({});
+  const mockQuestionStartedAtRef = useRef<number | null>(null);
+  const recentFallbackIdsRef = useRef<string[]>([]);
+
+  const trackExamQuestionTime = () => {
+    if (!currentQuestion || examQuestionStartedAtRef.current === null) return;
+    const elapsedSeconds = Math.max(1, Math.round((Date.now() - examQuestionStartedAtRef.current) / 1000));
+    const updated = {
+      ...examSectionTimeSpentRef.current,
+      [currentQuestion.subject]: (examSectionTimeSpentRef.current[currentQuestion.subject] || 0) + elapsedSeconds
+    };
+    examSectionTimeSpentRef.current = updated;
+    setExamSectionTimeSpent(updated);
+    examQuestionStartedAtRef.current = Date.now();
+  };
+
+  const trackMockQuestionTime = () => {
+    const currentMockQuestion = mockTestQuestions[mockTestIndex];
+    if (!currentMockQuestion || mockQuestionStartedAtRef.current === null) return;
+    const elapsedSeconds = Math.max(1, Math.round((Date.now() - mockQuestionStartedAtRef.current) / 1000));
+    const updated = {
+      ...mockSectionTimeSpentRef.current,
+      [currentMockQuestion.subject]: (mockSectionTimeSpentRef.current[currentMockQuestion.subject] || 0) + elapsedSeconds
+    };
+    mockSectionTimeSpentRef.current = updated;
+    setMockSectionTimeSpent(updated);
+    mockQuestionStartedAtRef.current = Date.now();
+  };
+
+  const goToPrevMockQuestion = () => {
+    trackMockQuestionTime();
+    setMockTestIndex(prev => Math.max(0, prev - 1));
+  };
+
+  const goToNextMockQuestion = () => {
+    trackMockQuestionTime();
+    setMockTestIndex(prev => Math.min(mockTestQuestions.length - 1, prev + 1));
+  };
 
   useEffect(() => {
     const presetSubjects = TRACK_SUBJECTS[learnerProfile.targetCourse] || TRACK_SUBJECTS[CourseTrack.LLB3];
@@ -177,6 +299,18 @@ const TestArena: React.FC = () => {
       if (examTimerRef.current) window.clearInterval(examTimerRef.current);
     };
   }, [mode, examStage]);
+
+  useEffect(() => {
+    if (mode === 'exam' && examStage === 'active' && currentQuestion) {
+      examQuestionStartedAtRef.current = Date.now();
+    }
+  }, [mode, examStage, currentQuestion?.id]);
+
+  useEffect(() => {
+    if (mode === 'fullMock' && mockTestStage === 'active' && mockTestQuestions[mockTestIndex]) {
+      mockQuestionStartedAtRef.current = Date.now();
+    }
+  }, [mode, mockTestStage, mockTestIndex, mockTestQuestions]);
   
   useEffect(() => {
     return () => {
@@ -219,13 +353,17 @@ const TestArena: React.FC = () => {
     setMockTestQuestions(selectedQuestions.sort(() => Math.random() - 0.5));
     setMockTestIndex(0);
     setMockTestAnswers(new Map());
+    setMockSectionTimeSpent({});
+    mockSectionTimeSpentRef.current = {};
     setTimeLeft(test.duration * 60);
     setSelectedMockTest(testId);
     setMockTestStage('active');
+    mockQuestionStartedAtRef.current = Date.now();
   };
 
   const submitMockTest = () => {
     if (examTimerRef.current) window.clearInterval(examTimerRef.current);
+    trackMockQuestionTime();
     
     let correct = 0;
     let attempted = 0;
@@ -251,7 +389,10 @@ const TestArena: React.FC = () => {
       date: Date.now(),
       score: correct,
       total: mockTestQuestions.length,
-      subjectBreakdown
+      subjectBreakdown,
+      durationSeconds: Object.values(mockSectionTimeSpentRef.current).reduce((sum, seconds) => sum + seconds, 0),
+      sectionTimeSpent: mockSectionTimeSpentRef.current,
+      attempted
     });
     
     setMockTestStage('review');
@@ -289,8 +430,8 @@ const TestArena: React.FC = () => {
 
     const jsonStr = await generateQuestion(querySubject, queryDifficulty, queryTopic);
     try {
-      const parsed = JSON.parse(jsonStr);
-      if (!parsed.question) throw new Error("Invalid question format");
+      const parsed = parseGeneratedQuestion(jsonStr);
+      if (!parsed) throw new Error('Invalid question format');
 
       setCurrentQuestion({
         id: Date.now().toString(),
@@ -301,9 +442,12 @@ const TestArena: React.FC = () => {
         subject: querySubject,
         topic: parsed.topic
       });
-    } catch (e) {
-      console.error("Parsing error", e);
-      setCurrentQuestion(getFallbackQuestion(querySubject, queryDifficulty, queryTopic));
+    } catch {
+      const recentIdsSet = new Set(recentFallbackIdsRef.current);
+      const fallback = getFallbackQuestion(recentIdsSet, querySubject, queryDifficulty, queryTopic);
+      const baseFallbackId = fallback.id.replace(/-\d+$/, '');
+      recentFallbackIdsRef.current = [...recentFallbackIdsRef.current, baseFallbackId].slice(-12);
+      setCurrentQuestion(fallback);
     } finally {
       setLoading(false);
     }
@@ -348,6 +492,7 @@ const TestArena: React.FC = () => {
 
   const handleExamNext = () => {
     if (!currentQuestion || selectedOption === null) return;
+    trackExamQuestionTime();
     const isCorrect = selectedOption === currentQuestion.correctAnswer;
     setExamAnswers(prev => [...prev, {
       question: currentQuestion,
@@ -360,7 +505,10 @@ const TestArena: React.FC = () => {
   const startExam = () => {
     setExamStage('active');
     setExamAnswers([]);
+    setExamSectionTimeSpent({});
+    examSectionTimeSpentRef.current = {};
     setTimeLeft(120 * 60);
+    examQuestionStartedAtRef.current = Date.now();
     loadNewQuestion();
   };
 
@@ -377,6 +525,9 @@ const TestArena: React.FC = () => {
 
   const finishExam = () => {
     if (examTimerRef.current) window.clearInterval(examTimerRef.current);
+    if (currentQuestion && selectedOption !== null) {
+      trackExamQuestionTime();
+    }
     
     const subjectBreakdown: Record<string, {correct: number, total: number}> = {};
     let totalCorrect = 0;
@@ -408,7 +559,10 @@ const TestArena: React.FC = () => {
       date: Date.now(),
       score: totalCorrect,
       total: examAnswers.length + (currentQuestion && selectedOption !== null ? 1 : 0),
-      subjectBreakdown
+      subjectBreakdown,
+      durationSeconds: Object.values(examSectionTimeSpentRef.current).reduce((sum, seconds) => sum + seconds, 0),
+      sectionTimeSpent: examSectionTimeSpentRef.current,
+      attempted: examAnswers.length + (currentQuestion && selectedOption !== null ? 1 : 0)
     });
 
     setExamStage('summary');
@@ -840,7 +994,7 @@ const TestArena: React.FC = () => {
                 
                 <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-100 dark:border-gray-700">
                   <button 
-                    onClick={() => setMockTestIndex(prev => Math.max(0, prev - 1))}
+                    onClick={goToPrevMockQuestion}
                     disabled={mockTestIndex === 0}
                     className="px-4 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 text-sm"
                   >
@@ -853,7 +1007,7 @@ const TestArena: React.FC = () => {
                     Submit Test
                   </button>
                   <button 
-                    onClick={() => setMockTestIndex(prev => Math.min(mockTestQuestions.length - 1, prev + 1))}
+                    onClick={goToNextMockQuestion}
                     disabled={mockTestIndex === mockTestQuestions.length - 1}
                     className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 text-sm"
                   >

@@ -1875,6 +1875,278 @@ DI speed improves with disciplined sequence, not random calculation.
 
 Memorize multipliers to reduce calculation time.
     `
+  },
+  {
+    id: 'eng-5',
+    title: 'Hospitality Communication and Guest Handling English',
+    subject: Subject.English,
+    difficulty: 'Medium',
+    readTime: 16,
+    summary: 'Polite service vocabulary, complaint handling phrases, and scenario-ready communication patterns.',
+    tags: ['Hospitality', 'Service English', 'HM Track'],
+    content: `
+# Hospitality Communication and Guest Handling English
+
+## 1) Service Politeness Framework
+- Greeting: "Good morning, welcome to our property."
+- Confirmation: "Let me quickly verify that for you."
+- Assurance: "I will resolve this immediately."
+- Closure: "Thank you for your patience."
+
+## 2) Complaint Handling Script
+1. Acknowledge: "I understand your concern."
+2. Apologize briefly: "I am sorry for the inconvenience."
+3. Action step: "I will coordinate with housekeeping/front office right away."
+4. Follow-up promise: "I will update you in 10 minutes."
+
+## 3) Accuracy in Listening Questions
+- Focus on intent words: *urgent, refund, replacement, reservation, confirmation*
+- Identify emotional tone: calm, frustrated, demanding
+- Pick option that solves the problem, not one that only sounds polite
+
+## 4) High-Frequency Exam Conversions
+- Direct to polite: "Wait here" -> "Could you please wait here for a moment?"
+- Informal to formal: "We messed up" -> "There was an operational error on our side."
+
+Clear and calm communication is a scoring edge in HM aptitude and interviews.
+    `
+  },
+  {
+    id: 'eng-6',
+    title: 'Management RC and Business Vocabulary Boost',
+    subject: Subject.English,
+    difficulty: 'Hard',
+    readTime: 18,
+    summary: 'Comprehension strategy for market/economy passages and high-yield business word clusters.',
+    tags: ['BBA/BMS', 'RC', 'Vocabulary'],
+    content: `
+# Management RC and Business Vocabulary Boost
+
+## 1) Passage Types You Will See
+- Market trend summaries
+- Startup and funding reports
+- Policy-impact editorials
+- Consumer behavior caselets
+
+## 2) Vocabulary Clusters
+- Growth: expansion, scaling, acceleration
+- Risk: volatility, exposure, downturn
+- Finance: liquidity, leverage, valuation
+- Strategy: segmentation, differentiation, positioning
+
+## 3) RC Solving Protocol
+1. Read title and first line to set context
+2. Mark claim-evidence pairs
+3. Flag numbers, years, and policy references
+4. Solve factual questions first, inference later
+
+## 4) Trap Avoidance
+- Do not confuse author opinion with quoted expert opinion
+- Ignore options that add new facts not in passage
+- Eliminate absolute claims unless passage is absolute
+
+Practice with business-themed passages improves both English and GK linkage.
+    `
+  },
+  {
+    id: 'lr-6',
+    title: 'Data Sufficiency and Analytical Decision Rules',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Hard',
+    readTime: 17,
+    summary: 'Structured framework for data sufficiency and decision-making logic common in BBA/BMS tests.',
+    tags: ['Data Sufficiency', 'Analytical', 'BBA/BMS'],
+    content: `
+# Data Sufficiency and Analytical Decision Rules
+
+## 1) Data Sufficiency Format
+- Statement I alone sufficient?
+- Statement II alone sufficient?
+- Both together sufficient?
+
+## 2) Working Method
+1. Identify target output (value/range/comparison)
+2. Test Statement I independently
+3. Reset and test Statement II independently
+4. Combine only if both alone are insufficient
+
+## 3) Decision-Making Cases
+- Capacity vs demand constraints
+- Cost vs quality trade-off
+- Deadline vs risk trade-off
+
+## 4) Elimination Heuristics
+- If one statement gives unique value, mark sufficient quickly
+- If both statements repeat same data, combined value is low
+- If variables remain free, statement is insufficient
+
+This framework reduces guesswork in higher-order aptitude sets.
+    `
+  },
+  {
+    id: 'lr-7',
+    title: 'Service Operations Logic Caselets',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Medium',
+    readTime: 15,
+    summary: 'Queue, scheduling, and resource-allocation logic for hospitality and operations aptitude questions.',
+    tags: ['Operations', 'Caselets', 'HM Track'],
+    content: `
+# Service Operations Logic Caselets
+
+## 1) Typical Caselet Themes
+- Check-in/check-out congestion
+- Restaurant table allocation
+- Housekeeping shift sequencing
+- Event-slot scheduling conflicts
+
+## 2) Fast Modeling Pattern
+- Convert narrative into slots and constraints
+- Mark hard constraints first (fixed slots)
+- Add soft constraints after fixed placements
+
+## 3) Queue Logic Tips
+- Priority queue means arrival order may not hold
+- Service time differences change completion order
+- Parallel counters require lane-wise tracking
+
+## 4) Common Error Traps
+- Ignoring one-off exceptions
+- Mixing up start time and completion time
+- Forgetting mandatory buffer intervals
+
+Caselet speed depends on neat structure more than raw math.
+    `
+  },
+  {
+    id: 'gk-9',
+    title: 'Startup, Corporate, and Market Awareness Capsule',
+    subject: Subject.GK,
+    difficulty: 'Medium',
+    readTime: 14,
+    summary: 'Business-current affairs essentials for BBA/BMS and management aptitude tracks.',
+    tags: ['Startup', 'Corporate GK', 'BBA/BMS'],
+    content: `
+# Startup, Corporate, and Market Awareness Capsule
+
+## 1) Startup Ecosystem Basics
+- Funding stages: Seed, Series A, Series B+
+- Unicorn: startup valued at $1B+
+- IPO: company lists shares to public market
+
+## 2) Corporate Awareness Quick Points
+- CEO/CFO role differences
+- ESG: Environmental, Social, Governance focus
+- Merger vs acquisition basics
+
+## 3) Market Indicators to Track
+- Index movement (Sensex/Nifty)
+- Interest rate decisions by RBI
+- Inflation and policy announcements
+
+## 4) Exam Strategy
+- Maintain one-page weekly business GK digest
+- Track major appointments and exits
+- Revise key terms through flashcards
+
+Business-awareness questions reward consistency over memorizing random trivia.
+    `
+  },
+  {
+    id: 'gk-10',
+    title: 'Travel, Tourism, and Hotel Industry Awareness',
+    subject: Subject.GK,
+    difficulty: 'Easy',
+    readTime: 13,
+    summary: 'Industry-specific GK for hospitality aspirants: tourism bodies, terminology, and India circuits.',
+    tags: ['Tourism', 'Hotel Industry', 'HM Track'],
+    content: `
+# Travel, Tourism, and Hotel Industry Awareness
+
+## 1) Tourism Ecosystem Basics
+- Domestic vs inbound tourism
+- Peak vs off-season demand
+- Heritage, eco, and medical tourism categories
+
+## 2) Hotel Operations Terms
+- Occupancy %, ARR, RevPAR
+- Front office, F&B, housekeeping key functions
+- Overbooking risk and mitigation
+
+## 3) India High-Yield Facts
+- Golden Triangle: Delhi-Agra-Jaipur
+- Coastal circuits and hill circuits in exam GK
+- Major festival-tourism linkages by state
+
+## 4) Test Tip
+- Remember facts in clusters: destination + attraction + season + category
+
+This capsule gives HM aspirants domain-specific GK without overloading details.
+    `
+  },
+  {
+    id: 'math-9',
+    title: 'Time-Work, Scheduling, and Throughput Aptitude',
+    subject: Subject.Math,
+    difficulty: 'Hard',
+    readTime: 19,
+    summary: 'Operational math toolkit for shifts, team productivity, and process completion questions.',
+    tags: ['Time & Work', 'Operations Math', 'BBA/BMS'],
+    content: `
+# Time-Work, Scheduling, and Throughput Aptitude
+
+## 1) Core Relation
+- Work = Rate x Time
+- If A completes in 6 days, A's one-day work = 1/6
+
+## 2) Team Combination Rule
+- Combined rate = sum of individual rates
+- Completion time = 1 / combined rate
+
+## 3) Scheduling Questions
+- Convert all durations to a common unit first
+- Account for breaks, shift changes, and overlap windows
+- Track cumulative output after each interval
+
+## 4) Throughput Scenarios
+- Service counters with unequal rates
+- Machine/process output per hour
+- Bottleneck stage determines total completion pace
+
+Use fraction-based calculations to avoid decimal drift in long questions.
+    `
+  },
+  {
+    id: 'math-10',
+    title: 'Ratio, Mixture, and Costing for Service Tracks',
+    subject: Subject.Math,
+    difficulty: 'Medium',
+    readTime: 16,
+    summary: 'Ratio-alligation-costing questions tailored for hospitality and business operations contexts.',
+    tags: ['Ratio', 'Mixture', 'Costing', 'HM Track'],
+    content: `
+# Ratio, Mixture, and Costing for Service Tracks
+
+## 1) Ratio Scaling
+- Keep ratio in lowest form first
+- Convert to actual values using common multiplier
+
+## 2) Mixture and Alligation
+- Weighted average for blending two categories
+- Alligation shortcut for target-value blend
+
+## 3) Costing Questions
+- Total cost = fixed + variable components
+- Unit cost = total cost / units produced
+- Margin % usually computed on cost unless stated otherwise
+
+## 4) Service Context Examples
+- Ingredient blend costing
+- Room package component pricing
+- Event budget allocation ratios
+
+Practice with context-rich problems to improve transfer in real exam caselets.
+    `
   }
 ];
 
@@ -1894,9 +2166,9 @@ const StudyHub: React.FC = () => {
   const trackQuickTopicIdsMap: Record<CourseTrack, string[]> = {
     [CourseTrack.LLB3]: ['la-1', 'la-2', 'la-3'],
     [CourseTrack.LLB5]: ['la-1', 'eng-3', 'lr-1', 'math-8'],
-    [CourseTrack.BBA_BMS]: ['math-7', 'lr-4', 'eng-3'],
-    [CourseTrack.HOTEL_MGMT]: ['eng-4', 'gk-7', 'lr-5'],
-    [CourseTrack.OTHER]: ['gk-8', 'lr-4', 'eng-3']
+    [CourseTrack.BBA_BMS]: ['math-7', 'math-9', 'lr-6', 'gk-9', 'eng-6'],
+    [CourseTrack.HOTEL_MGMT]: ['eng-5', 'gk-10', 'lr-7', 'math-10', 'gk-7'],
+    [CourseTrack.OTHER]: ['gk-8', 'lr-6', 'eng-4', 'math-9', 'gk-9']
   };
 
   const trackSubjects = trackSubjectsMap[learnerProfile.targetCourse] || trackSubjectsMap[CourseTrack.LLB3];

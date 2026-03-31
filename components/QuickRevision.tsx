@@ -4,7 +4,7 @@ import {
   Scale, FileText, Gavel, AlertTriangle, Globe, 
   Clock, Target, Award, List, Brain, Languages, Calculator, Compass
 } from 'lucide-react';
-import { QUICK_REVISION_NOTES, EXAM_PATTERN } from '../data/studyNotes';
+import { QUICK_REVISION_NOTES, EXAM_PATTERN, TopicMCQ } from '../data/studyNotes';
 
 type SubjectKey = keyof typeof QUICK_REVISION_NOTES;
 
@@ -26,6 +26,7 @@ export default function QuickRevision() {
   const [activeSubject, setActiveSubject] = useState<SubjectKey>('constitutionalLaw');
   const [expandedTopics, setExpandedTopics] = useState<Record<string, boolean>>({});
   const [completedPoints, setCompletedPoints] = useState<Set<string>>(new Set());
+  const [revealedMcqs, setRevealedMcqs] = useState<Set<string>>(new Set());
   const [showExamPattern, setShowExamPattern] = useState(false);
 
   const toggleTopic = (topicTitle: string) => {
@@ -45,6 +46,60 @@ export default function QuickRevision() {
       }
       return newSet;
     });
+  };
+
+  const toggleMcqReveal = (mcqId: string) => {
+    setRevealedMcqs(prev => {
+      const next = new Set(prev);
+      if (next.has(mcqId)) {
+        next.delete(mcqId);
+      } else {
+        next.add(mcqId);
+      }
+      return next;
+    });
+  };
+
+  const optionLabel = (index: number) => String.fromCharCode(65 + index);
+
+  const renderMCQ = (mcq: TopicMCQ, mcqIndex: number, topicId: string) => {
+    const mcqId = `${topicId}-mcq-${mcqIndex}`;
+    const isRevealed = revealedMcqs.has(mcqId);
+
+    return (
+      <div key={mcqId} className="bg-gray-700/40 border border-gray-700 rounded-lg p-3">
+        <p className="text-sm font-medium text-gray-100 mb-2">
+          {mcqIndex + 1}. {mcq.question}
+        </p>
+        <div className="space-y-1 mb-3">
+          {mcq.options.map((option, optionIndex) => {
+            const isAnswer = optionIndex === mcq.answerIndex;
+            const revealedClass = isRevealed
+              ? isAnswer
+                ? 'border-green-500/70 bg-green-500/10 text-green-300'
+                : 'border-gray-700 bg-gray-800/60 text-gray-400'
+              : 'border-gray-700 bg-gray-800/60 text-gray-300';
+
+            return (
+              <div key={optionIndex} className={`text-xs p-2 rounded border ${revealedClass}`}>
+                {optionLabel(optionIndex)}. {option}
+              </div>
+            );
+          })}
+        </div>
+        <button
+          onClick={() => toggleMcqReveal(mcqId)}
+          className="text-xs px-3 py-1.5 rounded-md bg-blue-600/80 hover:bg-blue-600 text-white transition-colors"
+        >
+          {isRevealed ? 'Hide Answer' : 'Show Answer'}
+        </button>
+        {isRevealed && (
+          <p className="text-xs text-gray-300 mt-2">
+            <span className="text-green-400 font-medium">Explanation:</span> {mcq.explanation}
+          </p>
+        )}
+      </div>
+    );
   };
 
   const currentSubject = QUICK_REVISION_NOTES[activeSubject];
@@ -207,6 +262,7 @@ export default function QuickRevision() {
             <div className="space-y-4">
               {currentSubject.topics.map((topic, topicIndex) => {
                 const isExpanded = expandedTopics[`${activeSubject}-${topicIndex}`] ?? topicIndex === 0;
+                const topicId = `${activeSubject}-${topicIndex}`;
                 const topicCompletedCount = topic.points.filter((_, pi) => 
                   completedPoints.has(`${activeSubject}-${topicIndex}-${pi}`)
                 ).length;
@@ -214,7 +270,7 @@ export default function QuickRevision() {
                 return (
                   <div key={topicIndex} className="bg-gray-800 rounded-xl overflow-hidden">
                     <button
-                      onClick={() => toggleTopic(`${activeSubject}-${topicIndex}`)}
+                      onClick={() => toggleTopic(topicId)}
                       className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-750"
                     >
                       <div className="flex items-center gap-3">
@@ -264,6 +320,30 @@ export default function QuickRevision() {
                               </div>
                             );
                           })}
+
+                          {topic.solvedExample && (
+                            <div className="mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+                              <h4 className="text-sm font-semibold text-yellow-300 mb-2">Solved Example</h4>
+                              <p className="text-sm text-gray-200 mb-2">
+                                <span className="text-yellow-200 font-medium">Problem:</span> {topic.solvedExample.prompt}
+                              </p>
+                              <p className="text-sm text-gray-300 mb-2">
+                                <span className="text-yellow-200 font-medium">Approach:</span> {topic.solvedExample.approach}
+                              </p>
+                              <p className="text-sm text-green-300">
+                                <span className="text-yellow-200 font-medium">Answer:</span> {topic.solvedExample.answer}
+                              </p>
+                            </div>
+                          )}
+
+                          {topic.mcqs && topic.mcqs.length > 0 && (
+                            <div className="mt-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                              <h4 className="text-sm font-semibold text-blue-300 mb-3">Practice MCQs ({topic.mcqs.length})</h4>
+                              <div className="space-y-3">
+                                {topic.mcqs.map((mcq, mcqIndex) => renderMCQ(mcq, mcqIndex, topicId))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

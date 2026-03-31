@@ -1,5 +1,30 @@
 // Comprehensive Study Notes for MH CET Law
 
+export interface SolvedExample {
+  prompt: string;
+  approach: string;
+  answer: string;
+}
+
+export interface TopicMCQ {
+  question: string;
+  options: string[];
+  answerIndex: number;
+  explanation: string;
+}
+
+export interface RevisionTopic {
+  title: string;
+  points: string[];
+  solvedExample?: SolvedExample;
+  mcqs?: TopicMCQ[];
+}
+
+export interface RevisionSubject {
+  title: string;
+  topics: RevisionTopic[];
+}
+
 export const QUICK_REVISION_NOTES = {
   constitutionalLaw: {
     title: "Constitutional Law Quick Revision",
@@ -30,6 +55,43 @@ export const QUICK_REVISION_NOTES = {
           "Art. 25-28: Freedom of religion",
           "Art. 29-30: Cultural and educational rights of minorities",
           "Art. 32: Right to Constitutional Remedies - 'Heart and Soul' - Ambedkar",
+        ],
+        solvedExample: {
+          prompt: "A state order blocks a student newspaper without hearing the editors. Which fundamental rights are likely affected?",
+          approach: "Map facts to rights: censorship and publication limits trigger Art. 19(1)(a); lack of fair process connects to Art. 21 due process logic.",
+          answer: "Primary violation is Art. 19(1)(a). The arbitrary procedure can also be challenged through Art. 21 fairness and Art. 14 non-arbitrariness."
+        },
+        mcqs: [
+          {
+            question: "Which Article is called the 'Heart and Soul' of the Constitution?",
+            options: ["Article 14", "Article 21", "Article 32", "Article 226"],
+            answerIndex: 2,
+            explanation: "Dr. Ambedkar described Article 32 as the heart and soul because it provides constitutional remedies."
+          },
+          {
+            question: "Article 21A guarantees which right?",
+            options: ["Right to work", "Right to education for 6-14 years", "Right to privacy", "Right to property"],
+            answerIndex: 1,
+            explanation: "Article 21A, inserted by 86th Amendment, guarantees free and compulsory education for children aged 6 to 14."
+          },
+          {
+            question: "Which of the following is NOT part of Article 20 protection?",
+            options: ["No ex-post facto law", "No double jeopardy", "No self-incrimination", "No preventive detention"],
+            answerIndex: 3,
+            explanation: "Article 20 covers ex-post facto, double jeopardy, and self-incrimination; preventive detention is dealt with under Article 22."
+          },
+          {
+            question: "Freedom of religion is mainly covered under:",
+            options: ["Articles 19-22", "Articles 23-24", "Articles 25-28", "Articles 29-30"],
+            answerIndex: 2,
+            explanation: "Articles 25 to 28 govern freedom of conscience and religion."
+          },
+          {
+            question: "Equal opportunity in public employment is guaranteed by:",
+            options: ["Article 15", "Article 16", "Article 17", "Article 18"],
+            answerIndex: 1,
+            explanation: "Article 16 specifically addresses equality of opportunity in matters of public employment."
+          }
         ]
       },
       {
@@ -123,6 +185,43 @@ export const QUICK_REVISION_NOTES = {
           "Lawful consideration",
           "Lawful object",
           "Not expressly declared void",
+        ],
+        solvedExample: {
+          prompt: "A agrees to sell his bike to B for Rs. 50,000. B accepts. Later, it is discovered A is a minor. Is the contract enforceable?",
+          approach: "Apply Section 10 essentials. Parties must be competent. Minority destroys competency regardless of offer and acceptance.",
+          answer: "The agreement is void because one party is not competent to contract. A minor's agreement is void ab initio."
+        },
+        mcqs: [
+          {
+            question: "Under Section 10, which is essential for a valid contract?",
+            options: ["Registration in all cases", "Written form in all cases", "Free consent", "Notarization"],
+            answerIndex: 2,
+            explanation: "Free consent is a core element under Section 10."
+          },
+          {
+            question: "A contract with unlawful object is:",
+            options: ["Valid", "Void", "Voidable", "Unenforceable only if oral"],
+            answerIndex: 1,
+            explanation: "Lawful object is mandatory; unlawful object makes agreement void."
+          },
+          {
+            question: "Competency includes:",
+            options: ["Any person with PAN card", "Age 18+, sound mind, not disqualified", "Only citizens", "Only graduates"],
+            answerIndex: 1,
+            explanation: "Competency requires majority, soundness of mind, and no legal disqualification."
+          },
+          {
+            question: "If all essentials are present except lawful consideration, agreement is:",
+            options: ["Valid", "Void", "Voidable at option of promisee", "Illegal only if criminal"],
+            answerIndex: 1,
+            explanation: "Absence of lawful consideration generally makes the agreement void."
+          },
+          {
+            question: "Which statement is correct?",
+            options: ["All void agreements are illegal", "All illegal agreements are valid", "All illegal agreements are void", "Void and illegal are always identical"],
+            answerIndex: 2,
+            explanation: "Illegal agreements are void, but void agreements are not necessarily illegal."
+          }
         ]
       },
       {
@@ -232,6 +331,43 @@ export const QUICK_REVISION_NOTES = {
           "Neighbour principle: Donoghue v. Stevenson (1932)",
           "Reasonable man test",
           "Res ipsa loquitur applies when: Thing in defendant's control, accident wouldn't happen without negligence",
+        ],
+        solvedExample: {
+          prompt: "A bus driver jumps a red signal and hits a pedestrian on a zebra crossing. What tort principle applies?",
+          approach: "Check negligence elements: duty of care exists, red signal breach proves breach, injury establishes damage and causation.",
+          answer: "The driver is liable in negligence because all three elements - duty, breach, and resulting damage - are satisfied."
+        },
+        mcqs: [
+          {
+            question: "Which case established the neighbour principle?",
+            options: ["Rylands v. Fletcher", "Donoghue v. Stevenson", "Ashby v. White", "MC Mehta v. UOI"],
+            answerIndex: 1,
+            explanation: "Donoghue v. Stevenson is the foundational case for duty of care in negligence."
+          },
+          {
+            question: "Negligence requires which combination?",
+            options: ["Motive and intention", "Duty, breach, damage", "Contract and consideration", "Publication and malice"],
+            answerIndex: 1,
+            explanation: "Core negligence ingredients are duty of care, breach of duty, and legally recognized damage."
+          },
+          {
+            question: "Res ipsa loquitur means:",
+            options: ["Consent is no injury", "Every wrong has remedy", "Thing speaks for itself", "No damage no action"],
+            answerIndex: 2,
+            explanation: "The maxim means the nature of accident itself indicates negligence."
+          },
+          {
+            question: "Reasonable man test is used to evaluate:",
+            options: ["Criminal intent", "Standard of care", "Validity of contract", "Defamation damages"],
+            answerIndex: 1,
+            explanation: "It measures whether defendant acted as an ordinary prudent person would in similar circumstances."
+          },
+          {
+            question: "If no legal damage occurs, negligence claim generally:",
+            options: ["Automatically succeeds", "Fails", "Becomes criminal", "Turns into strict liability"],
+            answerIndex: 1,
+            explanation: "Damage is essential; without it, negligence action typically fails."
+          }
         ]
       },
       {
@@ -318,6 +454,43 @@ export const QUICK_REVISION_NOTES = {
           "All murders are CH but not all CH are murders",
           "Sec. 300 exceptions: Provocation, private defense excess, public servant excess, sudden fight, consent",
           "Punishment: Murder (Sec. 302) = death or life; CH not amounting to murder (Sec. 304) = life or 10 years",
+        ],
+        solvedExample: {
+          prompt: "In a sudden street fight without premeditation, A strikes B once with a stick; B dies. Which legal distinction is tested?",
+          approach: "Check intention, knowledge, and Section 300 exceptions. Sudden fight can reduce murder to culpable homicide not amounting to murder.",
+          answer: "Likely culpable homicide not amounting to murder if facts satisfy sudden fight exception and absence of preplanned intent."
+        },
+        mcqs: [
+          {
+            question: "Which statement is correct?",
+            options: ["All culpable homicides are murder", "All murders are culpable homicide", "Murder and culpable homicide are identical", "Neither overlaps"],
+            answerIndex: 1,
+            explanation: "Murder is a species of culpable homicide, but culpable homicide has a wider scope."
+          },
+          {
+            question: "Section 300 primarily defines:",
+            options: ["Theft", "Murder", "Abetment", "Defamation"],
+            answerIndex: 1,
+            explanation: "Section 300 defines when culpable homicide becomes murder."
+          },
+          {
+            question: "Grave and sudden provocation is relevant as:",
+            options: ["A complete defense for all crimes", "An exception reducing murder liability", "A bail rule", "A procedural safeguard"],
+            answerIndex: 1,
+            explanation: "It is one of the recognized exceptions under Section 300."
+          },
+          {
+            question: "Punishment under Section 302 can be:",
+            options: ["Fine only", "Up to 2 years", "Death or life imprisonment", "Mandatory probation"],
+            answerIndex: 2,
+            explanation: "Section 302 prescribes death or life imprisonment."
+          },
+          {
+            question: "CH not amounting to murder is punishable under:",
+            options: ["Section 304", "Section 307", "Section 320", "Section 390"],
+            answerIndex: 0,
+            explanation: "Section 304 applies to culpable homicide not amounting to murder."
+          }
         ]
       },
       {
@@ -388,6 +561,43 @@ export const QUICK_REVISION_NOTES = {
           "Navtej Singh Johar (2018): Section 377 partially struck down",
           "Joseph Shine (2018): Adultery not a crime (Sec. 497 struck down)",
           "Shayara Bano (2017): Triple talaq unconstitutional",
+        ],
+        solvedExample: {
+          prompt: "A question asks which case recognized privacy as a fundamental right under Article 21. How should you solve quickly?",
+          approach: "Use case-theme mapping from revision list and eliminate unrelated doctrines like basic structure and reservation ceilings.",
+          answer: "K.S. Puttaswamy (2017) is the correct case for privacy as a fundamental right."
+        },
+        mcqs: [
+          {
+            question: "Basic Structure doctrine is from:",
+            options: ["Golaknath", "Kesavananda Bharati", "Minerva Mills", "S.R. Bommai"],
+            answerIndex: 1,
+            explanation: "Kesavananda Bharati (1973) established the Basic Structure doctrine."
+          },
+          {
+            question: "Right to privacy as a fundamental right was affirmed in:",
+            options: ["ADM Jabalpur", "Indra Sawhney", "Puttaswamy", "Joseph Shine"],
+            answerIndex: 2,
+            explanation: "Justice K.S. Puttaswamy v. Union of India (2017) recognized privacy as a fundamental right."
+          },
+          {
+            question: "Secularism as basic structure and Art. 356 review linked to:",
+            options: ["S.R. Bommai", "Maneka Gandhi", "Navtej Johar", "Shayara Bano"],
+            answerIndex: 0,
+            explanation: "S.R. Bommai is the leading case on this point."
+          },
+          {
+            question: "Triple talaq declared unconstitutional in:",
+            options: ["Shayara Bano", "Minerva Mills", "Bachan Singh", "Virsa Singh"],
+            answerIndex: 0,
+            explanation: "Shayara Bano (2017) held instant triple talaq unconstitutional."
+          },
+          {
+            question: "50% reservation ceiling and creamy layer were discussed in:",
+            options: ["Indra Sawhney", "Golaknath", "Kesavananda", "Bommai"],
+            answerIndex: 0,
+            explanation: "Indra Sawhney (1992) is central to reservation limits and creamy layer doctrine."
+          }
         ]
       },
       {
@@ -461,6 +671,43 @@ export const QUICK_REVISION_NOTES = {
           "Paris Olympics 2024: India won 6 medals",
           "India surpassed China as most populous: 2023",
           "Nobel Peace Prize 2024: Nihon Hidankyo (Japan)",
+        ],
+        solvedExample: {
+          prompt: "If a question asks 'Which event happened on July 1, 2024?', how do you avoid confusion with space missions?",
+          approach: "Anchor events by date buckets: Aug 2023 Chandrayaan, Sep 2023 Aditya, Jul 2024 legal reform rollout.",
+          answer: "The new criminal laws BNS, BNSS, and BSA came into force on July 1, 2024."
+        },
+        mcqs: [
+          {
+            question: "Chandrayaan-3 moon south pole landing date was:",
+            options: ["Aug 23, 2023", "Sep 2, 2023", "Mar 11, 2024", "Jul 1, 2024"],
+            answerIndex: 0,
+            explanation: "India's Chandrayaan-3 landed on Aug 23, 2023."
+          },
+          {
+            question: "India's first solar mission was:",
+            options: ["Mangalyaan", "Aditya-L1", "Gaganyaan", "Chandrayaan-2"],
+            answerIndex: 1,
+            explanation: "Aditya-L1 is India's first dedicated solar mission."
+          },
+          {
+            question: "The new criminal law framework effective from July 1, 2024 includes:",
+            options: ["IPC, CrPC, Evidence Act", "BNS, BNSS, BSA", "Only BNS", "Only BNSS"],
+            answerIndex: 1,
+            explanation: "The trio is Bharatiya Nyaya Sanhita, Bharatiya Nagarik Suraksha Sanhita, and Bharatiya Sakshya Adhiniyam."
+          },
+          {
+            question: "CAA Rules were notified on:",
+            options: ["Jan 26, 2024", "Mar 11, 2024", "Apr 14, 2024", "Nov 26, 2024"],
+            answerIndex: 1,
+            explanation: "CAA Rules notification date was March 11, 2024."
+          },
+          {
+            question: "Nobel Peace Prize 2024 went to:",
+            options: ["WHO", "Nihon Hidankyo", "UNICEF", "WTO"],
+            answerIndex: 1,
+            explanation: "Nihon Hidankyo from Japan received the Nobel Peace Prize 2024."
+          }
         ]
       },
       {
@@ -512,6 +759,43 @@ export const QUICK_REVISION_NOTES = {
           "Split facts into elements and test one-by-one against principle",
           "If two options look similar, prefer one that mirrors principle language exactly",
           "Never choose moral option over legal option unless principle explicitly supports it",
+        ],
+        solvedExample: {
+          prompt: "Principle: Whoever intentionally causes unlawful confinement is liable. Fact: A locks B in a room as a prank for 2 hours. Is A liable?",
+          approach: "Treat principle as complete law, test each element: intentional act, confinement, unlawfulness.",
+          answer: "Yes, A is liable because all principle elements are satisfied regardless of prank motive."
+        },
+        mcqs: [
+          {
+            question: "In principle-fact questions, first step should be:",
+            options: ["Apply outside legal knowledge", "Read options first", "Read and decode principle elements", "Guess likely moral answer"],
+            answerIndex: 2,
+            explanation: "The principle controls; break it into legal elements before checking facts."
+          },
+          {
+            question: "If principle conflicts with your prior legal knowledge, you should:",
+            options: ["Ignore principle", "Follow principle given in question", "Skip question", "Choose longest option"],
+            answerIndex: 1,
+            explanation: "CET legal reasoning treats the provided principle as the governing law for that question."
+          },
+          {
+            question: "Which is the best elimination strategy?",
+            options: ["Pick morally fair option", "Pick shortest option", "Prefer option mirroring principle language", "Always choose option C"],
+            answerIndex: 2,
+            explanation: "Closest legal language alignment usually signals the correct option."
+          },
+          {
+            question: "In legal reasoning MCQs, 'intentionally' usually tests:",
+            options: ["Venue", "Mens rea element", "Jurisdiction only", "Damages amount"],
+            answerIndex: 1,
+            explanation: "Such words indicate mental element requirements."
+          },
+          {
+            question: "Choosing moral over legal option without principle support is:",
+            options: ["Correct technique", "Neutral technique", "Common trap", "Mandatory approach"],
+            answerIndex: 2,
+            explanation: "Legal aptitude tests legal application, not abstract morality preference."
+          }
         ]
       },
       {
@@ -573,6 +857,43 @@ export const QUICK_REVISION_NOTES = {
           "In either-or questions, both conclusions must be exclusive and exhaustive",
           "No + Some combinations are common trap zones",
           "Practice 3-set and 4-set Venn diagrams for speed",
+        ],
+        solvedExample: {
+          prompt: "Statements: All lawyers are readers. Some readers are writers. Conclusion I: Some lawyers are writers. Conclusion II: Some writers are readers.",
+          approach: "Draw Venn sets. First conclusion is not definite. Second follows directly from 'Some readers are writers'.",
+          answer: "Only Conclusion II follows."
+        },
+        mcqs: [
+          {
+            question: "From 'All A are B', which must be true?",
+            options: ["All B are A", "Some A are not B", "No A is B", "Some B may be A"],
+            answerIndex: 3,
+            explanation: "All A inside B implies at least possible overlap from B side; reverse universal is invalid."
+          },
+          {
+            question: "Best method for syllogism accuracy is:",
+            options: ["Sentence memory", "Venn diagrams", "Random elimination", "Keyword guessing"],
+            answerIndex: 1,
+            explanation: "Venn representation minimizes logical errors."
+          },
+          {
+            question: "Either-or conclusion is valid when conclusions are:",
+            options: ["Both true together", "Exclusive and exhaustive", "Both false", "Lengthy"],
+            answerIndex: 1,
+            explanation: "Either-or requires mutual exclusivity and coverage of all possibilities."
+          },
+          {
+            question: "Which is a common syllogism trap?",
+            options: ["Using sets", "Distribution reversal", "Drawing diagrams", "Checking possibility"],
+            answerIndex: 1,
+            explanation: "Reversing terms (illicit conversion) causes many errors."
+          },
+          {
+            question: "If statement says 'Some P are Q', then:",
+            options: ["All P are Q", "Some Q are P", "No Q are P", "All Q are P"],
+            answerIndex: 1,
+            explanation: "Particular affirmative is reversible: some Q are P follows."
+          }
         ]
       },
       {
@@ -634,6 +955,43 @@ export const QUICK_REVISION_NOTES = {
           "Eliminate options using absolute words: always, never, only",
           "Main idea is usually broad enough to cover all paragraphs",
           "Mark transition words: however, therefore, moreover, in contrast",
+        ],
+        solvedExample: {
+          prompt: "Passage tone is cautious but optimistic. Option A says 'author is fully certain'. Option B says 'author is hopeful with reservations'.",
+          approach: "Match tone words exactly and avoid extreme language unless text is extreme.",
+          answer: "Option B is correct because it preserves the mixed cautious-optimistic tone."
+        },
+        mcqs: [
+          {
+            question: "For RC inference questions, best answer is:",
+            options: ["Most imaginative", "Most emotionally appealing", "Most supported by text", "Longest option"],
+            answerIndex: 2,
+            explanation: "Inference must remain text-grounded."
+          },
+          {
+            question: "Which words often signal extreme options to eliminate?",
+            options: ["However, therefore", "Always, never, only", "Maybe, perhaps", "Likely, might"],
+            answerIndex: 1,
+            explanation: "Absolute qualifiers are frequently overbroad and wrong."
+          },
+          {
+            question: "Main idea should usually be:",
+            options: ["A minor detail", "Broad and inclusive", "Contradictory", "Only first paragraph summary"],
+            answerIndex: 1,
+            explanation: "Main idea must capture the overall passage scope."
+          },
+          {
+            question: "Transition word 'however' typically indicates:",
+            options: ["Cause", "Contrast", "Example", "Conclusion"],
+            answerIndex: 1,
+            explanation: "'However' introduces contrast."
+          },
+          {
+            question: "Best pre-reading strategy is:",
+            options: ["Read options only", "Read passage backward", "Glance at question stems first", "Skip first paragraph"],
+            answerIndex: 2,
+            explanation: "Question stems create focus while reading and improve efficiency."
+          }
         ]
       },
       {
@@ -695,6 +1053,43 @@ export const QUICK_REVISION_NOTES = {
           "Marked price-discount-cashback questions require stepwise computation",
           "Use fraction equivalents for speed: 12.5%=1/8, 16.67%=1/6",
           "Avoid approximation when options are close",
+        ],
+        solvedExample: {
+          prompt: "Marked price Rs. 2000, discount 20%, cashback 10% on paid amount. Effective price?",
+          approach: "Apply in sequence: discount first then cashback on discounted amount.",
+          answer: "After discount: 2000 x 0.8 = 1600. Cashback 10% of 1600 = 160. Effective price = Rs. 1440."
+        },
+        mcqs: [
+          {
+            question: "Successive increase of 10% and 20% equals net increase of:",
+            options: ["30%", "32%", "28%", "26%"],
+            answerIndex: 1,
+            explanation: "Use a + b + ab/100 = 10 + 20 + 2 = 32%."
+          },
+          {
+            question: "Profit percentage is generally calculated on:",
+            options: ["Selling price", "Cost price", "Marked price", "Discounted price"],
+            answerIndex: 1,
+            explanation: "Unless specified, profit/loss percentages are on cost price."
+          },
+          {
+            question: "12.5% is equal to:",
+            options: ["1/6", "1/7", "1/8", "1/9"],
+            answerIndex: 2,
+            explanation: "12.5% = 12.5/100 = 1/8."
+          },
+          {
+            question: "If CP = 500 and SP = 575, profit% is:",
+            options: ["10%", "12%", "15%", "20%"],
+            answerIndex: 2,
+            explanation: "Profit = 75. Profit% = 75/500 x 100 = 15%."
+          },
+          {
+            question: "Discount 25% on Rs. 800 gives selling price:",
+            options: ["Rs. 650", "Rs. 620", "Rs. 600", "Rs. 580"],
+            answerIndex: 2,
+            explanation: "25% of 800 = 200; reduced price = 600."
+          }
         ]
       },
       {
@@ -756,6 +1151,43 @@ export const QUICK_REVISION_NOTES = {
           "Final 10 min: review marked options and accidental skips",
           "No negative marking allows attempts, but avoid random guessing clusters",
           "Keep 2-3 minute buffer for navigation and sanity checks",
+        ],
+        solvedExample: {
+          prompt: "In first 45 minutes you solved only 42 questions. Should you keep grinding one hard RC set?",
+          approach: "Follow pass-based discipline: maximize easy-medium attempts early; defer time sinks to second pass.",
+          answer: "Skip the hard set temporarily, continue scoring available easier questions, then return in Pass 2."
+        },
+        mcqs: [
+          {
+            question: "Recommended Pass 1 window is:",
+            options: ["0-30 min", "0-45 min", "0-60 min", "0-90 min"],
+            answerIndex: 1,
+            explanation: "The revision plan allocates first 45 minutes to high-confidence easy-medium attempts."
+          },
+          {
+            question: "Final review buffer ideally should be:",
+            options: ["0 min", "1 min", "2-3 min", "15-20 min"],
+            answerIndex: 2,
+            explanation: "A small navigation/check buffer prevents accidental unattempted questions."
+          },
+          {
+            question: "No negative marking means you should:",
+            options: ["Guess every question immediately", "Still avoid random blind clusters", "Leave all doubtful questions", "Spend full time on one section"],
+            answerIndex: 1,
+            explanation: "No negative marking helps attempts, but structured attempts are better than random clusters."
+          },
+          {
+            question: "Pass 3 is mainly for:",
+            options: ["Reading instructions", "Easy one-liners", "Marked difficult questions", "Skipping all doubtful items"],
+            answerIndex: 2,
+            explanation: "Pass 3 revisits previously marked difficult questions."
+          },
+          {
+            question: "Best approach if stuck on one hard puzzle early is:",
+            options: ["Continue till solved", "Mark and move", "Exit exam", "Change subject permanently"],
+            answerIndex: 1,
+            explanation: "Time discipline is critical; mark and move preserves score potential."
+          }
         ]
       },
       {
@@ -804,7 +1236,7 @@ export const QUICK_REVISION_NOTES = {
       },
     ]
   },
-};
+} satisfies Record<string, RevisionSubject>;
 
 export const EXAM_PATTERN = {
   name: "MH CET Law (3-Year LLB)",

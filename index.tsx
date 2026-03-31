@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App';
 
 const rootElement = document.getElementById('root');
@@ -9,13 +10,15 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('Service worker registration failed:', error);
-    });
-  });
-}
+registerSW({
+  immediate: true,
+  onOfflineReady() {
+    console.info('LawRanker is ready for offline use.');
+  },
+  onRegisterError(error) {
+    console.error('Service worker registration failed:', error);
+  },
+});
 
 root.render(
   <React.StrictMode>

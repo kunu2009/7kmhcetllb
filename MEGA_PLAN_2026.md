@@ -18,24 +18,24 @@
 
 #### P1 (Next - Core Learning Effectiveness)
 
-- [ ] Add solved example + 5 MCQs block under each major quick revision topic
-- [ ] Add weak-area auto drill generation from last 3 mock/test sessions
+- [x] Add solved example + 5 MCQs block under each major quick revision topic
+- [x] Add weak-area auto drill generation from last 3 mock/test sessions
 - [x] Add dashboard "Next Best Action" card based on pending todos + weakest lane
-- [ ] Add mock analysis panel: speed vs accuracy by section
+- [x] Add mock analysis panel: speed vs accuracy by section
 
 #### P2 (Then - Scale and Polish)
 
-- [ ] Code-split heavy modules (Reels fullscreen, Quick Revision modal, analytics charts)
-- [ ] Add source-confidence tags for reels items (Primary API / RSS / Cache)
-- [ ] Add monthly content freshness checklist for legal/GK datasets
-- [ ] Add smoke tests for onboarding -> dashboard -> study -> test critical flow
+- [x] Code-split heavy modules (Reels fullscreen, Quick Revision modal, analytics charts)
+- [x] Add source-confidence tags for reels items (Primary API / RSS / Cache)
+- [x] Add monthly content freshness checklist for legal/GK datasets
+- [x] Add smoke tests for onboarding -> dashboard -> study -> test critical flow
 
 ### 🔥 Top Priorities (Do These Next)
 
-- [ ] **PWA setup is missing** (no service worker, no offline caching, no install prompt)
-- [ ] **Study material depth is still thin** for non-law tracks (BBA/BMS/HM/BA etc.)
-- [ ] **Run full QA pass** across all practice modes to ensure no broken user flow
-- [ ] **Add stronger static fallback pools** so practice remains rich even if AI response parsing fails
+- [x] **PWA setup is missing** (no service worker, no offline caching, no install prompt)
+- [x] **Study material depth is still thin** for non-law tracks (BBA/BMS/HM/BA etc.)
+- [x] **Run full QA pass** across all practice modes to ensure no broken user flow
+- [x] **Add stronger static fallback pools** so practice remains rich even if AI response parsing fails
 
 ### ✅ What is Actually Working
 
@@ -52,7 +52,7 @@
 
 - Content quantity is better than before, but still not enough for complete MH CET prep across all tracks
 - College/admission intelligence modules are still roadmap-level (not fully implemented)
-- PWA/offline mode is not implemented in current Vite setup
+- PWA/offline mode now runs on vite-plugin-pwa with runtime caching and install prompt
 - AI-dependent flows need more robust, diverse local fallback banks
 
 ### 📊 Current Snapshot (Reality-Based)
@@ -62,7 +62,7 @@
 - Track-aware Personalization: ✅ Working
 - PYQ Module: ✅ Working (2019-2024)
 - Weak Point + Analytics: ✅ Working
-- PWA / Offline: ❌ Not Implemented
+- PWA / Offline: ✅ Working
 - Deep Multi-Track Content Coverage: ⚠️ Partial
 
 ---

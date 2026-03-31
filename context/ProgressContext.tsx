@@ -15,6 +15,9 @@ export interface TestResult {
   score: number;
   total: number;
   subjectBreakdown: Record<string, { correct: number, total: number }>;
+  durationSeconds?: number;
+  sectionTimeSpent?: Record<string, number>;
+  attempted?: number;
 }
 
 export interface Achievement {

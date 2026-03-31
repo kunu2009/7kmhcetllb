@@ -19,6 +19,26 @@ const DAILY_MAXIMS = [
   { latin: 'Nemo judex in causa sua', meaning: 'No one can be judge in their own cause', usage: 'Principle of Natural Justice' },
 ];
 
+interface FreshnessChecklistItem {
+  id: string;
+  title: string;
+  dataset: string;
+  completed: boolean;
+  lastCheckedAt?: number;
+}
+
+const getMonthStamp = (date: Date) => {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${date.getFullYear()}-${month}`;
+};
+
+const createMonthlyFreshnessChecklist = (): FreshnessChecklistItem[] => [
+  { id: 'legal-cases', title: 'Update landmark legal cases and amendments', dataset: 'Legal Notes + Quick Revision', completed: false },
+  { id: 'gk-current', title: 'Refresh current affairs (appointments, awards, policy)', dataset: 'GK + Reels', completed: false },
+  { id: 'gk-static', title: 'Audit static GK facts and remove stale entries', dataset: 'GK Master Notes', completed: false },
+  { id: 'practice-bank', title: 'Validate question bank and fallback relevance', dataset: 'Mock + Fallback Banks', completed: false }
+];
+
 const getLaneIcon = (subject: string) => {
   const label = subject.toLowerCase();
   if (label.includes('legal') || label.includes('law')) return Scale;
@@ -30,12 +50,65 @@ const getLaneIcon = (subject: string) => {
   return BookOpen;
 };
 
+const getDrillTemplate = (subject: string) => {
+  const label = subject.toLowerCase();
+
+  if (label.includes('legal') || label.includes('law')) {
+    return {
+      focus: 'Principle-Fact + Contract/Tort mixed set',
+      action: '25 min principle-fact solve + 15 legal MCQs',
+      route: `/study?tab=library&subject=${encodeURIComponent(subject)}`
+    };
+  }
+
+  if (label.includes('logical') || label.includes('reasoning')) {
+    return {
+      focus: 'Syllogism + arrangements speed drill',
+      action: '20 min puzzles + 20 reasoning MCQs',
+      route: '/practice?mode=mixed'
+    };
+  }
+
+  if (label.includes('english') || label.includes('reading')) {
+    return {
+      focus: 'RC precision + grammar error spotting',
+      action: '1 RC passage + 15 grammar MCQs',
+      route: '/study?tab=quick-revision'
+    };
+  }
+
+  if (label.includes('general') || label.includes('gk') || label.includes('current')) {
+    return {
+      focus: 'Current affairs + static polity revision',
+      action: '15 current affairs notes + 20 GK MCQs',
+      route: `/study?tab=library&subject=${encodeURIComponent(subject)}`
+    };
+  }
+
+  if (label.includes('math') || label.includes('quant')) {
+    return {
+      focus: 'Percentages-ratio-time speed worksheet',
+      action: '20 quant drills + 10 DI questions',
+      route: '/practice?mode=topic'
+    };
+  }
+
+  return {
+    focus: 'Concept recap + targeted question set',
+    action: '15 min revision + 20 MCQs',
+    route: '/practice'
+  };
+};
+
 const Dashboard: React.FC = () => {
-  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile, updateLearnerProfile, applyStarterGoalsByTrack } = useProgress();
+  const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile, updateLearnerProfile, applyStarterGoalsByTrack, testHistory } = useProgress();
   const [newGoal, setNewGoal] = useState('');
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<CourseTrack>(learnerProfile.targetCourse);
   const [collapsedSubjects, setCollapsedSubjects] = useState<Record<string, boolean>>({});
+  const [autoDrillAddedCount, setAutoDrillAddedCount] = useState<number | null>(null);
+  const [freshnessChecklist, setFreshnessChecklist] = useState<FreshnessChecklistItem[]>(createMonthlyFreshnessChecklist());
+  const [freshnessTodoFeedback, setFreshnessTodoFeedback] = useState<string | null>(null);
 
   const LAST_SECTION_KEY = 'lawranker_last_section';
   const CONTINUE_FALLBACK = '/study';
@@ -43,6 +116,7 @@ const Dashboard: React.FC = () => {
 
   const [continuePath, setContinuePath] = useState(CONTINUE_FALLBACK);
   const [continueLabel, setContinueLabel] = useState(CONTINUE_LABEL_FALLBACK);
+  const freshnessStorageKey = `lawranker_content_freshness_${getMonthStamp(new Date())}`;
   
   // Update streak on component mount
   useEffect(() => {
@@ -65,6 +139,29 @@ const Dashboard: React.FC = () => {
       setContinueLabel(CONTINUE_LABEL_FALLBACK);
     }
   }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(freshnessStorageKey);
+    if (!saved) {
+      setFreshnessChecklist(createMonthlyFreshnessChecklist());
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved) as FreshnessChecklistItem[];
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        setFreshnessChecklist(createMonthlyFreshnessChecklist());
+        return;
+      }
+      setFreshnessChecklist(parsed);
+    } catch {
+      setFreshnessChecklist(createMonthlyFreshnessChecklist());
+    }
+  }, [freshnessStorageKey]);
+
+  useEffect(() => {
+    localStorage.setItem(freshnessStorageKey, JSON.stringify(freshnessChecklist));
+  }, [freshnessChecklist, freshnessStorageKey]);
   
   // Get maxim of the day based on date
   const today = new Date();
@@ -123,6 +220,78 @@ const Dashboard: React.FC = () => {
   const pendingTodos = todos.filter(todo => !todo.completed);
   const nextTodo = pendingTodos[0];
   const weakLane = trackBlueprints.find((lane) => lane.subject.toLowerCase().includes(stats.weakArea.toLowerCase()));
+  const lastThreeMocks = [...testHistory].sort((a, b) => b.date - a.date).slice(0, 3);
+
+  const recentWeakSubjectAggregate: Record<string, { correct: number; total: number }> = {};
+  lastThreeMocks.forEach((mock) => {
+    Object.entries(mock.subjectBreakdown).forEach(([subject, data]) => {
+      if (!recentWeakSubjectAggregate[subject]) {
+        recentWeakSubjectAggregate[subject] = { correct: 0, total: 0 };
+      }
+      recentWeakSubjectAggregate[subject].correct += data.correct;
+      recentWeakSubjectAggregate[subject].total += data.total;
+    });
+  });
+
+  const weakAreaDrills = Object.entries(recentWeakSubjectAggregate)
+    .filter(([, data]) => data.total > 0)
+    .map(([subject, data]) => {
+      const accuracy = Math.round((data.correct / data.total) * 100);
+      const template = getDrillTemplate(subject);
+      const todoTask = `Auto Drill: ${subject} (${accuracy}%) - ${template.action}`;
+      return {
+        subject,
+        accuracy,
+        focus: template.focus,
+        action: template.action,
+        route: template.route,
+        todoTask
+      };
+    })
+    .sort((a, b) => a.accuracy - b.accuracy)
+    .slice(0, 3);
+
+  const addWeakAreaDrills = () => {
+    let added = 0;
+    weakAreaDrills.forEach((drill) => {
+      const exists = todos.some(todo => todo.task.toLowerCase() === drill.todoTask.toLowerCase());
+      if (!exists) {
+        addTodo(drill.todoTask);
+        added += 1;
+      }
+    });
+    setAutoDrillAddedCount(added);
+  };
+
+  const toggleFreshnessItem = (id: string) => {
+    setFreshnessChecklist(prev => prev.map((item) => (
+      item.id === id
+        ? { ...item, completed: !item.completed, lastCheckedAt: !item.completed ? Date.now() : item.lastCheckedAt }
+        : item
+    )));
+  };
+
+  const addFreshnessTasksToGoals = () => {
+    const pending = freshnessChecklist.filter(item => !item.completed);
+    let added = 0;
+
+    pending.forEach((item) => {
+      const task = `Monthly Freshness: ${item.title}`;
+      const exists = todos.some(todo => todo.task.toLowerCase() === task.toLowerCase());
+      if (!exists) {
+        addTodo(task);
+        added += 1;
+      }
+    });
+
+    setFreshnessTodoFeedback(
+      added > 0
+        ? `Added ${added} freshness task(s) to Today's Goals.`
+        : 'Freshness tasks already exist in Today\'s Goals.'
+    );
+  };
+
+  const freshnessCompletedCount = freshnessChecklist.filter(item => item.completed).length;
 
   const nextBestAction = nextTodo
     ? {
@@ -131,6 +300,13 @@ const Dashboard: React.FC = () => {
         route: `/study?tab=library&q=${encodeURIComponent(nextTodo.task)}&subject=${encodeURIComponent(nextTodo.subject)}`,
         cta: `Start ${nextTodo.subject}`
       }
+    : weakAreaDrills[0]
+      ? {
+          title: `Auto Drill: ${weakAreaDrills[0].subject}`,
+          detail: `From your last ${lastThreeMocks.length} mocks, this is your weakest trend at ${weakAreaDrills[0].accuracy}% accuracy.`,
+          route: weakAreaDrills[0].route,
+          cta: 'Start Weak Drill'
+        }
     : weakLane
       ? {
           title: `Focus Lane: ${weakLane.subject}`,
@@ -534,6 +710,59 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
+            <div className="bg-gradient-to-br from-cyan-600 to-sky-700 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" /> Weak-Area Auto Drill
+                </h3>
+                <p className="text-cyan-100 text-xs mb-3">
+                  Based on your latest {Math.min(lastThreeMocks.length, 3)} mock tests.
+                </p>
+
+                {weakAreaDrills.length > 0 ? (
+                  <div className="space-y-2 mb-4">
+                    {weakAreaDrills.map((drill) => (
+                      <div key={drill.subject} className="bg-white/15 rounded-lg p-2.5 border border-white/20">
+                        <p className="text-sm font-semibold">{drill.subject} ({drill.accuracy}% accuracy)</p>
+                        <p className="text-xs text-cyan-100">{drill.focus}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-cyan-100 text-sm mb-4">
+                    Complete at least one mock to unlock auto-generated weak-area drills.
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {weakAreaDrills[0] && (
+                    <Link
+                      to={weakAreaDrills[0].route}
+                      onClick={() => saveLastSection(weakAreaDrills[0].route, `Auto Drill: ${weakAreaDrills[0].subject}`)}
+                      className="inline-flex items-center gap-2 bg-white text-cyan-700 text-xs font-bold px-3 py-2 rounded-lg hover:bg-cyan-50 transition-colors"
+                    >
+                      Start Drill <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                  <button
+                    onClick={addWeakAreaDrills}
+                    disabled={weakAreaDrills.length === 0}
+                    className="inline-flex items-center gap-2 bg-cyan-900/40 border border-cyan-200/30 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-cyan-900/60 transition-colors"
+                  >
+                    Add Drills to Goals
+                  </button>
+                </div>
+                {autoDrillAddedCount !== null && (
+                  <p className="text-[11px] text-cyan-100 mt-2">
+                    {autoDrillAddedCount > 0 ? `Added ${autoDrillAddedCount} drill goal(s).` : 'Drill goals already exist in your list.'}
+                  </p>
+                )}
+              </div>
+              <div className="absolute -bottom-4 -right-4 opacity-20">
+                <BrainCircuit className="w-24 h-24 text-white" />
+              </div>
+            </div>
+
             <div className="bg-gradient-to-br from-rose-500 to-pink-600 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
                 <div className="relative z-10">
                     <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
@@ -549,6 +778,63 @@ const Dashboard: React.FC = () => {
                 <div className="absolute -bottom-4 -right-4 opacity-20">
                     <AlertCircle className="w-24 h-24 text-white" />
                 </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-lg text-gray-800 dark:text-white">Monthly Content Freshness</h3>
+                <span className="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
+                  {freshnessCompletedCount}/{freshnessChecklist.length} Done
+                </span>
+              </div>
+
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                {getMonthStamp(today)} audit: keep legal and GK datasets current.
+              </p>
+
+              <div className="space-y-2.5">
+                {freshnessChecklist.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleFreshnessItem(item.id)}
+                    className="w-full text-left p-3 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      {item.completed ? (
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                      )}
+                      <div className="min-w-0">
+                        <p className={`text-sm font-medium ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-gray-100'}`}>
+                          {item.title}
+                        </p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{item.dataset}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 mt-4">
+                <button
+                  onClick={addFreshnessTasksToGoals}
+                  className="px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700"
+                >
+                  Add Pending to Goals
+                </button>
+                <Link
+                  to="/study"
+                  onClick={() => saveLastSection('/study', 'Content Freshness Review')}
+                  className="px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                >
+                  Open Study Hub
+                </Link>
+              </div>
+
+              {freshnessTodoFeedback && (
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-2">{freshnessTodoFeedback}</p>
+              )}
             </div>
 
             {/* Daily Checklist */}

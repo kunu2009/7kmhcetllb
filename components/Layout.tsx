@@ -6,7 +6,6 @@ import {
   BrainCircuit, 
   Swords, 
   BarChart3,
-  GraduationCap,
   ChevronLeft,
   ChevronRight,
   Sun,
@@ -29,6 +28,7 @@ import {
   ShieldAlert,
   ExternalLink
 } from 'lucide-react';
+import PwaInstallPrompt from './PwaInstallPrompt';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -90,9 +90,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         {/* Header */}
         <div className={`p-6 border-b border-indigo-800 dark:border-gray-800 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} transition-all`}>
-          <div className="bg-indigo-800 p-2 rounded-lg">
-             <GraduationCap className="w-8 h-8 text-yellow-400 flex-shrink-0" />
-          </div>
+          <img
+            src="/7kmhcetlogo.jpg"
+            alt="LawRanker MH-CET logo"
+            className="w-10 h-10 rounded-lg object-cover border border-indigo-700 flex-shrink-0"
+          />
           {!isCollapsed && (
             <div className="animate-in fade-in duration-200 overflow-hidden whitespace-nowrap">
               <h1 className="font-bold text-xl tracking-tight">LawRanker</h1>
@@ -331,7 +333,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Mobile Header Title */}
         <div className="md:hidden p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shadow-sm z-10 sticky top-0">
           <div className="flex items-center gap-2">
-            <GraduationCap className="w-6 h-6 text-indigo-600 dark:text-yellow-400" />
+            <img
+              src="/7kmhcetlogo.jpg"
+              alt="LawRanker MH-CET logo"
+              className="w-7 h-7 rounded-md object-cover border border-indigo-200 dark:border-gray-700"
+            />
             <span className="font-bold text-lg text-indigo-900 dark:text-white tracking-tight">LawRanker</span>
           </div>
           <button 
@@ -344,6 +350,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <div className="flex-1 overflow-y-auto p-3 md:p-8 scroll-smooth">
           <div className="max-w-7xl mx-auto min-h-full">
+            <PwaInstallPrompt />
             {children}
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { Subject } from '../types';
+import { CONTENT_SCALE_UP_QUESTIONS } from './contentScaleQuestions';
 
 export interface MCQQuestion {
   id: string;
@@ -1457,6 +1458,8 @@ export const MOCK_TEST_QUESTIONS: MCQQuestion[] = [
     difficulty: 'medium',
     topic: 'Judiciary'
   },
+  // Content scale-up pack (Mar 2026)
+  ...CONTENT_SCALE_UP_QUESTIONS,
 ];
 
 export const FULL_MOCK_TESTS = [

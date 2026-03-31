@@ -5,6 +5,17 @@ import { ReelNewsItem, fetchReelNews } from '../services/geminiService';
 const PAGE_SIZE = 12;
 const REELS_CACHE_PREFIX = 'lawranker_reels_cache_v1';
 
+const SOURCE_BADGE_CLASS: Record<string, string> = {
+  'Primary API': 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700/50',
+  'RSS Fallback': 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700/50',
+  Cache: 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600'
+};
+
+const getSourceBadgeClass = (tag: ReelNewsItem['confidenceTag']) => {
+  if (!tag) return SOURCE_BADGE_CLASS['RSS Fallback'];
+  return SOURCE_BADGE_CLASS[tag] || SOURCE_BADGE_CLASS['RSS Fallback'];
+};
+
 const formatDateInput = (date: Date) => date.toISOString().split('T')[0];
 
 const getYesterday = () => {
@@ -41,7 +52,12 @@ const ReelsHub: React.FC = () => {
       const raw = localStorage.getItem(getCacheKey());
       if (!raw) return [];
       const parsed = JSON.parse(raw) as { items?: ReelNewsItem[] };
-      return Array.isArray(parsed?.items) ? parsed.items : [];
+      if (!Array.isArray(parsed?.items)) return [];
+      return parsed.items.map((item) => ({
+        ...item,
+        sourceType: 'cache',
+        confidenceTag: 'Cache'
+      }));
     } catch {
       return [];
     }
@@ -335,7 +351,12 @@ const ReelsHub: React.FC = () => {
 
                 <div className="p-4 md:p-6 flex-1 flex flex-col">
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    <span className="px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{item.category || category}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{item.category || category}</span>
+                      <span className={`px-2 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${getSourceBadgeClass(item.confidenceTag)}`}>
+                        {item.confidenceTag || 'RSS Fallback'}
+                      </span>
+                    </div>
                     <span>{item.publishedAt || 'Latest'}</span>
                   </div>
 
@@ -408,7 +429,12 @@ const ReelsHub: React.FC = () => {
 
               <div className="p-5 md:p-7 flex-1 flex flex-col bg-gray-950">
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
-                  <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-300">{fullScreenItem.category || category}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-300">{fullScreenItem.category || category}</span>
+                    <span className={`px-2 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${getSourceBadgeClass(fullScreenItem.confidenceTag)}`}>
+                      {fullScreenItem.confidenceTag || 'RSS Fallback'}
+                    </span>
+                  </div>
                   <span>{fullScreenItem.publishedAt || 'Latest'}</span>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold leading-tight mb-4">{fullScreenItem.title}</h3>

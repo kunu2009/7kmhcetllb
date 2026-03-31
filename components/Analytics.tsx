@@ -25,6 +25,45 @@ const Analytics: React.FC = () => {
     target: 90 + (idx * 0.5), 
   }));
 
+  const sectionSpeedAccuracyData = useMemo(() => {
+    const recentTimedTests = testHistory
+      .filter(test => test.sectionTimeSpent && Object.keys(test.sectionTimeSpent).length > 0)
+      .slice(-5);
+
+    const aggregate: Record<string, { correct: number; total: number; timeSeconds: number }> = {};
+
+    recentTimedTests.forEach((test) => {
+      Object.entries(test.subjectBreakdown).forEach(([subject, breakdown]) => {
+        if (!aggregate[subject]) {
+          aggregate[subject] = { correct: 0, total: 0, timeSeconds: 0 };
+        }
+
+        aggregate[subject].correct += breakdown.correct;
+        aggregate[subject].total += breakdown.total;
+        aggregate[subject].timeSeconds += test.sectionTimeSpent?.[subject] || 0;
+      });
+    });
+
+    return Object.entries(aggregate)
+      .map(([subject, values]) => {
+        const accuracy = values.total > 0 ? Math.round((values.correct / values.total) * 100) : 0;
+        const qpm = values.timeSeconds > 0 ? +(values.total / (values.timeSeconds / 60)).toFixed(2) : 0;
+        const secPerQuestion = values.total > 0 && values.timeSeconds > 0
+          ? Math.round(values.timeSeconds / values.total)
+          : 0;
+
+        return {
+          subject,
+          accuracy,
+          qpm,
+          secPerQuestion,
+          attempts: values.total,
+          timeMinutes: Math.round(values.timeSeconds / 60)
+        };
+      })
+      .sort((a, b) => a.accuracy - b.accuracy);
+  }, [testHistory]);
+
   // Calculate insights
   const insights = useMemo(() => {
     if (testHistory.length === 0) return null;
@@ -192,9 +231,46 @@ const Analytics: React.FC = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-64 md:h-80 flex flex-col items-center justify-center text-center">
-               <Clock className="w-10 h-10 md:w-12 md:h-12 text-orange-200 dark:text-orange-900/50 mb-2 md:mb-3" />
-               <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm px-4">Time Analysis will appear here after more tests.</p>
+            <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-64 md:h-80 overflow-hidden">
+              <h3 className="font-bold text-sm md:text-base text-gray-700 dark:text-gray-200 mb-3 md:mb-4 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-orange-500" /> Speed vs Accuracy by Section
+              </h3>
+
+              {sectionSpeedAccuracyData.length === 0 ? (
+                <div className="h-[calc(100%-2rem)] flex flex-col items-center justify-center text-center">
+                  <Clock className="w-10 h-10 md:w-12 md:h-12 text-orange-200 dark:text-orange-900/50 mb-2 md:mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400 text-xs md:text-sm px-4">Complete timed tests to unlock section speed analysis.</p>
+                </div>
+              ) : (
+                <div className="space-y-3 h-[calc(100%-2rem)]">
+                  <div className="h-32 md:h-36">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ScatterChart margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                        <XAxis type="number" dataKey="qpm" name="Speed" unit=" q/min" tick={{ fontSize: 10 }} />
+                        <YAxis type="number" dataKey="accuracy" name="Accuracy" unit="%" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <ZAxis type="number" dataKey="attempts" range={[60, 320]} />
+                        <Tooltip cursor={{ strokeDasharray: '3 3' }} formatter={(value: number, name) => {
+                          if (name === 'Speed') return [`${value} q/min`, 'Speed'];
+                          if (name === 'Accuracy') return [`${value}%`, 'Accuracy'];
+                          return [value, name];
+                        }} />
+                        <Scatter name="Sections" data={sectionSpeedAccuracyData} fill="#f97316" />
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                    {sectionSpeedAccuracyData.map((section) => (
+                      <div key={section.subject} className="text-xs rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 px-2.5 py-2 flex items-center justify-between gap-2">
+                        <span className="text-gray-700 dark:text-gray-200 font-medium truncate">{section.subject}</span>
+                        <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">{section.qpm} q/min</span>
+                        <span className="text-indigo-600 dark:text-indigo-400 font-semibold whitespace-nowrap">{section.accuracy}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>

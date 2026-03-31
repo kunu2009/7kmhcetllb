@@ -205,6 +205,8 @@ export interface ReelNewsItem {
   imageUrl?: string;
   publishedAt?: string;
   category?: string;
+  sourceType?: 'primary-api' | 'rss-fallback' | 'cache';
+  confidenceTag?: 'Primary API' | 'RSS Fallback' | 'Cache';
 }
 
 export interface ReelNewsQueryOptions {
@@ -376,7 +378,9 @@ export const fetchReelNews = async (
       url,
       imageUrl: sanitizeImageUrl(item.imageUrl || item.image || item.thumbnailUrl),
       publishedAt: stripHtml(item.date || item.time) || undefined,
-      category
+      category,
+      sourceType: 'primary-api',
+      confidenceTag: 'Primary API'
     };
   };
 
@@ -451,7 +455,9 @@ export const fetchReelNews = async (
       url: sanitizeUrl(item.link || item.guid || '#'),
       imageUrl: sanitizeImageUrl(item.thumbnail || item?.enclosure?.link || item?.media_thumbnail || item?.image),
       publishedAt: stripHtml(item.pubDate) || undefined,
-      category
+      category,
+      sourceType: 'rss-fallback',
+      confidenceTag: 'RSS Fallback'
     }));
 
     return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(offset, offset + limit);
