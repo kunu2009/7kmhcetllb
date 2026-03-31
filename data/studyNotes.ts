@@ -499,6 +499,311 @@ export const QUICK_REVISION_NOTES = {
       },
     ]
   },
+
+  legalReasoning: {
+    title: "Legal Reasoning & Aptitude Master Notes",
+    topics: [
+      {
+        title: "How to Solve Principle-Fact Questions",
+        points: [
+          "Read principle first and treat it as complete law for that question",
+          "Ignore your outside legal knowledge if principle gives different standard",
+          "Identify keywords: intentionally, knowingly, negligently, reasonable, immediate",
+          "Split facts into elements and test one-by-one against principle",
+          "If two options look similar, prefer one that mirrors principle language exactly",
+          "Never choose moral option over legal option unless principle explicitly supports it",
+        ]
+      },
+      {
+        title: "Tort and Crime Distinction for MCQs",
+        points: [
+          "Tort protects private rights; crime protects public order",
+          "In tort, remedy is usually damages; in crime, punishment is primary",
+          "Same act can create both civil and criminal liability (e.g., rash driving)",
+          "Standard of proof: civil preponderance vs criminal beyond reasonable doubt",
+          "Vicarious liability is common in tort but rare in criminal law",
+          "Limitation and procedural path differ: complaint/suit vs FIR/prosecution",
+        ]
+      },
+      {
+        title: "Important Contract Traps in CET",
+        points: [
+          "Invitation to offer is not an offer: display of goods, menu card, tender notice",
+          "Silence does not amount to acceptance unless prior valid course of dealings",
+          "Consideration need not be adequate, but must be real and lawful",
+          "Past consideration is valid in India if at promisor's desire",
+          "Minor agreement is void ab initio; estoppel generally does not validate it",
+          "Void and illegal are different: illegal can taint collateral transactions",
+        ]
+      },
+      {
+        title: "Constitutional Law Fast Elimination",
+        points: [
+          "Article 14, 19, 21 form golden triangle in rights jurisprudence",
+          "Article 32 is itself a fundamental right; Article 226 wider for HCs",
+          "DPSPs are non-justiciable but increasingly used in interpretation",
+          "Basic structure doctrine limits Parliament's amending power",
+          "Emergency questions often test which rights can or cannot be suspended",
+          "Match amendment numbers with signature outcomes to eliminate options quickly",
+        ]
+      },
+      {
+        title: "Legal Terms You Should Instantly Recognize",
+        points: [
+          "Mens rea: guilty mind; actus reus: guilty act",
+          "Ultra vires: beyond powers; intra vires: within powers",
+          "Sub judice: matter under judicial consideration",
+          "Ratio decidendi: binding reason of decision",
+          "Obiter dicta: persuasive incidental observations",
+          "Caveat emptor: buyer beware; caveat venditor: seller beware",
+        ]
+      },
+    ]
+  },
+
+  logicalReasoningMastery: {
+    title: "Logical & Analytical Reasoning Master Notes",
+    topics: [
+      {
+        title: "Syllogism High-Accuracy Method",
+        points: [
+          "Convert statements into Venn form before looking at conclusions",
+          "Use possibility cases carefully when direct conclusion is not definite",
+          "Watch distribution errors: All A are B does not imply All B are A",
+          "In either-or questions, both conclusions must be exclusive and exhaustive",
+          "No + Some combinations are common trap zones",
+          "Practice 3-set and 4-set Venn diagrams for speed",
+        ]
+      },
+      {
+        title: "Seating Arrangement Framework",
+        points: [
+          "Fix reference direction first (facing center or facing outside)",
+          "Place absolute clues before relative clues",
+          "Handle immediate-left/right clues after base positions are stable",
+          "Mark uncertain positions with small candidate sets, not full rewriting",
+          "For circular with professions/colors, use layered table format",
+          "If puzzle stalls, revisit hidden negatives like 'not adjacent'",
+        ]
+      },
+      {
+        title: "Blood Relations and Coding",
+        points: [
+          "Use generation levels (+1 parent, -1 child) for quick consistency checks",
+          "Translate verbal chains into symbols before answering",
+          "In coded relation questions, decode from repeated pair structure",
+          "Brother/sister clues require gender confirmation, not assumption",
+          "Maternal vs paternal side distinctions appear in harder sets",
+          "Two-step verification avoids common relation inversion mistakes",
+        ]
+      },
+      {
+        title: "Statement-Assumption Strengthening",
+        points: [
+          "Assumption is unstated support required for conclusion to hold",
+          "Reject extreme assumptions unless statement is itself extreme",
+          "If conclusion can survive without a statement, it is not an assumption",
+          "Differentiate assumption from inference and implication",
+          "Policy questions often hide feasibility assumptions",
+          "Use negation test: if negating assumption destroys argument, it is likely valid",
+        ]
+      },
+      {
+        title: "Clocks, Calendars and Series",
+        points: [
+          "Odd days method is the fastest for calendar day computation",
+          "Leap year exception: century years must be divisible by 400",
+          "Clock angle formula: |30H - 5.5M|",
+          "Number series often combine alternating operations",
+          "Alphabet series may use positional jumps and reverse indexing",
+          "Take first differences and second differences before guessing pattern",
+        ]
+      },
+    ]
+  },
+
+  englishMastery: {
+    title: "English Language & Comprehension Master Notes",
+    topics: [
+      {
+        title: "Reading Comprehension Precision",
+        points: [
+          "Read question stems first to set purpose while reading passage",
+          "Separate author's tone from factual content",
+          "For inference, choose option most supported, not most imaginative",
+          "Eliminate options using absolute words: always, never, only",
+          "Main idea is usually broad enough to cover all paragraphs",
+          "Mark transition words: however, therefore, moreover, in contrast",
+        ]
+      },
+      {
+        title: "Grammar Error Spotting",
+        points: [
+          "Subject-verb agreement fails most in complex noun phrases",
+          "Pronoun reference must be clear, singular/plural consistent",
+          "Tense consistency matters across time markers",
+          "Articles are tested with professions, unique nouns, and abstract nouns",
+          "Prepositions with verbs are fixed collocations (depend on, comply with)",
+          "Parallelism in lists and comparisons is a recurring CET pattern",
+        ]
+      },
+      {
+        title: "Vocabulary Through Context",
+        points: [
+          "Prefer contextual meaning over dictionary primary meaning",
+          "Roots and prefixes help decode unfamiliar legal vocabulary",
+          "Synonym questions test nuance, not just broad similarity",
+          "Antonyms can be logical opposite or contextual opposite",
+          "One-word substitution appears with governance and law themes",
+          "Build active list of 10 high-frequency words weekly",
+        ]
+      },
+      {
+        title: "Sentence Rearrangement and Para Jumbles",
+        points: [
+          "Find opening sentence: usually introduces subject without pronouns",
+          "Track pronoun references to locate dependent sentences",
+          "Chronology markers (first, then, finally) signal order",
+          "Cause-effect connectors create natural sequence",
+          "Concluding sentence typically generalizes or summarizes",
+          "Form mandatory pairs before full arrangement",
+        ]
+      },
+      {
+        title: "Cloze Test and Fillers",
+        points: [
+          "Check grammar fit first, then contextual fit",
+          "Read one sentence before and after blank",
+          "Collocations often decide final answer (strong evidence, heavy rain)",
+          "If two options seem correct, compare tone consistency",
+          "Watch preposition and phrasal-verb combinations",
+          "Avoid selecting option that repeats nearby word unnecessarily",
+        ]
+      },
+    ]
+  },
+
+  quantitativeMastery: {
+    title: "Quantitative Techniques (Math) Master Notes",
+    topics: [
+      {
+        title: "Percentages, Profit-Loss, Discount",
+        points: [
+          "Base value awareness is key: x% of y is not y% of x",
+          "Successive percentage change formula: a + b + ab/100",
+          "Profit% and loss% are always on cost price unless stated",
+          "Marked price-discount-cashback questions require stepwise computation",
+          "Use fraction equivalents for speed: 12.5%=1/8, 16.67%=1/6",
+          "Avoid approximation when options are close",
+        ]
+      },
+      {
+        title: "Ratio, Proportion, Partnership",
+        points: [
+          "Scale ratios to common base before combining",
+          "In partnership, share is proportional to capital × time",
+          "When one ratio changes, convert to actual quantities",
+          "Mixture and alligation are applications of weighted average",
+          "A:B and B:C can merge via LCM of middle term",
+          "Keep units consistent to avoid silent errors",
+        ]
+      },
+      {
+        title: "Time-Speed-Distance and Work",
+        points: [
+          "Core relation: Distance = Speed × Time",
+          "Average speed is total distance by total time, not simple mean",
+          "Boat-stream problems use upstream = b-s, downstream = b+s",
+          "Work rates add: if A finishes in x days, one day work = 1/x",
+          "Pipe-cistern follows same work-rate logic with leak negative",
+          "Relative speed is essential in train crossing questions",
+        ]
+      },
+      {
+        title: "Simple Interest, Compound Interest, Data Interpretation",
+        points: [
+          "SI formula: PRT/100; CI grows on accumulated amount",
+          "Difference between CI and SI increases with time and rate",
+          "For two-year CI-SI shortcut: P(R/100)^2",
+          "In DI, read title, units, and axis before calculations",
+          "Estimate first, then compute exactly for near options",
+          "Pie chart questions often test percentage-share conversion",
+        ]
+      },
+      {
+        title: "Math Speed Toolkit",
+        points: [
+          "Memorize squares up to 30 and cubes up to 20",
+          "Use divisibility checks before long calculations",
+          "Approximation strategy: round with controlled correction",
+          "If options are far apart, use elimination over full solve",
+          "Keep 20-minute daily arithmetic drill for retention",
+          "Write micro-steps neatly; avoids sign and decimal mistakes",
+        ]
+      },
+    ]
+  },
+
+  examStrategy: {
+    title: "Test Strategy, Revision, and Accuracy Playbook",
+    topics: [
+      {
+        title: "120-Minute Paper Time Plan",
+        points: [
+          "Pass 1 (0-45 min): Solve easy/medium high-confidence questions",
+          "Pass 2 (45-90 min): Attempt moderate reasoning and RC sets",
+          "Pass 3 (90-110 min): Return to marked difficult questions",
+          "Final 10 min: review marked options and accidental skips",
+          "No negative marking allows attempts, but avoid random guessing clusters",
+          "Keep 2-3 minute buffer for navigation and sanity checks",
+        ]
+      },
+      {
+        title: "Mock Test Analysis Framework",
+        points: [
+          "Classify errors: concept gap, misread, speed error, careless mark",
+          "Track recurring weak chapters and assign next 3-day repair plan",
+          "Measure accuracy subject-wise, not only total score",
+          "Re-solve wrong questions without seeing answer first",
+          "Create mistake notebook with one-line correction rule",
+          "One mock is useful only if post-analysis is completed",
+        ]
+      },
+      {
+        title: "Revision Ladder (T-30 to T-1)",
+        points: [
+          "T-30 to T-21: Build concept closure in weak areas",
+          "T-20 to T-11: Mixed mocks + topic revision blocks",
+          "T-10 to T-4: Past-year pattern simulation and formula/legal sheet",
+          "T-3 to T-1: Light revision, no heavy new topics",
+          "Revise constitutional articles, legal maxims, and static GK lists daily",
+          "Sleep discipline in final week improves decision accuracy",
+        ]
+      },
+      {
+        title: "Accuracy Under Pressure",
+        points: [
+          "Use two-touch rule: read stem twice for legal principle items",
+          "Avoid answer switching without objective reason",
+          "For RC, anchor each answer to exact passage evidence",
+          "Mark doubtful questions and revisit after mental reset",
+          "Skip ego battles with single hard puzzle",
+          "Confidence calibration matters more than speed alone",
+        ]
+      },
+      {
+        title: "Exam-Day Checklist",
+        points: [
+          "Carry admit card and valid photo ID",
+          "Reach center early to avoid stress hormones spike",
+          "Use first minute to inspect interface and section flow",
+          "Do not over-invest in first difficult question",
+          "Hydrate lightly and keep breathing rhythm stable",
+          "Finish with gratitude mindset to keep panic low",
+        ]
+      },
+    ]
+  },
 };
 
 export const EXAM_PATTERN = {

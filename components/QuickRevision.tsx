@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   BookOpen, ChevronRight, ChevronDown, CheckCircle, 
   Scale, FileText, Gavel, AlertTriangle, Globe, 
-  Clock, Target, Award, List
+  Clock, Target, Award, List, Brain, Languages, Calculator, Compass
 } from 'lucide-react';
 import { QUICK_REVISION_NOTES, EXAM_PATTERN } from '../data/studyNotes';
 
@@ -15,6 +15,11 @@ const SUBJECT_CONFIG: Record<SubjectKey, { icon: React.ElementType; color: strin
   criminalLaw: { icon: Gavel, color: 'text-red-500', label: 'Criminal Law (IPC/BNS)' },
   importantCases: { icon: BookOpen, color: 'text-purple-500', label: 'Landmark Cases' },
   gkCurrent: { icon: Globe, color: 'text-teal-500', label: 'GK & Current Affairs' },
+  legalReasoning: { icon: Scale, color: 'text-cyan-500', label: 'Legal Reasoning Mastery' },
+  logicalReasoningMastery: { icon: Brain, color: 'text-pink-500', label: 'Logical Reasoning Mastery' },
+  englishMastery: { icon: Languages, color: 'text-indigo-400', label: 'English Mastery' },
+  quantitativeMastery: { icon: Calculator, color: 'text-lime-500', label: 'Quantitative Mastery' },
+  examStrategy: { icon: Compass, color: 'text-amber-400', label: 'Exam Strategy Playbook' },
 };
 
 export default function QuickRevision() {
