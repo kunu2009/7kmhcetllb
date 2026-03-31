@@ -120,6 +120,31 @@ const Dashboard: React.FC = () => {
     .sort((a, b) => (b.unlockedAt || 0) - (a.unlockedAt || 0))
     .slice(0, 3);
 
+  const pendingTodos = todos.filter(todo => !todo.completed);
+  const nextTodo = pendingTodos[0];
+  const weakLane = trackBlueprints.find((lane) => lane.subject.toLowerCase().includes(stats.weakArea.toLowerCase()));
+
+  const nextBestAction = nextTodo
+    ? {
+        title: `Next Goal: ${nextTodo.task}`,
+        detail: `Continue your pending ${nextTodo.subject} goal now for highest momentum.`,
+        route: `/study?tab=library&q=${encodeURIComponent(nextTodo.task)}&subject=${encodeURIComponent(nextTodo.subject)}`,
+        cta: `Start ${nextTodo.subject}`
+      }
+    : weakLane
+      ? {
+          title: `Focus Lane: ${weakLane.subject}`,
+          detail: `No pending goals. Improve your weaker lane with a targeted revision push.`,
+          route: `/study?tab=library&subject=${encodeURIComponent(weakLane.subject)}`,
+          cta: `Revise ${weakLane.subject}`
+        }
+      : {
+          title: 'Quick Performance Push',
+          detail: 'No pending goals or weak lane detected. Run a short practice sprint now.',
+          route: '/practice',
+          cta: 'Start Practice'
+        };
+
   if (!learnerProfile.onboardingCompleted) {
     return <OnboardingWizard />;
   }
@@ -487,6 +512,28 @@ const Dashboard: React.FC = () => {
 
         {/* Recommended Actions */}
         <div className="space-y-6">
+          <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                <Target className="w-5 h-5" /> Next Best Action
+              </h3>
+              <p className="text-indigo-100 text-sm font-semibold mb-1">{nextBestAction.title}</p>
+              <p className="text-indigo-100/90 text-sm mb-4">
+                {nextBestAction.detail}
+              </p>
+              <Link
+                to={nextBestAction.route}
+                onClick={() => saveLastSection(nextBestAction.route, nextBestAction.cta)}
+                className="inline-flex items-center gap-2 bg-white text-indigo-700 text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+              >
+                {nextBestAction.cta} <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="absolute -bottom-4 -right-4 opacity-20">
+              <Target className="w-24 h-24 text-white" />
+            </div>
+          </div>
+
             <div className="bg-gradient-to-br from-rose-500 to-pink-600 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
                 <div className="relative z-10">
                     <h3 className="font-bold text-lg mb-1 flex items-center gap-2">

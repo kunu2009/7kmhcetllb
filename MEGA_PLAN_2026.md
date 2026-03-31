@@ -20,7 +20,7 @@
 
 - [ ] Add solved example + 5 MCQs block under each major quick revision topic
 - [ ] Add weak-area auto drill generation from last 3 mock/test sessions
-- [ ] Add dashboard "Next Best Action" card based on pending todos + weakest lane
+- [x] Add dashboard "Next Best Action" card based on pending todos + weakest lane
 - [ ] Add mock analysis panel: speed vs accuracy by section
 
 #### P2 (Then - Scale and Polish)
