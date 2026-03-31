@@ -30,6 +30,7 @@ const ReelsHub: React.FC = () => {
   const [activeReelIndex, setActiveReelIndex] = useState<number | null>(null);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
+  const [activeDatePreset, setActiveDatePreset] = useState<'none' | 'today' | 'yesterday' | 'last7'>('none');
 
   const loadPage = useCallback(async (startOffset: number, append: boolean) => {
     if (append) {
@@ -42,13 +43,31 @@ const ReelsHub: React.FC = () => {
 
     const fetched = await fetchReelNews({
       category,
-      date: selectedDate || undefined,
+      date: activeDatePreset === 'last7' ? undefined : (selectedDate || undefined),
+      fromDate: activeDatePreset === 'last7' ? getLast7DayStart() : undefined,
       offset: startOffset,
       limit: PAGE_SIZE
     });
 
+    if (!fetched.length && !append && selectedDate) {
+      const fallback = await fetchReelNews({
+        category,
+        offset: startOffset,
+        limit: PAGE_SIZE
+      });
+      if (fallback.length) {
+        setError(`No exact matches for ${selectedDate}. Showing latest available reels.`);
+        setItems(fallback);
+        setHasMore(fallback.length === PAGE_SIZE);
+        setOffset(startOffset + fallback.length);
+        setLoading(false);
+        setLoadingMore(false);
+        return;
+      }
+    }
+
     if (!fetched.length && !append) {
-      setError('No news found for this day/category. Try another date or category.');
+      setError('No news found for this filter. Try another category or date.');
     }
 
     setItems((prev) => {
@@ -74,7 +93,7 @@ const ReelsHub: React.FC = () => {
 
   useEffect(() => {
     refreshFeed();
-  }, [category, selectedDate]);
+  }, [category, selectedDate, activeDatePreset]);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -146,7 +165,10 @@ const ReelsHub: React.FC = () => {
             <input
               type="date"
               value={selectedDate}
-              onChange={(event) => setSelectedDate(event.target.value)}
+              onChange={(event) => {
+                setSelectedDate(event.target.value);
+                setActiveDatePreset('none');
+              }}
               max={new Date().toISOString().split('T')[0]}
               className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white/10 border border-indigo-400/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
@@ -163,26 +185,38 @@ const ReelsHub: React.FC = () => {
 
         <div className="flex flex-wrap gap-2 mt-3">
           <button
-            onClick={() => setSelectedDate(formatDateInput(new Date()))}
+            onClick={() => {
+              setSelectedDate(formatDateInput(new Date()));
+              setActiveDatePreset('today');
+            }}
             className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
           >
             Today
           </button>
           <button
-            onClick={() => setSelectedDate(getYesterday())}
+            onClick={() => {
+              setSelectedDate(getYesterday());
+              setActiveDatePreset('yesterday');
+            }}
             className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
           >
             Yesterday
           </button>
           <button
-            onClick={() => setSelectedDate(getLast7DayStart())}
+            onClick={() => {
+              setSelectedDate('');
+              setActiveDatePreset('last7');
+            }}
             className="px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/20 text-xs font-medium"
-            title="Shows results from this date filter baseline"
+            title="Shows results from last 7 days window"
           >
             Last 7 Days
           </button>
           <button
-            onClick={() => setSelectedDate('')}
+            onClick={() => {
+              setSelectedDate('');
+              setActiveDatePreset('none');
+            }}
             className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium border border-white/20"
           >
             Clear Date

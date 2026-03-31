@@ -86,6 +86,29 @@ export const QUICK_REVISION_NOTES = {
           "SC issues under Art. 32 (only for FRs), HC under Art. 226 (FRs + other purposes)",
         ]
       },
+      {
+        title: "Union Parliament & Law-Making",
+        points: [
+          "Parliament = President + Lok Sabha + Rajya Sabha (Art. 79)",
+          "Money Bill (Art. 110): Only in Lok Sabha, Speaker's certification final",
+          "Ordinary Bill: Must pass both Houses; deadlock can lead to joint sitting (Art. 108)",
+          "Constitution Amendment Bill (Art. 368): Special majority, no joint sitting",
+          "President can return non-money bill once; if passed again, must give assent",
+          "Ordinance (Art. 123): President can promulgate when Parliament not in session",
+          "Parliamentary devices: Question Hour, Zero Hour, Adjournment Motion, No-confidence Motion",
+        ]
+      },
+      {
+        title: "Emergency Provisions (Part XVIII)",
+        points: [
+          "National Emergency (Art. 352): War, external aggression, armed rebellion",
+          "President's Rule (Art. 356): Failure of constitutional machinery in state",
+          "Financial Emergency (Art. 360): Threat to India's financial stability",
+          "Art. 19 automatically suspended only during war/external aggression emergency",
+          "Art. 20 and Art. 21 cannot be suspended even during emergency (44th Amendment)",
+          "Parliament controls continuation via periodic approval",
+        ]
+      },
     ]
   },
   
@@ -156,6 +179,28 @@ export const QUICK_REVISION_NOTES = {
           "Breach: Actual or anticipatory",
         ]
       },
+      {
+        title: "Offer, Acceptance & Communication",
+        points: [
+          "Offer must be clear, definite and intended to create legal relations",
+          "Invitation to offer is not an offer (display of goods, auction notice)",
+          "Acceptance must be absolute and unqualified (mirror rule)",
+          "Silence is not acceptance",
+          "Communication complete against proposer when acceptance is put in transmission",
+          "Revocation valid only before acceptance is complete against revoker",
+        ]
+      },
+      {
+        title: "Breach & Remedies",
+        points: [
+          "Damages are primary remedy; aim is compensation, not punishment",
+          "Liquidated damages and penalty governed by Sec. 74",
+          "Specific performance under Specific Relief Act for unique subject matter",
+          "Injunction may restrain breach of negative covenant",
+          "Quantum meruit: Payment for work done when contract is discharged",
+          "Mitigation rule: Aggrieved party must reasonably reduce losses",
+        ]
+      },
     ]
   },
   
@@ -215,6 +260,27 @@ export const QUICK_REVISION_NOTES = {
           "Course of employment: Even if unauthorized manner",
           "Frolic and detour: Not in course",
           "State liability: Art. 300 - Government can sue and be sued",
+        ]
+      },
+      {
+        title: "Nuisance, Trespass & Passing Off",
+        points: [
+          "Private nuisance: Unreasonable interference with use/enjoyment of land",
+          "Public nuisance: Interference with rights of public at large",
+          "Trespass to land actionable per se (without proof of damage)",
+          "Trespass to person includes assault, battery and false imprisonment",
+          "Passing off protects business goodwill against misrepresentation",
+          "Defenses: Statutory authority, necessity, consent, contributory negligence",
+        ]
+      },
+      {
+        title: "Remedies in Tort",
+        points: [
+          "Judicial remedies: Damages, injunction, specific restitution of property",
+          "Damages types: Nominal, contemptuous, compensatory, exemplary",
+          "Extra-judicial remedies: Re-entry, recaption, abatement, distress damage feasant",
+          "Injunction can be temporary, perpetual or mandatory",
+          "Ubi jus ibi remedium: Every legal right has a remedy",
         ]
       },
     ]
@@ -280,6 +346,28 @@ export const QUICK_REVISION_NOTES = {
           "499-500: Defamation",
         ]
       },
+      {
+        title: "Stages of Crime & Inchoate Offences",
+        points: [
+          "Four stages: Intention, preparation, attempt, commission",
+          "Mere intention not punishable; preparation usually not punishable",
+          "Attempt punishable when act is proximate to offence",
+          "Abetment (Sec. 107): Instigation, conspiracy, intentional aid",
+          "Criminal conspiracy (Sec. 120A): Agreement to commit illegal act",
+          "Common intention (Sec. 34) vs common object (Sec. 149)",
+        ]
+      },
+      {
+        title: "Criminal Procedure Basics",
+        points: [
+          "Cognizable offence: Police can arrest without warrant",
+          "Non-cognizable offence: Warrant/order generally needed",
+          "Bailable vs non-bailable affects right to bail",
+          "FIR under Sec. 154 CrPC/BNSS starts investigation for cognizable offence",
+          "Confession to police officer generally inadmissible (except limited recovery rule)",
+          "Benefit of doubt goes to accused; burden is proof beyond reasonable doubt",
+        ]
+      },
     ]
   },
   
@@ -321,6 +409,16 @@ export const QUICK_REVISION_NOTES = {
           "Ashby v. White: Injuria sine damno",
           "Gloucester Grammar School: Damnum sine injuria",
           "Hall v. Brooklands (1933): Volenti non fit injuria",
+        ]
+      },
+      {
+        title: "Criminal Law Cases",
+        points: [
+          "State of Rajasthan v. Kashi Ram: Benefit of doubt principle",
+          "Bachan Singh v. State of Punjab (1980): Rarest of rare doctrine for death penalty",
+          "Virsa Singh v. State of Punjab: Intention test under murder provisions",
+          "K.M. Nanavati v. State of Maharashtra: Grave and sudden provocation discussion",
+          "D.K. Basu v. State of West Bengal: Arrest and custodial safeguards",
         ]
       },
     ]
@@ -376,6 +474,27 @@ export const QUICK_REVISION_NOTES = {
           "Nov 26: Constitution Day",
           "Dec 6: Mahaparinirvan Diwas (Ambedkar)",
           "Dec 10: Human Rights Day",
+        ]
+      },
+      {
+        title: "Maharashtra Quick Facts",
+        points: [
+          "Capital: Mumbai; Winter capital of legislature: Nagpur",
+          "High Court principal seat: Mumbai; benches at Nagpur, Aurangabad, Goa",
+          "Major rivers: Godavari, Krishna, Tapi, Bhima",
+          "UNESCO sites in Maharashtra include Ajanta and Ellora caves",
+          "State symbols and regional geography are frequent static GK asks",
+        ]
+      },
+      {
+        title: "Economy & Polity Rapid Facts",
+        points: [
+          "GDP (nominal) measures value at current prices; real GDP adjusts inflation",
+          "Repo rate: Rate at which RBI lends to commercial banks",
+          "CPI tracks retail inflation; WPI tracks wholesale price movement",
+          "Finance Commission recommends tax devolution between Centre and States",
+          "Parliament sessions: Budget, Monsoon and Winter",
+          "Constitution schedules and constitutional bodies are high-frequency MCQ zones",
         ]
       },
     ]

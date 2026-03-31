@@ -19,6 +19,17 @@ const DAILY_MAXIMS = [
   { latin: 'Nemo judex in causa sua', meaning: 'No one can be judge in their own cause', usage: 'Principle of Natural Justice' },
 ];
 
+const getLaneIcon = (subject: string) => {
+  const label = subject.toLowerCase();
+  if (label.includes('legal') || label.includes('law')) return Scale;
+  if (label.includes('logical') || label.includes('analytical') || label.includes('reasoning')) return BrainCircuit;
+  if (label.includes('english') || label.includes('language') || label.includes('reading')) return FileText;
+  if (label.includes('gk') || label.includes('current') || label.includes('awareness')) return Activity;
+  if (label.includes('math') || label.includes('quant') || label.includes('aptitude') || label.includes('data')) return Target;
+  if (label.includes('business') || label.includes('commerce') || label.includes('economy')) return Building2;
+  return BookOpen;
+};
+
 const Dashboard: React.FC = () => {
   const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile, updateLearnerProfile, applyStarterGoalsByTrack } = useProgress();
   const [newGoal, setNewGoal] = useState('');
@@ -184,31 +195,39 @@ const Dashboard: React.FC = () => {
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-gray-800 dark:text-white">{selectedExam.shortTitle} Subject Mastery Lanes</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Each lane includes concept coverage + tips/tricks + direct study and MCQ practice links.</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Simple daily plan with quick subject access.</p>
             </div>
-            <span className="text-[10px] px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 uppercase tracking-wider font-bold">Detailed</span>
+            <span className="text-[10px] px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 uppercase tracking-wider font-bold">Daily</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
             {trackBlueprints.map((lane) => (
               <div key={lane.subject} className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-sm font-bold text-gray-800 dark:text-white">{lane.subject}</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const SubjectIcon = getLaneIcon(lane.subject);
+                      return (
+                        <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 flex items-center justify-center">
+                          <SubjectIcon className="w-4 h-4" />
+                        </div>
+                      );
+                    })()}
+                    <h3 className="text-sm font-bold text-gray-800 dark:text-white">{lane.subject}</h3>
+                  </div>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">{lane.weightHint}</span>
                 </div>
 
                 <div className="mb-3">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">Core Concepts</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300">{lane.concepts.join(' • ')}</p>
-                </div>
-
-                <div className="mb-3">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">Tips & Tricks</p>
-                  <ul className="space-y-1">
-                    {lane.tips.map((tip) => (
-                      <li key={tip} className="text-xs text-gray-600 dark:text-gray-300">• {tip}</li>
+                  <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">Focus Topics</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {lane.concepts.slice(0, 3).map((concept) => (
+                      <span key={concept} className="px-2 py-1 text-[11px] rounded-md bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                        {concept}
+                      </span>
                     ))}
-                  </ul>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{lane.tips[0]}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -222,19 +241,7 @@ const Dashboard: React.FC = () => {
                     to={`/study?tab=library&subject=${encodeURIComponent(lane.subject)}`}
                     className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
                   >
-                    Study Concepts
-                  </Link>
-                  <Link
-                    to={`/practice?mode=topic&subject=${encodeURIComponent(lane.subject)}&topic=${encodeURIComponent(lane.defaultTopic)}&difficulty=Medium`}
-                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
-                  >
-                    Practice MCQs
-                  </Link>
-                  <Link
-                    to={`/weak-point?subject=${encodeURIComponent(lane.subject)}`}
-                    className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-xs font-semibold"
-                  >
-                    Weak Point Drill
+                    Study + MCQs
                   </Link>
                 </div>
               </div>

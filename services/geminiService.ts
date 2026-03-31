@@ -197,6 +197,7 @@ export interface ReelNewsQueryOptions {
   limit?: number;
   offset?: number;
   date?: string;
+  fromDate?: string;
 }
 
 export const fetchCurrentAffairs = async (year: string, topic: string): Promise<SearchResult> => {
@@ -332,9 +333,17 @@ export const fetchReelNews = async (
   const limit = options.limit ?? 15;
   const offset = options.offset ?? 0;
   const date = options.date;
+  const fromDate = options.fromDate;
   const inshortsCategory = INSHORTS_CATEGORY_MAP[category] || 'all';
 
-  const hasDateFilter = Boolean(date);
+  const hasDateFilter = Boolean(date || fromDate);
+
+  const addDays = (dateStr: string, days: number): string => {
+    const base = new Date(dateStr);
+    if (Number.isNaN(base.getTime())) return dateStr;
+    base.setDate(base.getDate() + days);
+    return base.toISOString().split('T')[0];
+  };
 
   const mapInshortsItem = (item: any, index: number): ReelNewsItem => {
     const title = stripHtml(item.title || item.heading || `News ${index + 1}`);
@@ -384,7 +393,13 @@ export const fetchReelNews = async (
   }
 
   const query = RSS_QUERY_MAP[category] || RSS_QUERY_MAP.all;
-  const dateFilterQuery = date ? `${query} after:${date} before:${date}` : query;
+  let dateFilterQuery = query;
+  if (date) {
+    const nextDate = addDays(date, 1);
+    dateFilterQuery = `${query} after:${date} before:${nextDate}`;
+  } else if (fromDate) {
+    dateFilterQuery = `${query} after:${fromDate}`;
+  }
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(dateFilterQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
 
   const rssCount = Math.max(offset + limit, 20);
