@@ -31,7 +31,6 @@ const getLast7DayStart = () => {
 };
 
 const ReelsHub: React.FC = () => {
-  const [category, setCategory] = useState<'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world'>('all');
   const [selectedDate, setSelectedDate] = useState('');
   const [items, setItems] = useState<ReelNewsItem[]>([]);
   const [offset, setOffset] = useState(0);
@@ -45,7 +44,7 @@ const ReelsHub: React.FC = () => {
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [activeDatePreset, setActiveDatePreset] = useState<'none' | 'today' | 'yesterday' | 'last7'>('none');
 
-  const getCacheKey = () => `${REELS_CACHE_PREFIX}:${category}:${activeDatePreset}:${selectedDate || 'none'}`;
+  const getCacheKey = () => `${REELS_CACHE_PREFIX}:${activeDatePreset}:${selectedDate || 'none'}`;
 
   const readCachedItems = (): ReelNewsItem[] => {
     try {
@@ -84,7 +83,6 @@ const ReelsHub: React.FC = () => {
     }
 
     const fetched = await fetchReelNews({
-      category,
       date: activeDatePreset === 'last7' ? undefined : (selectedDate || undefined),
       fromDate: activeDatePreset === 'last7' ? getLast7DayStart() : undefined,
       offset: startOffset,
@@ -103,7 +101,7 @@ const ReelsHub: React.FC = () => {
         return;
       }
 
-      setError('No news found for this filter right now. Please retry or clear date/category filters.');
+      setError('No news found for this date right now. Please retry or clear date filters.');
     }
 
     setItems((prev) => {
@@ -115,7 +113,7 @@ const ReelsHub: React.FC = () => {
 
     if (!append && fetched.length) {
       writeCachedItems(fetched);
-      if (category !== 'all' || selectedDate || activeDatePreset !== 'none') {
+      if (selectedDate || activeDatePreset !== 'none') {
         setInfoMessage('Showing best available reels for your selected filter.');
       }
     }
@@ -125,7 +123,7 @@ const ReelsHub: React.FC = () => {
 
     setLoading(false);
     setLoadingMore(false);
-  }, [category, selectedDate, activeDatePreset]);
+  }, [selectedDate, activeDatePreset]);
 
   const refreshFeed = useCallback(() => {
     setOffset(0);
@@ -136,7 +134,7 @@ const ReelsHub: React.FC = () => {
 
   useEffect(() => {
     refreshFeed();
-  }, [category, selectedDate, activeDatePreset]);
+  }, [selectedDate, activeDatePreset]);
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
@@ -186,23 +184,10 @@ const ReelsHub: React.FC = () => {
           <Newspaper className="w-5 h-5 md:w-6 md:h-6" /> Reels News
         </h2>
         <p className="text-indigo-200 text-xs md:text-sm mb-5 max-w-2xl">
-          Infinite feed: keep scrolling and more reels load automatically. Pick category or a specific date to see past news snapshots.
+          Infinite feed: keep scrolling and more reels load automatically. Pick a specific date to see past news snapshots.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:gap-3">
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value as typeof category)}
-            className="bg-white/10 border border-indigo-400/30 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm"
-          >
-            <option value="all" className="text-gray-900">All</option>
-            <option value="legal" className="text-gray-900">Legal</option>
-            <option value="business" className="text-gray-900">Business</option>
-            <option value="tech" className="text-gray-900">Tech</option>
-            <option value="sports" className="text-gray-900">Sports</option>
-            <option value="world" className="text-gray-900">World</option>
-          </select>
-
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3">
           <div className="relative md:col-span-2">
             <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-200" />
             <input
@@ -279,7 +264,6 @@ const ReelsHub: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setCategory('all');
                 setSelectedDate('');
                 setActiveDatePreset('none');
               }}
@@ -352,7 +336,7 @@ const ReelsHub: React.FC = () => {
                 <div className="p-4 md:p-6 flex-1 flex flex-col">
                   <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{item.category || category}</span>
+                      <span className="px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{item.category || 'General'}</span>
                       <span className={`px-2 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${getSourceBadgeClass(item.confidenceTag)}`}>
                         {item.confidenceTag || 'RSS Fallback'}
                       </span>
@@ -430,7 +414,7 @@ const ReelsHub: React.FC = () => {
               <div className="p-5 md:p-7 flex-1 flex flex-col bg-gray-950">
                 <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-300">{fullScreenItem.category || category}</span>
+                    <span className="px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-300">{fullScreenItem.category || 'General'}</span>
                     <span className={`px-2 py-1 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${getSourceBadgeClass(fullScreenItem.confidenceTag)}`}>
                       {fullScreenItem.confidenceTag || 'RSS Fallback'}
                     </span>
