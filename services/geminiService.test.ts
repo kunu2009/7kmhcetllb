@@ -111,4 +111,43 @@ describe('fetchReelNews', () => {
     expect(result[0].title).toContain('Valid link news');
     expect(result[0].url).toBe('https://example.com/valid-news');
   });
+
+  it('uses direct RSS XML fallback when rss2json bridge fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+
+      if (url.includes('inshortsapi.vercel.app') || url.includes('inshorts.deta.dev')) {
+        return jsonResponse({ data: [] }) as unknown as Response;
+      }
+
+      if (url.includes('rss2json')) {
+        throw new Error('rss2json unavailable');
+      }
+
+      if (url.includes('api.allorigins.win')) {
+        return {
+          ok: true,
+          text: async () => `
+            <rss><channel>
+              <item>
+                <title>Direct RSS legal update</title>
+                <link>https://example.com/direct-rss</link>
+                <description>Important court development from direct RSS fallback.</description>
+                <pubDate>Tue, 31 Mar 2026 09:00:00 GMT</pubDate>
+                <source>Google News</source>
+              </item>
+            </channel></rss>
+          `,
+        } as unknown as Response;
+      }
+
+      return jsonResponse({ items: [] }) as unknown as Response;
+    });
+
+    const result = await fetchReelNews({ date: '2026-03-31', limit: 5, offset: 0 });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toContain('Direct RSS legal update');
+    expect(result[0].url).toBe('https://example.com/direct-rss');
+  });
 });

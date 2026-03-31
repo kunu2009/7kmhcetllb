@@ -346,6 +346,37 @@ const dedupeNews = (items: ReelNewsItem[]): ReelNewsItem[] => {
   });
 };
 
+const extractRssTag = (xml: string, tag: string): string => {
+  const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+  return match?.[1] ? stripHtml(match[1]) : '';
+};
+
+const parseGoogleRssXml = (xml: string, category: string, offset: number, limit: number): ReelNewsItem[] => {
+  const itemMatches = xml.match(/<item>[\s\S]*?<\/item>/gi) || [];
+
+  const mapped: ReelNewsItem[] = itemMatches.map((block, index) => {
+    const title = extractRssTag(block, 'title') || `News ${index + 1}`;
+    const link = sanitizeUrl(extractRssTag(block, 'link'));
+    const descriptionRaw = extractRssTag(block, 'description');
+    const pubDate = extractRssTag(block, 'pubDate');
+    const source = extractRssTag(block, 'source') || 'Google News';
+
+    return {
+      id: `rss-xml-${category}-${index}-${title.slice(0, 24)}`,
+      title,
+      summary: buildSummary(descriptionRaw),
+      source,
+      url: link,
+      publishedAt: pubDate || undefined,
+      category,
+      sourceType: 'rss-fallback',
+      confidenceTag: 'RSS Fallback',
+    };
+  });
+
+  return dedupeNews(mapped.filter((item) => item.url !== '#')).slice(offset, offset + limit);
+};
+
 export const fetchReelNews = async (
   options: ReelNewsQueryOptions = {}
 ): Promise<ReelNewsItem[]> => {
@@ -463,6 +494,19 @@ export const fetchReelNews = async (
     return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(offset, offset + limit);
   };
 
+  const fetchFromDirectRssQuery = async (queryText: string): Promise<ReelNewsItem[]> => {
+    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(queryText)}&hl=en-IN&gl=IN&ceid=IN:en`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error('Direct RSS proxy unavailable');
+    const xml = await res.text();
+    if (!xml || !xml.includes('<rss')) {
+      throw new Error('Invalid RSS XML');
+    }
+
+    return parseGoogleRssXml(xml, category, offset, limit);
+  };
+
   for (const queryText of uniqueQueries) {
     try {
       const result = await fetchFromRssQuery(queryText);
@@ -471,6 +515,15 @@ export const fetchReelNews = async (
       }
     } catch (error) {
       console.warn(`RSS query failed: ${queryText}`, error);
+
+      try {
+        const xmlResult = await fetchFromDirectRssQuery(queryText);
+        if (xmlResult.length > 0) {
+          return xmlResult;
+        }
+      } catch (xmlError) {
+        console.warn(`Direct RSS query failed: ${queryText}`, xmlError);
+      }
     }
   }
 
