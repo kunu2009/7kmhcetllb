@@ -35,6 +35,14 @@ const Dashboard: React.FC = () => {
   const [newGoal, setNewGoal] = useState('');
   const [showAllAchievements, setShowAllAchievements] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<CourseTrack>(learnerProfile.targetCourse);
+  const [collapsedSubjects, setCollapsedSubjects] = useState<Record<string, boolean>>({});
+
+  const LAST_SECTION_KEY = 'lawranker_last_section';
+  const CONTINUE_FALLBACK = '/study';
+  const CONTINUE_LABEL_FALLBACK = 'Continue Learning';
+
+  const [continuePath, setContinuePath] = useState(CONTINUE_FALLBACK);
+  const [continueLabel, setContinueLabel] = useState(CONTINUE_LABEL_FALLBACK);
   
   // Update streak on component mount
   useEffect(() => {
@@ -44,6 +52,19 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     setSelectedTrack(learnerProfile.targetCourse);
   }, [learnerProfile.targetCourse]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(LAST_SECTION_KEY);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved) as { path?: string; label?: string };
+      if (parsed.path) setContinuePath(parsed.path);
+      if (parsed.label) setContinueLabel(parsed.label);
+    } catch {
+      setContinuePath(CONTINUE_FALLBACK);
+      setContinueLabel(CONTINUE_LABEL_FALLBACK);
+    }
+  }, []);
   
   // Get maxim of the day based on date
   const today = new Date();
@@ -74,6 +95,25 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const saveLastSection = (path: string, label: string) => {
+    setContinuePath(path);
+    setContinueLabel(label);
+    localStorage.setItem(LAST_SECTION_KEY, JSON.stringify({ path, label, at: Date.now() }));
+  };
+
+  const handleQuick20Plan = () => {
+    const quickTasks = [
+      `20-min Sprint: ${trackBlueprints[0]?.subject || 'Core Subject'} concepts`,
+      `10 MCQs: ${trackBlueprints[0]?.defaultTopic || 'Mixed Topic'}`,
+      'Review 3 mistakes and note one takeaway'
+    ];
+
+    quickTasks.forEach(task => {
+      const exists = todos.some(todo => todo.task.toLowerCase() === task.toLowerCase());
+      if (!exists) addTodo(task);
+    });
+  };
+
   const unlockedAchievements = getUnlockedAchievements();
   const recentAchievements = achievements
     .filter(a => a.unlocked)
@@ -102,8 +142,17 @@ const Dashboard: React.FC = () => {
             </p>
           </div>
           <div className="flex gap-2 md:gap-3 w-full md:w-auto">
+            <Link
+              to={continuePath}
+              onClick={() => saveLastSection(continuePath, continueLabel)}
+              className="flex-1 md:flex-none bg-yellow-400 text-indigo-900 hover:bg-yellow-300 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
+            >
+              <Clock className="w-4 h-4 md:w-5 md:h-5" />
+              {continueLabel}
+            </Link>
             <Link 
               to="/practice" 
+              onClick={() => saveLastSection('/practice', 'Continue Practice')}
               className="flex-1 md:flex-none bg-white text-indigo-700 hover:bg-indigo-50 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
             >
               <Zap className="w-4 h-4 md:w-5 md:h-5 group-hover:text-yellow-500 transition-colors" />
@@ -111,6 +160,7 @@ const Dashboard: React.FC = () => {
             </Link>
             <Link 
               to="/study" 
+              onClick={() => saveLastSection('/study', 'Continue Study')}
               className="flex-1 md:flex-none bg-indigo-700/50 hover:bg-indigo-700/70 backdrop-blur-sm text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-indigo-400/30 text-sm md:text-base"
             >
               <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
@@ -118,6 +168,19 @@ const Dashboard: React.FC = () => {
             </Link>
           </div>
         </div>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-gray-800 dark:text-white">One-click 20-minute plan</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Adds a compact concept + MCQ + review sprint to today's goals.</p>
+        </div>
+        <button
+          onClick={handleQuick20Plan}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold"
+        >
+          <Zap className="w-4 h-4" /> Add 20-min Plan
+        </button>
       </div>
 
       <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5">
@@ -215,35 +278,49 @@ const Dashboard: React.FC = () => {
                     })()}
                     <h3 className="text-sm font-bold text-gray-800 dark:text-white">{lane.subject}</h3>
                   </div>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">{lane.weightHint}</span>
-                </div>
-
-                <div className="mb-3">
-                  <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">Focus Topics</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {lane.concepts.slice(0, 3).map((concept) => (
-                      <span key={concept} className="px-2 py-1 text-[11px] rounded-md bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-                        {concept}
-                      </span>
-                    ))}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">{lane.weightHint}</span>
+                    <button
+                      onClick={() => setCollapsedSubjects(prev => ({ ...prev, [lane.subject]: !prev[lane.subject] }))}
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200"
+                    >
+                      {collapsedSubjects[lane.subject] ? 'Expand' : 'Collapse'}
+                    </button>
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{lane.tips[0]}</p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    to={`/exam-subjects?subject=${encodeURIComponent(lane.subject)}`}
-                    className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold"
-                  >
-                    Open Subject Hub
-                  </Link>
-                  <Link
-                    to={`/study?tab=library&subject=${encodeURIComponent(lane.subject)}`}
-                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
-                  >
-                    Study + MCQs
-                  </Link>
-                </div>
+                {!collapsedSubjects[lane.subject] && (
+                  <>
+                    <div className="mb-3">
+                      <p className="text-[11px] uppercase tracking-wider text-gray-400 mb-1">Focus Topics</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {lane.concepts.slice(0, 3).map((concept) => (
+                          <span key={concept} className="px-2 py-1 text-[11px] rounded-md bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
+                            {concept}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{lane.tips[0]}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        to={`/exam-subjects?subject=${encodeURIComponent(lane.subject)}`}
+                        onClick={() => saveLastSection(`/exam-subjects?subject=${encodeURIComponent(lane.subject)}`, `Continue ${lane.subject}`)}
+                        className="px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold"
+                      >
+                        Open Subject Hub
+                      </Link>
+                      <Link
+                        to={`/study?tab=library&subject=${encodeURIComponent(lane.subject)}`}
+                        onClick={() => saveLastSection(`/study?tab=library&subject=${encodeURIComponent(lane.subject)}`, `Continue ${lane.subject} Study`)}
+                        className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold"
+                      >
+                        Study + MCQs
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
