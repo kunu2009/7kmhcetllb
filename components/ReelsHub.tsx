@@ -3,6 +3,7 @@ import { ExternalLink, Maximize2, Minimize2, ChevronLeft, ChevronRight, Newspape
 import { ReelNewsItem, fetchReelNews } from '../services/geminiService';
 
 const PAGE_SIZE = 12;
+const REELS_CACHE_PREFIX = 'lawranker_reels_cache_v1';
 
 const formatDateInput = (date: Date) => date.toISOString().split('T')[0];
 
@@ -26,11 +27,33 @@ const ReelsHub: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [activeReelIndex, setActiveReelIndex] = useState<number | null>(null);
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [activeDatePreset, setActiveDatePreset] = useState<'none' | 'today' | 'yesterday' | 'last7'>('none');
+
+  const getCacheKey = () => `${REELS_CACHE_PREFIX}:${category}:${activeDatePreset}:${selectedDate || 'none'}`;
+
+  const readCachedItems = (): ReelNewsItem[] => {
+    try {
+      const raw = localStorage.getItem(getCacheKey());
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as { items?: ReelNewsItem[] };
+      return Array.isArray(parsed?.items) ? parsed.items : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const writeCachedItems = (newsItems: ReelNewsItem[]) => {
+    try {
+      localStorage.setItem(getCacheKey(), JSON.stringify({ items: newsItems.slice(0, 24), savedAt: Date.now() }));
+    } catch {
+      // Ignore cache write failure (quota/private mode).
+    }
+  };
 
   const loadPage = useCallback(async (startOffset: number, append: boolean) => {
     if (append) {
@@ -40,6 +63,9 @@ const ReelsHub: React.FC = () => {
     }
 
     setError(null);
+    if (!append) {
+      setInfoMessage(null);
+    }
 
     const fetched = await fetchReelNews({
       category,
@@ -49,25 +75,19 @@ const ReelsHub: React.FC = () => {
       limit: PAGE_SIZE
     });
 
-    if (!fetched.length && !append && selectedDate) {
-      const fallback = await fetchReelNews({
-        category,
-        offset: startOffset,
-        limit: PAGE_SIZE
-      });
-      if (fallback.length) {
-        setError(`No exact matches for ${selectedDate}. Showing latest available reels.`);
-        setItems(fallback);
-        setHasMore(fallback.length === PAGE_SIZE);
-        setOffset(startOffset + fallback.length);
+    if (!fetched.length && !append) {
+      const cached = readCachedItems();
+      if (cached.length) {
+        setItems(cached);
+        setHasMore(false);
+        setOffset(cached.length);
+        setInfoMessage('Live results are unavailable right now. Showing your last cached reels for this filter.');
         setLoading(false);
         setLoadingMore(false);
         return;
       }
-    }
 
-    if (!fetched.length && !append) {
-      setError('No news found for this filter. Try another category or date.');
+      setError('No news found for this filter right now. Please retry or clear date/category filters.');
     }
 
     setItems((prev) => {
@@ -76,6 +96,13 @@ const ReelsHub: React.FC = () => {
       next.forEach((item) => map.set(item.id + item.url, item));
       return Array.from(map.values());
     });
+
+    if (!append && fetched.length) {
+      writeCachedItems(fetched);
+      if (category !== 'all' || selectedDate || activeDatePreset !== 'none') {
+        setInfoMessage('Showing best available reels for your selected filter.');
+      }
+    }
 
     setHasMore(fetched.length === PAGE_SIZE);
     setOffset(startOffset + fetched.length);
@@ -225,8 +252,49 @@ const ReelsHub: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-4 text-sm">
-          {error}
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-4 text-sm flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <span>{error}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={refreshFeed}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white hover:bg-red-700"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => {
+                setCategory('all');
+                setSelectedDate('');
+                setActiveDatePreset('none');
+              }}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-400/40 hover:bg-red-100 dark:hover:bg-red-900/30"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      )}
+
+      {infoMessage && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-200 rounded-xl p-4 text-sm">
+          {infoMessage}
+        </div>
+      )}
+
+      {loading && items.length === 0 && (
+        <div className="space-y-4 animate-pulse">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="min-h-[40vh] bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="h-44 md:h-56 bg-gray-200 dark:bg-gray-700" />
+              <div className="p-4 md:p-6 space-y-3">
+                <div className="h-3 w-28 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-6 w-4/5 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-4 w-11/12 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-10 w-36 bg-gray-200 dark:bg-gray-700 rounded" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

@@ -6,6 +6,30 @@
 
 ## ✅ REALITY CHECK (March 30, 2026)
 
+### 🗓️ 2-Week Execution Roadmap (March 31 - April 13, 2026)
+
+#### P0 (Do First - Reliability and Daily Use)
+
+- [x] Reels category/date fallback hardening with RSS query failover chain
+- [x] Reels stale date preset dependency fix
+- [x] Reels retry actions + clearer error handling + loading skeleton states
+- [x] Reels cached fallback (show last successful feed if live fetch fails)
+- [ ] Add lightweight automated test coverage for reels filter + fallback logic
+
+#### P1 (Next - Core Learning Effectiveness)
+
+- [ ] Add solved example + 5 MCQs block under each major quick revision topic
+- [ ] Add weak-area auto drill generation from last 3 mock/test sessions
+- [ ] Add dashboard "Next Best Action" card based on pending todos + weakest lane
+- [ ] Add mock analysis panel: speed vs accuracy by section
+
+#### P2 (Then - Scale and Polish)
+
+- [ ] Code-split heavy modules (Reels fullscreen, Quick Revision modal, analytics charts)
+- [ ] Add source-confidence tags for reels items (Primary API / RSS / Cache)
+- [ ] Add monthly content freshness checklist for legal/GK datasets
+- [ ] Add smoke tests for onboarding -> dashboard -> study -> test critical flow
+
 ### 🔥 Top Priorities (Do These Next)
 
 - [ ] **PWA setup is missing** (no service worker, no offline caching, no install prompt)
