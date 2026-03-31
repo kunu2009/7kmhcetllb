@@ -82,7 +82,7 @@ const ReelsHub: React.FC = () => {
 
     setLoading(false);
     setLoadingMore(false);
-  }, [category, selectedDate]);
+  }, [category, selectedDate, activeDatePreset]);
 
   const refreshFeed = useCallback(() => {
     setOffset(0);

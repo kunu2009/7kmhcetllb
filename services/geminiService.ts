@@ -392,20 +392,33 @@ export const fetchReelNews = async (
     console.warn('Inshorts API (deta) unavailable, trying RSS fallback.', error);
   }
 
-  const query = RSS_QUERY_MAP[category] || RSS_QUERY_MAP.all;
-  let dateFilterQuery = query;
-  if (date) {
-    const nextDate = addDays(date, 1);
-    dateFilterQuery = `${query} after:${date} before:${nextDate}`;
-  } else if (fromDate) {
-    dateFilterQuery = `${query} after:${fromDate}`;
-  }
-  const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(dateFilterQuery)}&hl=en-IN&gl=IN&ceid=IN:en`;
+  const withDateQuery = (baseQuery: string): string => {
+    if (date) {
+      const nextDate = addDays(date, 1);
+      return `${baseQuery} after:${date} before:${nextDate}`;
+    }
+    if (fromDate) {
+      return `${baseQuery} after:${fromDate}`;
+    }
+    return baseQuery;
+  };
 
+  const primaryQuery = RSS_QUERY_MAP[category] || RSS_QUERY_MAP.all;
+  const fallbackQuery = RSS_QUERY_MAP.all;
+
+  const candidateQueries = [
+    withDateQuery(primaryQuery),
+    ...(hasDateFilter ? [primaryQuery] : []),
+    ...(category !== 'all' ? [withDateQuery(fallbackQuery)] : []),
+    ...(category !== 'all' && hasDateFilter ? [fallbackQuery] : [])
+  ].filter(Boolean);
+
+  const uniqueQueries = Array.from(new Set(candidateQueries));
   const rssCount = Math.max(offset + limit, 20);
-  const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${rssCount}`;
 
-  try {
+  const fetchFromRssQuery = async (queryText: string): Promise<ReelNewsItem[]> => {
+    const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(queryText)}&hl=en-IN&gl=IN&ceid=IN:en`;
+    const rssJsonUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=${rssCount}`;
     const res = await fetch(rssJsonUrl);
     if (!res.ok) throw new Error('RSS feed unavailable');
 
@@ -424,8 +437,19 @@ export const fetchReelNews = async (
     }));
 
     return dedupeNews(mapped.filter((item) => item.title && item.url !== '#')).slice(offset, offset + limit);
-  } catch (error) {
-    console.error('All free news sources failed.', error);
-    return [];
+  };
+
+  for (const queryText of uniqueQueries) {
+    try {
+      const result = await fetchFromRssQuery(queryText);
+      if (result.length > 0) {
+        return result;
+      }
+    } catch (error) {
+      console.warn(`RSS query failed: ${queryText}`, error);
+    }
   }
+
+  console.error('All free news sources failed.');
+  return [];
 };
