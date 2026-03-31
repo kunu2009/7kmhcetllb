@@ -14,7 +14,7 @@
 - [x] Reels stale date preset dependency fix
 - [x] Reels retry actions + clearer error handling + loading skeleton states
 - [x] Reels cached fallback (show last successful feed if live fetch fails)
-- [ ] Add lightweight automated test coverage for reels filter + fallback logic
+- [x] Add lightweight automated test coverage for reels filter + fallback logic
 
 #### P1 (Next - Core Learning Effectiveness)
 

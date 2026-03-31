@@ -21,12 +21,15 @@ const getApiKey = (): string => {
 
 const apiKey = getApiKey();
 
-const ai = new GoogleGenAI({ apiKey });
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 /**
  * Generates a study plan or explanation based on the prompt.
  */
 export const askAiTutor = async (prompt: string): Promise<string> => {
+  if (!ai) {
+    return "AI Tutor is unavailable right now because API key is missing.";
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -55,6 +58,9 @@ export const askAiTutor = async (prompt: string): Promise<string> => {
  * Explains a specific concept in detail.
  */
 export const explainConcept = async (concept: string, subject: string): Promise<string> => {
+  if (!ai) {
+    return "AI explanation is unavailable right now because API key is missing.";
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -79,6 +85,9 @@ export const explainConcept = async (concept: string, subject: string): Promise<
  * Generates a practice question for a specific subject and difficulty.
  */
 export const generateQuestion = async (subject: string, difficulty: string = 'Medium', topic?: string): Promise<string> => {
+  if (!ai) {
+    return "{}";
+  }
   try {
     const difficultyPrompt = difficulty === 'Hard' 
       ? "Create a complex, passage-based or principle-fact based question that tests deep understanding." 
@@ -115,6 +124,9 @@ export const generateQuestion = async (subject: string, difficulty: string = 'Me
  * Generates a quick 5-question quiz for a specific topic.
  */
 export const generateTopicQuiz = async (topic: string, subject: string): Promise<any[]> => {
+  if (!ai) {
+    return [];
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -142,6 +154,9 @@ export const generateTopicQuiz = async (topic: string, subject: string): Promise
  * Generates a personalized 12-week study plan.
  */
 export const generateStudyPlan = async (weakAreas?: string, hoursPerDay?: string): Promise<string> => {
+  if (!ai) {
+    return "Study plan generation is unavailable right now because API key is missing.";
+  }
   try {
     const customization = weakAreas 
       ? `Focus heavily on improving these weak areas: ${weakAreas}. The student can dedicate ${hoursPerDay || '4'} hours per day.`
@@ -201,6 +216,9 @@ export interface ReelNewsQueryOptions {
 }
 
 export const fetchCurrentAffairs = async (year: string, topic: string): Promise<SearchResult> => {
+  if (!ai) {
+    return { text: "Current affairs search is unavailable right now because API key is missing.", sources: [] };
+  }
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
