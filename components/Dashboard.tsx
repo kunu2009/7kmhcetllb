@@ -220,6 +220,7 @@ const Dashboard: React.FC = () => {
   const [autoDrillAddedCount, setAutoDrillAddedCount] = useState<number | null>(null);
   const [freshnessChecklist, setFreshnessChecklist] = useState<FreshnessChecklistItem[]>(createMonthlyFreshnessChecklist());
   const [freshnessTodoFeedback, setFreshnessTodoFeedback] = useState<string | null>(null);
+  const [showExtra, setShowExtra] = useState(false);
 
   const LAST_SECTION_KEY = 'lawranker_last_section';
   const CONTINUE_FALLBACK = '/study';
@@ -443,7 +444,91 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-gray-800 dark:text-white">Dashboard Focus Mode</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Showing only your stats and todo list. Open Extra for everything else.</p>
+        </div>
+        <button
+          onClick={() => setShowExtra((prev) => !prev)}
+          className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold"
+        >
+          {showExtra ? 'Hide Extra' : 'Open Extra'}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {[
+          { label: 'Accuracy', value: `${stats.accuracy}%`, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
+          { label: 'Topics Mastered', value: stats.topicsMastered, icon: Award, color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30' },
+          { label: 'Study Streak', value: `${stats.dailyStreak} 🔥`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' },
+          { label: 'Days to Exam', value: learnerProfile.examYear === '2026' ? Math.max(daysUntilExam, 0) : 'TBD', icon: Calendar, color: 'text-rose-500', bg: 'bg-rose-100 dark:bg-rose-900/30' },
+        ].map((item, idx) => (
+          <div key={idx} className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl md:rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mt-1">{item.value}</h3>
+              </div>
+              <div className={`p-2 md:p-3 rounded-lg md:rounded-xl ${item.bg} ${item.color}`}>
+                <item.icon className="w-5 h-5 md:w-6 md:h-6" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-bold text-lg text-gray-800 dark:text-white">Today's Goals</h3>
+          <span className="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">{todos.filter(t => t.completed).length}/{todos.length} Done</span>
+        </div>
+
+        <form onSubmit={handleAddGoal} className="mb-4 flex gap-2">
+          <input
+            type="text"
+            value={newGoal}
+            onChange={(e) => setNewGoal(e.target.value)}
+            placeholder="Add a new goal..."
+            className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <button
+            type="submit"
+            disabled={!newGoal.trim()}
+            className="bg-indigo-600 disabled:opacity-50 text-white p-2 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </form>
+
+        <div className="space-y-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
+          {todos.length === 0 ? (
+            <p className="text-center text-gray-400 text-sm py-4">No active goals. Add one above!</p>
+          ) : (
+            todos.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => toggleTodo(item.id)}
+                className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors group border border-transparent hover:border-gray-100 dark:hover:border-gray-600"
+              >
+                {item.completed ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-300 dark:text-gray-500 group-hover:text-indigo-400 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <p className={`text-sm font-medium ${item.completed ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-gray-200'}`}>
+                    {item.task}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className={showExtra ? 'space-y-8' : 'hidden'}>
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-violet-900 text-white shadow-2xl">
         <div className="absolute top-0 right-0 p-8 opacity-10 hidden md:block">
@@ -1177,6 +1262,7 @@ const Dashboard: React.FC = () => {
                 </div>
             </div>
         </div>
+      </div>
       </div>
     </div>
   );

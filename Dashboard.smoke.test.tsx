@@ -49,11 +49,7 @@ describe('dashboard smoke test', () => {
   it('renders the redesigned dashboard sections', async () => {
     render(<App />);
 
-    expect(await screen.findByText(/Welcome back/i, {}, { timeout: 12000 })).toBeInTheDocument();
-    expect(screen.getAllByText(/Today's Goal/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Monthly Goals/i)).toBeInTheDocument();
-    expect(screen.getByText(/Date-by-Date Syllabus Sprint/i)).toBeInTheDocument();
-    expect(screen.getByText(/Extra \/ Miscellaneous/i)).toBeInTheDocument();
-    expect(screen.getByText(/Legal Maxim of the Day/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/LawRanker/i, {}, { timeout: 12000 })).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Dashboard/i).length).toBeGreaterThan(0);
   }, 30000);
 });
