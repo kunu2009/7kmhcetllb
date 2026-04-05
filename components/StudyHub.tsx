@@ -19,7 +19,6 @@ import {
   Bookmark,
   ExternalLink,
   Bot,
-  Gavel,
   Scale,
   ShieldAlert,
   List,
@@ -32,8 +31,6 @@ import { explainConcept, generateStudyPlan, fetchReelNews, ReelNewsItem } from '
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
 import { Link, useSearchParams } from 'react-router-dom';
-import { getTrackSubjectBlueprints } from '../data/trackSubjectBlueprints';
-import { SUBJECT_STRATEGIES, SubjectStrategy } from '../data/studyTipsData';
 
 // --- Types ---
 
@@ -54,10 +51,993 @@ interface StaticTopic {
   }[];
 }
 
+interface MasterCheckpointQuestion {
+  q: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
+
+const FOCUS_SUBJECTS: Subject[] = [
+  Subject.LegalAptitude,
+  Subject.LogicalReasoning,
+  Subject.GK,
+  Subject.Math,
+  Subject.English
+];
+
+const MASTER_TOPIC_ID_BY_SUBJECT: Record<Subject, string> = {
+  [Subject.LegalAptitude]: 'la-master',
+  [Subject.LogicalReasoning]: 'lr-master',
+  [Subject.GK]: 'gk-master',
+  [Subject.Math]: 'math-master',
+  [Subject.English]: 'eng-master'
+};
+
+const MASTER_CHECKPOINT_QUIZZES: Record<string, MasterCheckpointQuestion[]> = {
+  'la-master': [
+    {
+      q: 'In principle-fact legal reasoning questions, what should be checked first?',
+      options: ['Moral fairness', 'Principle conditions', 'Option length', 'Case popularity'],
+      correct: 1,
+      explanation: 'Legal reasoning starts with matching principle conditions to facts, not external morality.'
+    },
+    {
+      q: 'A contract with a minor under Indian Contract law is generally:',
+      options: ['Voidable', 'Valid', 'Void', 'Enforceable if signed'],
+      correct: 2,
+      explanation: 'Agreement with a minor is void ab initio under standard contract principles.'
+    },
+    {
+      q: 'For negligence, which combination is essential?',
+      options: ['Duty, breach, damage', 'Offer and acceptance', 'Intention and motive', 'Writ and decree'],
+      correct: 0,
+      explanation: 'Negligence requires duty of care, breach of duty, and resulting damage.'
+    }
+  ],
+  'lr-master': [
+    {
+      q: 'Best first step in syllogism solving is to:',
+      options: ['Memorize options', 'Draw Venn structure', 'Guess strongest option', 'Read explanation first'],
+      correct: 1,
+      explanation: 'Diagramming statements (often via Venn representation) avoids assumption errors.'
+    },
+    {
+      q: 'In cause-effect questions, which is a common trap?',
+      options: ['Checking timeline', 'Testing mechanism', 'Treating correlation as causation', 'Eliminating alternatives'],
+      correct: 2,
+      explanation: 'Events moving together does not automatically prove one caused the other.'
+    },
+    {
+      q: 'In statement-assumption, an assumption is:',
+      options: ['Any true statement', 'A hidden required premise', 'A conclusion', 'A contradiction'],
+      correct: 1,
+      explanation: 'Assumption is the unstated support needed for the argument to stand.'
+    }
+  ],
+  'gk-master': [
+    {
+      q: 'A robust GK strategy should combine:',
+      options: ['Only static GK', 'Only current affairs', 'Static + current affairs', 'Only monthly tests'],
+      correct: 2,
+      explanation: 'CET patterns reward both static foundation and dynamic current updates.'
+    },
+    {
+      q: 'For current affairs retention, the best routine is:',
+      options: ['Read once before exam', 'Daily notes + spaced revision', 'Only watch videos', 'Only solve mocks'],
+      correct: 1,
+      explanation: 'Short daily note-taking plus revision cycles improves recall significantly.'
+    },
+    {
+      q: 'A typical polity GK question often asks about:',
+      options: ['Poetry meter', 'Constitutional article/body', 'Chemical equation', 'Algebraic identity'],
+      correct: 1,
+      explanation: 'Polity frequently tests constitutional articles, institutions, and amendments.'
+    }
+  ],
+  'math-master': [
+    {
+      q: 'When a value increases 20% then decreases 10%, net change is:',
+      options: ['10% increase', '8% increase', '10% decrease', 'No change'],
+      correct: 1,
+      explanation: '1.2 x 0.9 = 1.08, so net is 8% increase.'
+    },
+    {
+      q: 'In time-work, if A and B rates are known, combined time is:',
+      options: ['Product of times', '1 / (sum of rates)', 'Sum of times', 'Difference of rates'],
+      correct: 1,
+      explanation: 'Add rates first, then invert to get completion time.'
+    },
+    {
+      q: 'First step in train-speed questions is usually:',
+      options: ['Ignore units', 'Convert speed to m/s if needed', 'Round all values', 'Find LCM'],
+      correct: 1,
+      explanation: 'Unit consistency avoids major arithmetic mistakes in speed-distance problems.'
+    }
+  ],
+  'eng-master': [
+    {
+      q: 'In agreement rule for "Neither A nor B", verb matches:',
+      options: ['First subject', 'Nearest subject', 'Plural always', 'Singular always'],
+      correct: 1,
+      explanation: 'Verb commonly follows the nearer subject in such constructions.'
+    },
+    {
+      q: 'In reading comprehension, what should be solved first?',
+      options: ['Inference only', 'Vocabulary only', 'Factual direct questions', 'Title question last'],
+      correct: 2,
+      explanation: 'Direct factual questions are faster and anchor passage understanding.'
+    },
+    {
+      q: 'Strong para-jumble solving relies heavily on:',
+      options: ['Random sentence picks', 'Connector and pronoun links', 'Longest sentence first', 'Option popularity'],
+      correct: 1,
+      explanation: 'Logical connectors and pronoun references reveal stable sentence order.'
+    }
+  ]
+};
+
+const extractMasterConcepts = (topic: StaticTopic | null): string[] => {
+  if (!topic || !topic.id.endsWith('-master')) return [];
+  return topic.content
+    .split('\n')
+    .filter((line) => line.trim().startsWith('## '))
+    .map((line) => line.replace(/^##\s+/, '').trim())
+    .filter(Boolean);
+};
+
 // --- Preloaded Data (Simulating Massive Library) ---
 
 const STUDY_DATA: StaticTopic[] = [
   // LEGAL APTITUDE
+  {
+    id: 'la-master',
+    title: 'Legal Reasoning Master Guide: Concepts, Question Types, and Solving Patterns',
+    subject: Subject.LegalAptitude,
+    difficulty: 'Hard',
+    readTime: 38,
+    summary: 'A complete legal reasoning playbook with all core concepts, common question formats, and solved examples.',
+    tags: ['Legal Reasoning', 'Master Guide', 'Cases', 'Concepts'],
+    content: `
+# Legal Reasoning Master Guide
+
+This guide is designed to teach legal reasoning for MH CET style exams with a simple process:
+
+1. Read principle carefully.
+2. Break facts into legally relevant facts only.
+3. Match principle conditions one by one.
+4. Eliminate options that add facts not given.
+
+## 1) Legal Terms and Maxims
+
+### What is tested
+- Meaning and use of legal terms in short fact-based questions.
+
+### Question types
+- Definition + application question.
+- Incorrect statement identification.
+- Match legal maxim to scenario.
+
+### Example patterns
+- Identify correct meaning of mens rea, actus reus, tort, injunction.
+- Choose best maxim for a case snippet.
+
+## 2) Law of Torts
+
+### Core concepts
+- Negligence, nuisance, defamation, strict liability, vicarious liability.
+
+### Question types
+- Fact + duty + breach + damage analysis.
+- Employer liability for employee acts.
+- Defamation exceptions (truth/public good/fair comment).
+
+### Example patterns
+1. **Negligence caselet**: Was there duty of care and foreseeable harm?
+2. **Vicarious liability**: Did act occur in course of employment?
+3. **Strict liability**: Dangerous thing escape causing harm.
+
+## 3) Contract Law Basics
+
+### Core concepts
+- Offer, acceptance, consideration, capacity, free consent, void agreements.
+
+### Question types
+- Whether agreement forms a valid contract.
+- Distinguish void vs voidable.
+- Minor and person of unsound mind capacity questions.
+
+### Example patterns
+1. Offer revoked before acceptance: is contract formed?
+2. Agreement with minor: enforceable or not?
+3. Consent by coercion/misrepresentation: remedy available?
+
+## 4) Criminal Law Basics (IPC Logic)
+
+### Core concepts
+- Intention/knowledge, theft, cheating, hurt, common intention.
+
+### Question types
+- Distinguish civil wrong from criminal wrong.
+- Identify offence from given fact sequence.
+- General exceptions (private defense, necessity, infancy, insanity).
+
+### Example patterns
+1. Taking property dishonestly without consent.
+2. False representation to induce delivery.
+3. Act done in private defense limits.
+
+## 5) Constitutional Principles
+
+### Core concepts
+- Preamble values, fundamental rights, directive principles, basic structure.
+
+### Question types
+- Identify article/theme from scenario.
+- Rights restriction and reasonable classification.
+- Landmark case-based principle question.
+
+### Example patterns
+1. Equality classification test.
+2. Free speech restriction ground question.
+3. Basic structure cannot be destroyed question.
+
+## 6) Legal Reasoning Case-Method Questions
+
+### How to solve fast
+- Treat principle as statute text.
+- Facts not written are irrelevant.
+- Do not use real-world morality against principle.
+
+### Common traps
+- Emotional option vs legal option.
+- Option with additional assumed fact.
+- Half-correct statement with wrong conclusion.
+
+## 7) Solved Mini Drills
+
+### Drill A: Negligence
+Principle: A person is liable if they fail to take reasonable care causing foreseeable injury.
+
+Facts: A store owner leaves the floor wet without warning sign. Customer slips and fractures arm.
+
+Reasoning:
+- Duty? Yes, to customers.
+- Breach? Yes, no warning.
+- Foreseeability? Yes.
+- Damage? Yes.
+
+Conclusion: Store owner liable in negligence.
+
+### Drill B: Contract Capacity
+Principle: Agreement with a minor is void.
+
+Facts: A 16-year-old signs a bike purchase agreement and later refuses payment.
+
+Conclusion: Agreement void against minor; seller cannot enforce contract.
+
+### Drill C: Defamation Defense
+Principle: Truth made for public good may be a defense in defamation.
+
+Facts: Newspaper reports verified corruption records and publishes supporting documents.
+
+Conclusion: Likely protected if truth and public good proven.
+
+## 8) 10-Day Legal Reasoning Practice Structure
+
+1. Day 1-2: Terms + maxims + vocabulary.
+2. Day 3-4: Torts caselets.
+3. Day 5-6: Contract + capacity + consent.
+4. Day 7: Criminal law basics + exceptions.
+5. Day 8: Constitutional principle drills.
+6. Day 9: Mixed mock with timer.
+7. Day 10: Error-log revision and retest.
+
+## Final Exam Rule
+
+Legal reasoning is high-scoring if your process is consistent. Prioritize principle matching over outside knowledge, and keep an error notebook with trap categories.
+    `
+  },
+  {
+    id: 'lr-master',
+    title: 'Logical Reasoning Master Guide: All Concepts with Question Types and Practice Models',
+    subject: Subject.LogicalReasoning,
+    difficulty: 'Hard',
+    readTime: 40,
+    summary: 'Complete logical reasoning preparation: concept map, question varieties, and worked examples for every major topic.',
+    tags: ['Logical Reasoning', 'Syllogism', 'Puzzles', 'Critical Reasoning'],
+    content: `
+# Logical Reasoning Master Guide
+
+Use this 4-step logic framework in every question:
+
+1. Understand structure (statement, condition, order, relation).
+2. Convert into symbols/diagram.
+3. Test each option strictly against data.
+4. Reject assumptions not present in statement.
+
+## 1) Syllogism
+
+### Concepts
+- Universal and particular statements.
+- Definite conclusion vs possibility conclusion.
+
+### Question types
+- Two-statement direct conclusion.
+- Three-statement chained conclusion.
+- Possibility-based conclusion questions.
+
+### 3 example patterns
+1. All A are B; Some B are C.
+2. No P is Q; Some Q are R.
+3. Some X are Y; Some Y are Z.
+
+### Quick solving tip
+- Draw Venn circles quickly and verify each conclusion independently.
+
+## 2) Statement and Assumption
+
+### Concepts
+- Hidden premise required for statement to hold.
+
+### Question types
+- Which assumption is implicit?
+- Strong vs weak assumption.
+- Both assumptions follow / neither follows.
+
+### Example patterns
+1. Government campaign statement -> assumption on public response.
+2. Company policy statement -> assumption on employee behavior.
+
+## 3) Statement and Conclusion
+
+### Concepts
+- Only logically guaranteed conclusions follow.
+
+### Question types
+- Conclusion follows / does not follow.
+- Strongest conclusion selection.
+- Fact vs inference separation.
+
+### Example patterns
+1. Data trend statement with overgeneralized option traps.
+2. Comparative statement with reversed conclusion trap.
+
+## 4) Cause and Effect
+
+### Concepts
+- Correlation is not causation.
+- Time order and mechanism matter.
+
+### Question types
+- Identify cause-effect relation.
+- Choose possible cause from data.
+- Find alternative explanation.
+
+### Example patterns
+1. Sales increased after advertisement.
+2. Fever cases rise after rainfall.
+
+## 5) Blood Relations
+
+### Concepts
+- Family-tree mapping with generation markers.
+
+### Question types
+- Pointing/memory relation questions.
+- Coded relations.
+- Mixed relation chains.
+
+### Example patterns
+1. A is brother of B; B is mother of C.
+2. Introducing a person as father's sister's son.
+
+## 6) Direction and Distance
+
+### Concepts
+- Cardinal direction tracking with turns.
+
+### Question types
+- Final direction from start.
+- Shortest distance calculation.
+- Position relative to starting point.
+
+### Example patterns
+1. North-East-South turn sequence.
+2. Clockwise/anticlockwise directional puzzle.
+
+## 7) Coding-Decoding
+
+### Concepts
+- Pattern identification in letters/numbers/symbols.
+
+### Question types
+- Direct code mapping.
+- Position shift coding.
+- Language-based substitution coding.
+
+### Example patterns
+1. CAT = DBU style one-step shift.
+2. If ROPE is coded as 6821, then PORE = ?
+
+## 8) Seating Arrangement
+
+### Concepts
+- Linear, circular, and mixed-position puzzles.
+
+### Question types
+- Single-row arrangement.
+- Circular inward/outward facing.
+- Combined constraints with professions/colors.
+
+### Example patterns
+1. 8 people around a table, 4 inward 4 outward.
+2. 6 people in a row with left-right constraints.
+
+## 9) Ranking and Order
+
+### Concepts
+- Position from top/bottom and total count inference.
+
+### Question types
+- Find rank.
+- Find total participants.
+- Determine persons between two ranks.
+
+### Example patterns
+1. If A is 15th from top and 18th from bottom.
+2. B is 5 ranks above C in class list.
+
+## 10) Puzzle and Distribution
+
+### Concepts
+- Multi-variable matrix logic (person-place-object-time).
+
+### Question types
+- Assignment puzzle.
+- Day/time scheduling puzzle.
+- Floor-based arrangement.
+
+### Example patterns
+1. 5 friends, 5 cities, 5 professions mapping.
+2. Weekday slot allocation with exclusions.
+
+## 11) Input-Output and Pattern Series
+
+### Concepts
+- Observe rule transformation across steps.
+
+### Question types
+- Identify next step.
+- Determine final output.
+- Find missing element in sequence.
+
+### Example patterns
+1. Alternating numeric series.
+2. Word rearrangement output operation.
+
+## 12) Critical Reasoning (Argument)
+
+### Concepts
+- Strengthen, weaken, inference, paradox resolution.
+
+### Question types
+- Strong argument selection.
+- Assumption behind argument.
+- Best weakening evidence.
+
+### Example patterns
+1. Policy argument + evidence quality check.
+2. Business claim + contradictory data option.
+
+## Worked Concept Drills
+
+### Drill 1: Syllogism
+Statements: All lawyers are readers. Some readers are writers.
+
+Conclusions:
+1. Some lawyers are writers.
+2. Some writers are readers.
+
+Analysis:
+- 1 does not definitely follow.
+- 2 follows because Some readers are writers implies Some writers are readers.
+
+### Drill 2: Direction
+Riya walks 6m North, then 8m East, then 6m South.
+
+Net position: 8m East of start.
+
+### Drill 3: Assumption
+Statement: "Install rainwater harvesting in every school to reduce water scarcity."
+Implicit assumption: Schools can contribute meaningfully to local water conservation.
+
+## 12-Day Logical Plan
+
+1. Day 1: Syllogism + assumptions.
+2. Day 2: Conclusions + cause-effect.
+3. Day 3: Blood relation.
+4. Day 4: Direction-distance.
+5. Day 5: Coding-decoding.
+6. Day 6-7: Seating arrangement.
+7. Day 8: Ranking-order.
+8. Day 9: Distribution puzzle.
+9. Day 10: Critical reasoning.
+10. Day 11: Mixed timed set.
+11. Day 12: Error log revision.
+
+## Final Rule
+
+Accuracy in reasoning comes from diagram discipline. Draw first, solve second, and never skip option elimination.
+    `
+  },
+  {
+    id: 'gk-master',
+    title: 'GK + Current Affairs Master Guide: Static + Dynamic Coverage with Smart Revision',
+    subject: Subject.GK,
+    difficulty: 'Hard',
+    readTime: 36,
+    summary: 'Complete GK preparation blueprint covering static areas, current affairs buckets, question formats, and revision routines.',
+    tags: ['GK', 'Current Affairs', 'Static GK', 'Revision'],
+    content: `
+# GK + Current Affairs Master Guide
+
+Use this GK approach:
+
+1. Split syllabus into Static GK and Current Affairs.
+2. Maintain monthly notes and one-line fact sheets.
+3. Practice MCQs by category and by mixed sets.
+4. Revise in spaced cycles: 1 day, 3 days, 7 days.
+
+## 1) Indian Polity and Constitution
+
+### Concepts
+- Constitutional bodies, amendments, rights, parliament, judiciary.
+
+### Question types
+- Article/body identification.
+- Constitutional office and appointment.
+- Amendment-based factual questions.
+
+### Example patterns
+1. Which article deals with Right to Education?
+2. Composition/powers of Election Commission.
+
+## 2) History (Ancient, Medieval, Modern)
+
+### Concepts
+- Empires, movements, timelines, important personalities.
+
+### Question types
+- Chronology order.
+- Match person with movement.
+- Event-year or event-place mapping.
+
+### Example patterns
+1. Arrange major freedom movement events in sequence.
+2. Identify founder of socio-religious reform movement.
+
+## 3) Geography (India + World)
+
+### Concepts
+- Physical geography, rivers, climate, resources, maps.
+
+### Question types
+- River-origin-tributary questions.
+- State-resource-location questions.
+- Climate and monsoon pattern logic.
+
+### Example patterns
+1. Match river with tributary.
+2. Identify state by mineral dominance.
+
+## 4) Economy and Budget Basics
+
+### Concepts
+- GDP, inflation, fiscal deficit, taxation, banking terms.
+
+### Question types
+- Full form and meaning questions.
+- Current policy and budget headline fact.
+- Institution-role matching.
+
+### Example patterns
+1. Repo rate impact question.
+2. Fiscal deficit meaning-based MCQ.
+
+## 5) Science and Technology
+
+### Concepts
+- Basic physics/chem/bio facts + current science missions.
+
+### Question types
+- Application-based science fact.
+- Space mission and agency mapping.
+- Health/biotech updates.
+
+### Example patterns
+1. Mission-agency-country match.
+2. Basic biology process factual question.
+
+## 6) Awards, Sports, Books, and Important Days
+
+### Concepts
+- National/international awards, tournaments, authors, observance days.
+
+### Question types
+- Latest winner and year.
+- Event-host-country.
+- Theme/day date matching.
+
+### Example patterns
+1. Identify award category and winner.
+2. World day and date pair.
+
+## 7) Current Affairs (Last 6-12 Months)
+
+### Buckets
+- National affairs
+- International relations
+- Economy/business
+- Legal/judicial updates
+- Science and technology
+- Environment and reports
+
+### Question types
+- Statement-based current fact validation.
+- Organization-report index question.
+- Summit/location and participant question.
+
+### Example patterns
+1. Recent summit host country.
+2. Report published by which institution.
+
+## Solved Mini Drills
+
+### Drill 1: Polity
+Question: Which constitutional body conducts elections in India?
+
+Answer path: Independent constitutional authority -> Election Commission of India.
+
+### Drill 2: Economy
+Question: Increase in repo rate generally has what immediate effect?
+
+Answer path: Cost of borrowing rises -> credit demand may reduce.
+
+### Drill 3: Current Affairs
+Question: A summit question asks host country + theme from recent months.
+
+Answer path: Use month-wise CA notes and verify final shortlist.
+
+## 14-Day GK Rotation
+
+1. Day 1-3: Polity + History.
+2. Day 4-5: Geography + Economy.
+3. Day 6: Science + Tech.
+4. Day 7: Awards/Sports/Books.
+5. Day 8-10: Current affairs monthly buckets.
+6. Day 11-12: Mixed quizzes (timed).
+7. Day 13: Error-log revision.
+8. Day 14: Mock and recap.
+
+## Final Rule
+
+GK rewards consistency, not cramming. Build daily micro-revision and monthly consolidation sheets.
+    `
+  },
+  {
+    id: 'math-master',
+    title: 'Mathematics Master Guide: Concepts, Question Archetypes, and Speed Frameworks',
+    subject: Subject.Math,
+    difficulty: 'Hard',
+    readTime: 38,
+    summary: 'Math preparation handbook with chapter-wise concept map, common question forms, and speed shortcuts for CET patterns.',
+    tags: ['Mathematics', 'Quant', 'Speed Math', 'Practice'],
+    content: `
+# Mathematics Master Guide
+
+Math success model:
+
+1. Concept clarity first.
+2. Formula recall second.
+3. Timed drills third.
+4. Error analysis after every set.
+
+## 1) Number System
+
+### Concepts
+- Divisibility, factors, remainders, LCM/HCF, cyclicity.
+
+### Question types
+- Remainder theorem questions.
+- Factor count and trailing zero.
+- LCM-HCF relation.
+
+### Example patterns
+1. Remainder when large power is divided by n.
+2. Number of factors of composite number.
+
+## 2) Percentages, Profit-Loss, Discount
+
+### Concepts
+- Percentage change, successive percentage, CP-SP-MP relation.
+
+### Question types
+- Net gain/loss with discount.
+- Marked price and successive discounts.
+- Equivalent percentage conversion.
+
+### Example patterns
+1. Two successive discounts vs one equivalent discount.
+2. Profit percentage after marked-price discount.
+
+## 3) Ratio, Proportion, Partnership
+
+### Concepts
+- Proportional division, variation, weighted shares.
+
+### Question types
+- Ratio simplification and scaling.
+- Partnership profit sharing by capital-time.
+- Direct and inverse variation.
+
+### Example patterns
+1. Profit split with different joining times.
+2. Convert mixed ratio into absolute quantities.
+
+## 4) Time and Work + Pipes and Cisterns
+
+### Concepts
+- Work-rate addition/subtraction.
+
+### Question types
+- Individual and combined efficiency.
+- Alternate-day work plans.
+- Fill-drain net work questions.
+
+### Example patterns
+1. A and B together, then C alone schedule.
+2. Pipe fills while leak drains.
+
+## 5) Time, Speed, Distance
+
+### Concepts
+- Relative speed, average speed, trains/boats.
+
+### Question types
+- Train-platform crossing.
+- Upstream-downstream speed.
+- Multi-leg average speed.
+
+### Example patterns
+1. Train crossing another train.
+2. Boat speed and stream speed extraction.
+
+## 6) Algebra (Linear/Quadratic)
+
+### Concepts
+- Equations, roots, identities, simplification.
+
+### Question types
+- Root relation based questions.
+- Value of expression using identities.
+- Equation modeling from words.
+
+### Example patterns
+1. If roots known, find coefficient relation.
+2. Simplify with algebraic identities.
+
+## 7) Geometry and Mensuration
+
+### Concepts
+- Triangles, circles, polygons, area-volume.
+
+### Question types
+- Similar triangles and proportion.
+- Circle tangents/chords basics.
+- Surface area and volume comparisons.
+
+### Example patterns
+1. Radius change and area percentage change.
+2. Cone-cylinder volume relation question.
+
+## 8) Data Interpretation and Data Sufficiency
+
+### Concepts
+- Tables/charts interpretation, option elimination.
+
+### Question types
+- Percentage/comparison from chart data.
+- Missing-value inference.
+- Sufficiency statements.
+
+### Example patterns
+1. Bar chart growth rate comparison.
+2. Pie chart share and absolute value derivation.
+
+## Solved Mini Drills
+
+### Drill 1: Successive Percentage
+Price increases by 20% then decreases by 10%.
+
+Net factor = 1.2 x 0.9 = 1.08 -> net 8% increase.
+
+### Drill 2: Time and Work
+A does work in 12 days, B in 18 days.
+
+Rate(A+B) = 1/12 + 1/18 = 5/36.
+Time = 36/5 = 7.2 days.
+
+### Drill 3: Train Problem
+Train length = 180 m, speed = 54 km/h.
+
+Convert speed: 54 x 5/18 = 15 m/s.
+Time to cross pole = 180/15 = 12 s.
+
+## 15-Day Math Rotation
+
+1. Day 1-2: Number system + percentages.
+2. Day 3-4: Ratio + P/L + SI/CI.
+3. Day 5-6: Time-work + TSD.
+4. Day 7-8: Algebra.
+5. Day 9-10: Geometry + mensuration.
+6. Day 11-12: DI sets.
+7. Day 13: Mixed revision.
+8. Day 14: Timed sectional test.
+9. Day 15: Error-log retest.
+
+## Final Rule
+
+Math scores rise when formula recall and approximation speed are trained daily with timed sets.
+    `
+  },
+  {
+    id: 'eng-master',
+    title: 'English Master Guide: Grammar, Vocabulary, Reading, and Exam Strategy',
+    subject: Subject.English,
+    difficulty: 'Hard',
+    readTime: 35,
+    summary: 'Complete English section preparation guide with concept map, question formats, and method-driven solving templates.',
+    tags: ['English', 'Grammar', 'Vocabulary', 'Comprehension'],
+    content: `
+# English Master Guide
+
+English scoring framework:
+
+1. Build grammar accuracy.
+2. Expand active vocabulary.
+3. Improve reading speed with precision.
+4. Practice option elimination using rules.
+
+## 1) Parts of Speech and Sentence Structure
+
+### Concepts
+- Noun, pronoun, adjective, verb, adverb, preposition, conjunction.
+
+### Question types
+- Identify grammatical role.
+- Choose grammatically correct sentence.
+- Error in sentence structure.
+
+### Example patterns
+1. Spot misuse of adjective/adverb.
+2. Subject-verb mismatch in long sentence.
+
+## 2) Tenses and Subject-Verb Agreement
+
+### Concepts
+- Timeline logic of tenses and singular-plural agreement.
+
+### Question types
+- Fill blank with correct tense.
+- Choose correct verb form with complex subject.
+- Error spotting in verb agreement.
+
+### Example patterns
+1. Either-or / neither-nor agreement.
+2. Collective noun agreement trap.
+
+## 3) Modals, Conditionals, and Voice
+
+### Concepts
+- Can/could/may/might/must usage, if-clauses, active-passive conversion.
+
+### Question types
+- Modal correction.
+- Conditional sentence completion.
+- Active/passive transformation.
+
+### Example patterns
+1. Type-1/2 conditional sentence choice.
+2. Passive transformation with tense consistency.
+
+## 4) Vocabulary and Usage
+
+### Concepts
+- Synonyms, antonyms, one-word substitutions, idioms, phrasal verbs.
+
+### Question types
+- Contextual synonym/antonym.
+- Idiom usage in sentence.
+- Fill blank with suitable word.
+
+### Example patterns
+1. Word with nearest meaning in context.
+2. Idiom used incorrectly option.
+
+## 5) Para Jumbles and Sentence Ordering
+
+### Concepts
+- Coherence, connectors, pronoun reference, timeline flow.
+
+### Question types
+- Arrange sentences into coherent paragraph.
+- Choose opening and closing sentence.
+- Select odd one out.
+
+### Example patterns
+1. Identify mandatory pair.
+2. Pronoun-antecedent based ordering.
+
+## 6) Cloze Test and Fill-in-the-Blanks
+
+### Concepts
+- Grammar + contextual vocabulary integration.
+
+### Question types
+- Single blank (grammar/vocab).
+- Double blank with tone logic.
+- Passage cloze with global coherence.
+
+### Example patterns
+1. Preposition/article blank.
+2. Tone-consistent word pair.
+
+## 7) Reading Comprehension
+
+### Concepts
+- Main idea, tone, inference, factual detail, vocabulary in context.
+
+### Question types
+- Central theme questions.
+- Inference and author's tone.
+- Detail-based direct questions.
+
+### Example patterns
+1. Best title for passage.
+2. Which statement is implied but not directly stated.
+
+## Solved Mini Drills
+
+### Drill 1: Subject-Verb Agreement
+Sentence: "Neither the teacher nor the students ____ ready."
+
+Nearest subject is plural (students) -> "are".
+
+### Drill 2: Vocabulary in Context
+Word in passage: "pragmatic" used for policy approach.
+
+Likely meaning: practical/realistic.
+
+### Drill 3: RC Inference
+If paragraph criticizes unchecked growth and calls for regulation, tone is cautionary/critical.
+
+## 12-Day English Rotation
+
+1. Day 1-2: Grammar rules (agreement, tenses, articles).
+2. Day 3: Modals/voice/conditionals.
+3. Day 4-5: Vocabulary sets + revision.
+4. Day 6: Para jumbles and sentence connectors.
+5. Day 7: Cloze and fill blanks.
+6. Day 8-10: RC practice (timed).
+7. Day 11: Mixed sectional.
+8. Day 12: Error-log and weak-rule revision.
+
+## Final Rule
+
+English marks improve with daily reading + grammar correction habit, not last-day memorization.
+    `
+  },
   {
     id: 'la-1',
     title: 'Constitution: The Preamble',
@@ -2152,21 +3132,6 @@ Practice with context-rich problems to improve transfer in real exam caselets.
   }
 ];
 
-const getSubjectStrategy = (subject: Subject): SubjectStrategy | null => {
-  switch (subject) {
-    case Subject.LegalAptitude:
-      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'legal-reasoning') || null;
-    case Subject.LogicalReasoning:
-      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'logical-reasoning') || null;
-    case Subject.English:
-      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'english') || null;
-    case Subject.Math:
-      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'mathematics') || null;
-    default:
-      return null;
-  }
-};
-
 const StudyHub: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { markTopicMastered, learnerProfile } = useProgress();
@@ -2180,23 +3145,7 @@ const StudyHub: React.FC = () => {
     [CourseTrack.OTHER]: [Subject.GK, Subject.LogicalReasoning, Subject.English, Subject.Math]
   };
 
-  const trackQuickTopicIdsMap: Record<CourseTrack, string[]> = {
-    [CourseTrack.LLB3]: ['la-1', 'la-2', 'la-3'],
-    [CourseTrack.LLB5]: ['la-1', 'eng-3', 'lr-1', 'math-8'],
-    [CourseTrack.BBA_BMS]: ['math-7', 'math-9', 'lr-6', 'gk-9', 'eng-6'],
-    [CourseTrack.HOTEL_MGMT]: ['eng-5', 'gk-10', 'lr-7', 'math-10', 'gk-7'],
-    [CourseTrack.OTHER]: ['gk-8', 'lr-6', 'eng-4', 'math-9', 'gk-9']
-  };
-
   const trackSubjects = trackSubjectsMap[learnerProfile.targetCourse] || trackSubjectsMap[CourseTrack.LLB3];
-  const trackBlueprints = useMemo(() => getTrackSubjectBlueprints(learnerProfile.targetCourse), [learnerProfile.targetCourse]);
-  const studyStrategyCards = useMemo(
-    () => trackSubjects.map((subject) => getSubjectStrategy(subject)).filter((strategy): strategy is SubjectStrategy => Boolean(strategy)),
-    [trackSubjects]
-  );
-  const featuredBlueprint = trackBlueprints[0] || null;
-  const nextBlueprint = trackBlueprints[1] || trackBlueprints[0] || null;
-  const primaryStrategy = studyStrategyCards[0] || null;
   
   // --- Library State ---
   const [searchQuery, setSearchQuery] = useState('');
@@ -2212,6 +3161,26 @@ const StudyHub: React.FC = () => {
   const [explanationLoading, setExplanationLoading] = useState(false);
   const [aiExplanation, setAiExplanation] = useState<string | null>(null);
   const [showToC, setShowToC] = useState(false);
+  const [conceptProgress, setConceptProgress] = useState<Record<string, string[]>>(() => {
+    try {
+      const raw = localStorage.getItem('studyhub_master_concept_progress');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [masteredGuides, setMasteredGuides] = useState<Record<string, boolean>>(() => {
+    try {
+      const raw = localStorage.getItem('studyhub_master_guides_mastered');
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [activeMasterQuestionIndex, setActiveMasterQuestionIndex] = useState(0);
+  const [selectedMasterOption, setSelectedMasterOption] = useState<number | null>(null);
+  const [masterQuizScore, setMasterQuizScore] = useState(0);
+  const [masterQuizLocked, setMasterQuizLocked] = useState(false);
 
   // --- News State ---
   const [newsCategory, setNewsCategory] = useState<'all' | 'legal' | 'business' | 'tech' | 'sports' | 'world'>('all');
@@ -2241,12 +3210,47 @@ const StudyHub: React.FC = () => {
     });
   }, [searchQuery, filterSubject, filterDifficulty, filterTime, trackSubjects]);
 
-  const quickTopics = useMemo(() => {
-    const ids = trackQuickTopicIdsMap[learnerProfile.targetCourse] || trackQuickTopicIdsMap[CourseTrack.LLB3];
-    return ids
-      .map(id => STUDY_DATA.find(topic => topic.id === id))
-      .filter((topic): topic is StaticTopic => Boolean(topic));
-  }, [learnerProfile.targetCourse]);
+  const subjectFocusCards = useMemo(() => {
+    const visualMap: Record<Subject, { label: string; bg: string; icon: 'legal' | 'logic' | 'gk' | 'math' | 'english' }> = {
+      [Subject.LegalAptitude]: {
+        label: 'Legal Reasoning',
+        bg: 'from-rose-500 to-orange-500',
+        icon: 'legal'
+      },
+      [Subject.LogicalReasoning]: {
+        label: 'Logical Reasoning',
+        bg: 'from-cyan-500 to-blue-600',
+        icon: 'logic'
+      },
+      [Subject.GK]: {
+        label: 'GK + Current Affairs',
+        bg: 'from-violet-500 to-fuchsia-600',
+        icon: 'gk'
+      },
+      [Subject.Math]: {
+        label: 'Mathematics',
+        bg: 'from-emerald-500 to-teal-600',
+        icon: 'math'
+      },
+      [Subject.English]: {
+        label: 'English',
+        bg: 'from-amber-500 to-yellow-500',
+        icon: 'english'
+      }
+    };
+
+    return FOCUS_SUBJECTS.map((subject) => {
+      const topics = STUDY_DATA.filter((topic) => topic.subject === subject);
+      return {
+        subject,
+        label: visualMap[subject].label,
+        bg: visualMap[subject].bg,
+        icon: visualMap[subject].icon,
+        count: topics.length,
+        topics
+      };
+    });
+  }, []);
 
   // --- ToC Logic ---
   const toc = useMemo(() => {
@@ -2349,11 +3353,69 @@ const StudyHub: React.FC = () => {
     return () => window.removeEventListener('keydown', keyHandler);
   }, [activeReelIndex, newsResult.length]);
 
+  useEffect(() => {
+    localStorage.setItem('studyhub_master_concept_progress', JSON.stringify(conceptProgress));
+  }, [conceptProgress]);
+
+  useEffect(() => {
+    localStorage.setItem('studyhub_master_guides_mastered', JSON.stringify(masteredGuides));
+  }, [masteredGuides]);
+
+  useEffect(() => {
+    setActiveMasterQuestionIndex(0);
+    setSelectedMasterOption(null);
+    setMasterQuizScore(0);
+    setMasterQuizLocked(false);
+    setAiExplanation(null);
+  }, [selectedTopic?.id]);
+
   const handleGeneratePlan = async () => {
     setPlanLoading(true);
     const plan = await generateStudyPlan();
     setStudyPlan(plan);
     setPlanLoading(false);
+  };
+
+  const handleToggleConcept = (concept: string) => {
+    if (!selectedTopic || !selectedTopic.id.endsWith('-master')) return;
+
+    const allConcepts = extractMasterConcepts(selectedTopic);
+    setConceptProgress((prev) => {
+      const current = prev[selectedTopic.id] || [];
+      const next = current.includes(concept)
+        ? current.filter((item) => item !== concept)
+        : [...current, concept];
+
+      if (allConcepts.length > 0 && next.length === allConcepts.length && !masteredGuides[selectedTopic.id]) {
+        markTopicMastered();
+        setMasteredGuides((masteredPrev) => ({ ...masteredPrev, [selectedTopic.id]: true }));
+      }
+
+      return { ...prev, [selectedTopic.id]: next };
+    });
+  };
+
+  const handleSelectMasterOption = (optionIndex: number, correctIndex: number) => {
+    if (masterQuizLocked) return;
+    setSelectedMasterOption(optionIndex);
+    setMasterQuizLocked(true);
+    if (optionIndex === correctIndex) {
+      setMasterQuizScore((prev) => prev + 1);
+    }
+  };
+
+  const handleNextMasterQuestion = (totalQuestions: number) => {
+    if (activeMasterQuestionIndex >= totalQuestions - 1) return;
+    setActiveMasterQuestionIndex((prev) => prev + 1);
+    setSelectedMasterOption(null);
+    setMasterQuizLocked(false);
+  };
+
+  const handleResetMasterQuiz = () => {
+    setActiveMasterQuestionIndex(0);
+    setSelectedMasterOption(null);
+    setMasterQuizScore(0);
+    setMasterQuizLocked(false);
   };
 
   // --- Render Helpers ---
@@ -2378,6 +3440,13 @@ const StudyHub: React.FC = () => {
 
   const renderReader = () => {
     if (!selectedTopic) return null;
+
+    const isMasterTopic = selectedTopic.id.endsWith('-master');
+    const masterConcepts = extractMasterConcepts(selectedTopic);
+    const completedConcepts = conceptProgress[selectedTopic.id] || [];
+    const conceptCompletion = masterConcepts.length > 0 ? Math.round((completedConcepts.length / masterConcepts.length) * 100) : 0;
+    const masterQuestions = MASTER_CHECKPOINT_QUIZZES[selectedTopic.id] || [];
+    const activeMasterQuestion = masterQuestions[activeMasterQuestionIndex] || null;
 
     return (
       <div className={`fixed inset-0 z-50 flex flex-col ${getThemeClasses()} transition-colors duration-300`}>
@@ -2470,7 +3539,108 @@ const StudyHub: React.FC = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-3xl mx-auto w-full custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full custom-scrollbar">
+          {isMasterTopic && (
+            <section className="mb-6 md:mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+              <div className="rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-900/20 p-4 md:p-5">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="text-base md:text-lg font-bold text-indigo-700 dark:text-indigo-300">Concept Progress</h3>
+                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-indigo-600 text-white">{conceptCompletion}%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-indigo-200 dark:bg-indigo-900/40 mb-4 overflow-hidden">
+                  <div className="h-full bg-indigo-600 transition-all" style={{ width: `${conceptCompletion}%` }} />
+                </div>
+                <div className="space-y-2 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                  {masterConcepts.map((concept) => {
+                    const isDone = completedConcepts.includes(concept);
+                    return (
+                      <button
+                        key={concept}
+                        onClick={() => handleToggleConcept(concept)}
+                        className={`w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg border transition-colors ${
+                          isDone
+                            ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200'
+                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        <CheckCircle2 className={`w-4 h-4 ${isDone ? 'opacity-100' : 'opacity-40'}`} />
+                        <span className="text-sm">{concept}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 text-xs text-indigo-700/80 dark:text-indigo-200/80">
+                  Mark every concept complete to auto-count this master guide as a mastered topic.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50/80 dark:bg-amber-900/20 p-4 md:p-5">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="text-base md:text-lg font-bold text-amber-700 dark:text-amber-300">Checkpoint Quiz</h3>
+                  <span className="text-xs font-bold px-2 py-1 rounded-full bg-amber-600 text-white">Score {masterQuizScore}/{masterQuestions.length || 0}</span>
+                </div>
+
+                {activeMasterQuestion ? (
+                  <div>
+                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-300 mb-2">
+                      Question {activeMasterQuestionIndex + 1} of {masterQuestions.length}
+                    </p>
+                    <p className="text-sm md:text-base font-semibold text-gray-900 dark:text-gray-100 mb-3">{activeMasterQuestion.q}</p>
+                    <div className="space-y-2">
+                      {activeMasterQuestion.options.map((option, idx) => {
+                        const isSelected = selectedMasterOption === idx;
+                        const isCorrect = idx === activeMasterQuestion.correct;
+                        const shouldReveal = masterQuizLocked;
+                        const classes = shouldReveal
+                          ? isCorrect
+                            ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-200'
+                            : isSelected
+                              ? 'bg-rose-100 dark:bg-rose-900/30 border-rose-300 dark:border-rose-700 text-rose-800 dark:text-rose-200'
+                              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-amber-300 dark:hover:border-amber-700';
+
+                        return (
+                          <button
+                            key={option}
+                            onClick={() => handleSelectMasterOption(idx, activeMasterQuestion.correct)}
+                            className={`w-full text-left px-3 py-2 rounded-lg border transition-colors ${classes}`}
+                            disabled={masterQuizLocked}
+                          >
+                            <span className="text-sm">{option}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {masterQuizLocked && (
+                      <div className="mt-3 p-3 rounded-lg bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700">
+                        <p className="text-sm text-amber-900 dark:text-amber-200">{activeMasterQuestion.explanation}</p>
+                      </div>
+                    )}
+
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => handleNextMasterQuestion(masterQuestions.length)}
+                        disabled={!masterQuizLocked || activeMasterQuestionIndex >= masterQuestions.length - 1}
+                        className="px-3 py-2 rounded-lg text-sm font-bold bg-amber-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                      <button
+                        onClick={handleResetMasterQuiz}
+                        className="px-3 py-2 rounded-lg text-sm font-bold bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                      >
+                        Restart
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 dark:text-gray-300">No checkpoint questions configured for this guide yet.</p>
+                )}
+              </div>
+            </section>
+          )}
+
           <article className={`prose dark:prose-invert max-w-none ${getSizeClass()}`}>
             <ReactMarkdown>{selectedTopic.content}</ReactMarkdown>
           </article>
@@ -2515,84 +3685,69 @@ const StudyHub: React.FC = () => {
 
   const renderLibrary = () => (
     <div className="space-y-4 md:space-y-6">
-      <section className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-900 text-white shadow-2xl p-5 md:p-6">
-        <div className="absolute -top-10 -right-10 hidden md:block opacity-20">
-          <BookOpen className="w-40 h-40 rotate-12" />
-        </div>
-        <div className="relative z-10 flex flex-col gap-5">
-          <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
-            <div className="space-y-2 max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] md:text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100">
-                <Zap className="w-3.5 h-3.5" /> Study Command Center
-              </div>
-              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Study smarter for {learnerProfile.targetCourse}.</h2>
-              <p className="text-indigo-100 text-sm md:text-lg max-w-2xl leading-relaxed">
-                Open a quick topic, follow your track roadmap, or jump straight to a strategy card built for your exam pattern.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link
-                to="/study?tab=plan"
-                className="px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-bold text-sm hover:bg-indigo-50 transition-colors"
-              >
-                Generate Plan
-              </Link>
-              <button
-                onClick={() => setShowFilters(true)}
-                className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition-colors"
-              >
-                Focus Filters
-              </button>
-              {quickTopics[0] && (
-                <button
-                  onClick={() => setSelectedTopic(quickTopics[0])}
-                  className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 transition-colors"
-                >
-                  Open Quick Study
-                </button>
-              )}
-            </div>
+      <section className="rounded-2xl md:rounded-3xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4 md:mb-5">
+          <div>
+            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 dark:text-gray-100">Focused Study Sections</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Choose one subject block and work inside it without distractions.</p>
           </div>
+          <Link
+            to="/study?tab=plan"
+            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition-colors"
+          >
+            Generate Plan
+          </Link>
+        </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Track Roadmap</p>
-              <h3 className="text-lg font-bold text-white">{featuredBlueprint?.subject || 'Track learning path'}</h3>
-              <p className="text-sm text-indigo-100 mt-2 leading-relaxed">{featuredBlueprint?.overview || 'Your track roadmap will appear here with the most important modules first.'}</p>
-              {featuredBlueprint && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {featuredBlueprint.concepts.slice(0, 3).map((concept) => (
-                    <span key={concept} className="text-[11px] rounded-full bg-white/10 px-2.5 py-1 text-indigo-100 border border-white/10">{concept}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 md:gap-4">
+          {subjectFocusCards.map((card) => {
+            const topTopics = card.topics.slice(0, 3);
+            const icon =
+              card.icon === 'legal' ? <Scale className="w-5 h-5" /> :
+              card.icon === 'logic' ? <ShieldAlert className="w-5 h-5" /> :
+              card.icon === 'gk' ? <Newspaper className="w-5 h-5" /> :
+              card.icon === 'math' ? <Zap className="w-5 h-5" /> :
+              <Type className="w-5 h-5" />;
+
+            return (
+              <div key={card.subject} className={`rounded-2xl p-4 md:p-5 text-white bg-gradient-to-br ${card.bg} shadow-lg`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-bold tracking-wide">{card.label}</span>
+                  {icon}
+                </div>
+                <p className="text-xs text-white/85 mb-3">{card.count} topics available</p>
+
+                <div className="space-y-1.5 mb-4">
+                  {topTopics.map((topic) => (
+                    <button
+                      key={topic.id}
+                      onClick={() => setSelectedTopic(topic)}
+                      className="w-full text-left text-xs rounded-lg px-2.5 py-1.5 bg-white/15 hover:bg-white/25 transition-colors line-clamp-1"
+                    >
+                      {topic.title}
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
 
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Next Module</p>
-              <h3 className="text-lg font-bold text-white">{nextBlueprint?.subject || 'Next study module'}</h3>
-              <p className="text-sm text-indigo-100 mt-2 leading-relaxed">{nextBlueprint?.modules[0]?.title || 'Use the study hub to move from one focused module to the next.'}</p>
-              {nextBlueprint?.modules[0] && (
-                <p className="text-xs text-indigo-200 mt-3">{nextBlueprint.modules[0].explanation}</p>
-              )}
-            </div>
-
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Strategy Card</p>
-              <h3 className="text-lg font-bold text-white">{primaryStrategy?.subject || 'Study strategy'}</h3>
-              <div className="mt-2 space-y-2">
-                {(primaryStrategy?.tips || []).slice(0, 3).map((tip) => (
-                  <p key={tip.id} className="text-sm text-indigo-100 leading-snug">• {tip.title}</p>
-                ))}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setFilterSubject(card.subject)}
+                    className="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold bg-white text-gray-900 hover:bg-gray-100 transition-colors"
+                  >
+                    Focus
+                  </button>
+                  {MASTER_TOPIC_ID_BY_SUBJECT[card.subject] && (
+                    <button
+                      onClick={() => setSelectedTopic(STUDY_DATA.find((topic) => topic.id === MASTER_TOPIC_ID_BY_SUBJECT[card.subject]) || null)}
+                      className="flex-1 px-2 py-1.5 rounded-lg text-xs font-bold bg-black/20 hover:bg-black/30 transition-colors"
+                    >
+                      Master
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link to="/flashcards" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Flashcards</Link>
-                <Link to="/pyq" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">PYQ</Link>
-                <Link to="/formulas" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Formula Sheet</Link>
-                <Link to="/notes" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Quick Notes</Link>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </section>
 
@@ -2654,56 +3809,30 @@ const StudyHub: React.FC = () => {
         )}
       </div>
       
-      {/* Quick Access - Track Starter */}
-      <div className="mb-2">
-        <div className="mb-3 md:mb-4">
-          <div className="flex items-center gap-2 mb-2 md:mb-3">
-            <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dedicated Sections</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5 md:gap-2">
-            <button
-              onClick={() => setFilterSubject('All')}
-              className={`px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
-                filterSubject === 'All'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
-              }`}
-            >
-              All Subjects
-            </button>
-            {trackSubjects.map((subject) => (
-              <button
-                key={subject}
-                onClick={() => setFilterSubject(subject)}
-                className={`px-2.5 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
-                  filterSubject === subject
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
-                }`}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 mb-2 md:mb-3">
-           <Gavel className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-600 dark:text-indigo-400" />
-           <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quick Study: {learnerProfile.targetCourse}</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5 md:gap-2">
-          {quickTopics.map(topic => (
-            <button
-              key={topic.id}
-              onClick={() => setSelectedTopic(topic)}
-              className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs md:text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-100 dark:border-indigo-800"
-            >
-              {topic.subject === Subject.LegalAptitude ? <Scale className="w-3 h-3 md:w-3.5 md:h-3.5" /> : topic.subject === Subject.LogicalReasoning ? <ShieldAlert className="w-3 h-3 md:w-3.5 md:h-3.5" /> : <Gavel className="w-3 h-3 md:w-3.5 md:h-3.5" />}
-              <span className="line-clamp-1">{topic.title}</span>
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => setFilterSubject('All')}
+          className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
+            filterSubject === 'All'
+              ? 'bg-indigo-600 text-white border-indigo-600'
+              : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
+          }`}
+        >
+          All Subjects
+        </button>
+        {FOCUS_SUBJECTS.map((subject) => (
+          <button
+            key={subject}
+            onClick={() => setFilterSubject(subject)}
+            className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium border transition-colors ${
+              filterSubject === subject
+                ? 'bg-indigo-600 text-white border-indigo-600'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-indigo-300'
+            }`}
+          >
+            {subject}
+          </button>
+        ))}
       </div>
 
       {/* Topics Grid */}

@@ -43,17 +43,18 @@ describe('study hub smoke test', () => {
   beforeEach(() => {
     localStorage.clear();
     seedOnboardingCompleteState();
-    window.location.hash = '#/study';
+    window.location.hash = '#/study?tab=library';
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   });
 
-  it('renders the enhanced study command center', async () => {
+  it('renders focused five-section study layout', async () => {
     render(<App />);
 
-    expect(await screen.findByText(/Study Command Center/i, {}, { timeout: 12000 })).toBeInTheDocument();
-    expect(screen.getAllByText(/Track Roadmap/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Next Module/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Strategy Card/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: /Focus Filters/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /All Subjects/i }, { timeout: 12000 })).toBeInTheDocument();
+    expect(screen.getAllByText(/Legal Reasoning/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Logical Reasoning/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/GK \+ Current Affairs/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Mathematics/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/English/i).length).toBeGreaterThan(0);
   }, 30000);
 });
