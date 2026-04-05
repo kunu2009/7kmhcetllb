@@ -31,7 +31,9 @@ import { CourseTrack, Subject } from '../types';
 import { explainConcept, generateStudyPlan, fetchReelNews, ReelNewsItem } from '../services/geminiService';
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { getTrackSubjectBlueprints } from '../data/trackSubjectBlueprints';
+import { SUBJECT_STRATEGIES, SubjectStrategy } from '../data/studyTipsData';
 
 // --- Types ---
 
@@ -2150,6 +2152,21 @@ Practice with context-rich problems to improve transfer in real exam caselets.
   }
 ];
 
+const getSubjectStrategy = (subject: Subject): SubjectStrategy | null => {
+  switch (subject) {
+    case Subject.LegalAptitude:
+      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'legal-reasoning') || null;
+    case Subject.LogicalReasoning:
+      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'logical-reasoning') || null;
+    case Subject.English:
+      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'english') || null;
+    case Subject.Math:
+      return SUBJECT_STRATEGIES.find((strategy) => strategy.id === 'mathematics') || null;
+    default:
+      return null;
+  }
+};
+
 const StudyHub: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { markTopicMastered, learnerProfile } = useProgress();
@@ -2172,6 +2189,14 @@ const StudyHub: React.FC = () => {
   };
 
   const trackSubjects = trackSubjectsMap[learnerProfile.targetCourse] || trackSubjectsMap[CourseTrack.LLB3];
+  const trackBlueprints = useMemo(() => getTrackSubjectBlueprints(learnerProfile.targetCourse), [learnerProfile.targetCourse]);
+  const studyStrategyCards = useMemo(
+    () => trackSubjects.map((subject) => getSubjectStrategy(subject)).filter((strategy): strategy is SubjectStrategy => Boolean(strategy)),
+    [trackSubjects]
+  );
+  const featuredBlueprint = trackBlueprints[0] || null;
+  const nextBlueprint = trackBlueprints[1] || trackBlueprints[0] || null;
+  const primaryStrategy = studyStrategyCards[0] || null;
   
   // --- Library State ---
   const [searchQuery, setSearchQuery] = useState('');
@@ -2490,6 +2515,87 @@ const StudyHub: React.FC = () => {
 
   const renderLibrary = () => (
     <div className="space-y-4 md:space-y-6">
+      <section className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-900 text-white shadow-2xl p-5 md:p-6">
+        <div className="absolute -top-10 -right-10 hidden md:block opacity-20">
+          <BookOpen className="w-40 h-40 rotate-12" />
+        </div>
+        <div className="relative z-10 flex flex-col gap-5">
+          <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+            <div className="space-y-2 max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] md:text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100">
+                <Zap className="w-3.5 h-3.5" /> Study Command Center
+              </div>
+              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Study smarter for {learnerProfile.targetCourse}.</h2>
+              <p className="text-indigo-100 text-sm md:text-lg max-w-2xl leading-relaxed">
+                Open a quick topic, follow your track roadmap, or jump straight to a strategy card built for your exam pattern.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/study?tab=plan"
+                className="px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-bold text-sm hover:bg-indigo-50 transition-colors"
+              >
+                Generate Plan
+              </Link>
+              <button
+                onClick={() => setShowFilters(true)}
+                className="px-4 py-2.5 rounded-xl bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition-colors"
+              >
+                Focus Filters
+              </button>
+              {quickTopics[0] && (
+                <button
+                  onClick={() => setSelectedTopic(quickTopics[0])}
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500 transition-colors"
+                >
+                  Open Quick Study
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Track Roadmap</p>
+              <h3 className="text-lg font-bold text-white">{featuredBlueprint?.subject || 'Track learning path'}</h3>
+              <p className="text-sm text-indigo-100 mt-2 leading-relaxed">{featuredBlueprint?.overview || 'Your track roadmap will appear here with the most important modules first.'}</p>
+              {featuredBlueprint && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {featuredBlueprint.concepts.slice(0, 3).map((concept) => (
+                    <span key={concept} className="text-[11px] rounded-full bg-white/10 px-2.5 py-1 text-indigo-100 border border-white/10">{concept}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Next Module</p>
+              <h3 className="text-lg font-bold text-white">{nextBlueprint?.subject || 'Next study module'}</h3>
+              <p className="text-sm text-indigo-100 mt-2 leading-relaxed">{nextBlueprint?.modules[0]?.title || 'Use the study hub to move from one focused module to the next.'}</p>
+              {nextBlueprint?.modules[0] && (
+                <p className="text-xs text-indigo-200 mt-3">{nextBlueprint.modules[0].explanation}</p>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-[0.2em] text-indigo-200 mb-2">Strategy Card</p>
+              <h3 className="text-lg font-bold text-white">{primaryStrategy?.subject || 'Study strategy'}</h3>
+              <div className="mt-2 space-y-2">
+                {(primaryStrategy?.tips || []).slice(0, 3).map((tip) => (
+                  <p key={tip.id} className="text-sm text-indigo-100 leading-snug">• {tip.title}</p>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link to="/flashcards" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Flashcards</Link>
+                <Link to="/pyq" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">PYQ</Link>
+                <Link to="/formulas" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Formula Sheet</Link>
+                <Link to="/notes" className="text-[11px] px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors">Quick Notes</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Search Header */}
       <div className="sticky top-0 bg-gray-100 dark:bg-gray-900 pt-2 pb-3 md:pb-4 z-10">
         <div className="flex gap-2 mb-3 md:mb-4">
