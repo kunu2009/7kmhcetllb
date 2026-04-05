@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
 const seedOnboardingCompleteState = () => {
@@ -28,7 +28,7 @@ const seedOnboardingCompleteState = () => {
       achievements: [],
       lastActiveDate: '',
       learnerProfile: {
-        name: 'Smoke User',
+        name: 'Dashboard User',
         targetCourse: 'MH CET Law 3-Year LLB',
         selectedExamId: 'mah-llb-3y',
         examYear: '2026',
@@ -39,26 +39,21 @@ const seedOnboardingCompleteState = () => {
   );
 };
 
-describe('route-entry smoke tests', () => {
+describe('dashboard smoke test', () => {
   beforeEach(() => {
     localStorage.clear();
     seedOnboardingCompleteState();
+    window.location.hash = '#/';
   });
 
-  it('opens study route directly from hash URL', async () => {
-    window.location.hash = '#/study';
+  it('renders the redesigned dashboard sections', async () => {
     render(<App />);
 
-    await waitFor(() => expect(window.location.hash).toBe('#/study'));
-    expect(screen.getAllByText(/LawRanker/i).length).toBeGreaterThan(0);
-  }, 30000);
-
-  it('opens test arena route directly from hash URL', async () => {
-    window.location.hash = '#/practice';
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
-    render(<App />);
-
-    await waitFor(() => expect(window.location.hash).toBe('#/practice'));
-    expect(await screen.findByRole('heading', { name: /Test Arena/i }, { timeout: 20000 })).toBeInTheDocument();
+    expect(await screen.findByText(/Welcome back/i, {}, { timeout: 12000 })).toBeInTheDocument();
+    expect(screen.getAllByText(/Today's Goal/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Monthly Goals/i)).toBeInTheDocument();
+    expect(screen.getByText(/Date-by-Date Syllabus Sprint/i)).toBeInTheDocument();
+    expect(screen.getByText(/Extra \/ Miscellaneous/i)).toBeInTheDocument();
+    expect(screen.getByText(/Legal Maxim of the Day/i)).toBeInTheDocument();
   }, 30000);
 });

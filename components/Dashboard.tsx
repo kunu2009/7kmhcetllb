@@ -100,6 +100,117 @@ const getDrillTemplate = (subject: string) => {
   };
 };
 
+const DAILY_QUOTES = [
+  'Win the day, then the exam becomes a summary.',
+  'Small consistent reps beat rare intense bursts.',
+  'Clarity comes after repetition, not before it.',
+  'Study like the exam is close because it is.',
+  'Accuracy today creates confidence tomorrow.',
+  'Finish the task in front of you before chasing the next one.',
+  'Progress compounds when the schedule is honest.'
+];
+
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+];
+
+const formatDateLabel = (date: Date) => `${date.getDate()} ${MONTH_NAMES[date.getMonth()]}`;
+
+const getMonthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+const getMonthName = (date: Date) => MONTH_NAMES[date.getMonth()];
+
+const addDays = (date: Date, days: number) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+interface MonthlyGoalCard {
+  monthKey: string;
+  monthLabel: string;
+  headline: string;
+  emphasis: string;
+  checkpoints: string[];
+}
+
+interface DateSprintCard {
+  dateLabel: string;
+  weekday: string;
+  section: string;
+  focus: string;
+  checkpoint: string;
+  remainingDays: number;
+}
+
+const buildMonthlyGoalCards = (
+  startDate: Date,
+  examDate: Date,
+  selectedExamTitle: string,
+  trackBlueprints: ReturnType<typeof getTrackSubjectBlueprints>,
+  selectedExamSections: { name: string; syllabus: string[] }[]
+): MonthlyGoalCard[] => {
+  const cards: MonthlyGoalCard[] = [];
+  const startMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const endMonth = new Date(examDate.getFullYear(), examDate.getMonth(), 1);
+  const totalBlueprintSubjects = trackBlueprints.map((lane) => lane.subject);
+
+  for (let cursor = startMonth; cursor <= endMonth; cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1)) {
+    const monthKey = getMonthKey(cursor);
+    const monthLabel = getMonthName(cursor);
+    const monthIndex = cursor.getMonth();
+    const leadingSection = selectedExamSections[monthIndex % selectedExamSections.length];
+    const leadSubject = totalBlueprintSubjects[monthIndex % totalBlueprintSubjects.length] || selectedExamTitle;
+
+    cards.push({
+      monthKey,
+      monthLabel,
+      headline: `${monthLabel}: consolidate ${leadingSection.name}`,
+      emphasis: `Focus ${leadSubject} with daily recall + timed MCQs.`,
+      checkpoints: [
+        leadingSection.syllabus[0] || `${leadingSection.name} basics`,
+        leadingSection.syllabus[1] || 'Timed practice set',
+        'Weekly recap and error log'
+      ]
+    });
+  }
+
+  return cards;
+};
+
+const buildDateSprintCards = (
+  startDate: Date,
+  examDate: Date,
+  selectedExamSections: { name: string; syllabus: string[] }[],
+  trackBlueprints: ReturnType<typeof getTrackSubjectBlueprints>
+): DateSprintCard[] => {
+  const daysRemaining = Math.max(1, Math.ceil((examDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const visibleDays = Math.min(12, daysRemaining);
+
+  return Array.from({ length: visibleDays }, (_, index) => {
+    const currentDate = addDays(startDate, index);
+    const section = selectedExamSections[index % selectedExamSections.length];
+    const lane = trackBlueprints[index % trackBlueprints.length];
+    const weekday = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+
+    return {
+      dateLabel: formatDateLabel(currentDate),
+      weekday,
+      section: section.name,
+      focus: lane ? `${lane.subject} + ${section.name}` : section.name,
+      checkpoint: lane?.concepts[0] || section.syllabus[0] || 'Timed practice',
+      remainingDays: Math.max(daysRemaining - index - 1, 0)
+    };
+  });
+};
+
 const Dashboard: React.FC = () => {
   const { stats, todos, toggleTodo, addTodo, achievements, checkAndUpdateStreak, getUnlockedAchievements, learnerProfile, updateLearnerProfile, applyStarterGoalsByTrack, testHistory } = useProgress();
   const [newGoal, setNewGoal] = useState('');
@@ -171,7 +282,13 @@ const Dashboard: React.FC = () => {
   const selectedExam = getExamById(learnerProfile.selectedExamId || getDefaultExamIdByTrack(learnerProfile.targetCourse));
   const trackBlueprints = getTrackSubjectBlueprints(learnerProfile.targetCourse);
   const examDate = learnerProfile.examYear === '2026' ? new Date(selectedExam.examDate2026) : null;
+  const examIsUpcoming = Boolean(examDate && examDate > today);
+  const planningExamDate = examIsUpcoming ? examDate! : addDays(today, 30);
   const daysUntilExam = examDate ? Math.ceil((examDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+  const dailyQuote = DAILY_QUOTES[dayOfYear % DAILY_QUOTES.length];
+  const monthlyGoalCards = buildMonthlyGoalCards(today, planningExamDate, selectedExam.shortTitle, trackBlueprints, selectedExam.sections);
+  const dateSprintCards = buildDateSprintCards(today, planningExamDate, selectedExam.sections, trackBlueprints);
+  const examCountdownText = examIsUpcoming ? `${Math.max(daysUntilExam, 0)} days` : 'Update date';
 
   // Mock data for consistency chart
   const activityData = [
@@ -328,41 +445,52 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-900 dark:to-gray-900 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-violet-900 text-white shadow-2xl">
         <div className="absolute top-0 right-0 p-8 opacity-10 hidden md:block">
           <Trophy className="w-64 h-64 transform rotate-12" />
         </div>
-        <div className="relative z-10 p-5 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
-          <div className="space-y-1 md:space-y-2">
-            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tight">Mission Rank 1 🚀</h2>
-            <p className="text-indigo-100 max-w-lg text-sm md:text-lg">
-              "Consistency is what transforms average into excellence."
-            </p>
-            <p className="text-indigo-200 text-xs md:text-sm">
-              Track: {learnerProfile.targetCourse} • {selectedExam.shortTitle} • Exam {learnerProfile.examYear} • Goal {learnerProfile.dailyStudyHoursGoal}h/day
-            </p>
+        <div className="relative z-10 p-5 md:p-10 flex flex-col gap-5">
+          <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-4">
+            <div className="space-y-2 md:space-y-3 max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] md:text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100">
+                <Sparkles className="w-3.5 h-3.5" /> Welcome back
+              </div>
+              <h2 className="text-2xl md:text-4xl xl:text-5xl font-extrabold tracking-tight">
+                {learnerProfile.name || 'Learner'}, today is for clean momentum.
+              </h2>
+              <p className="text-indigo-100 max-w-2xl text-sm md:text-lg leading-relaxed">
+                {dailyQuote}
+              </p>
+              <p className="text-indigo-200 text-xs md:text-sm">
+                Track: {learnerProfile.targetCourse} • {selectedExam.shortTitle} • Exam window {learnerProfile.examYear} • Goal {learnerProfile.dailyStudyHoursGoal}h/day
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 w-full xl:w-[300px]">
+              <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 p-4">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-200">Countdown</p>
+                <p className="mt-1 text-2xl font-bold">{examCountdownText}</p>
+                <p className="text-sm text-indigo-100 mt-1">{selectedExam.shortTitle} target date: {formatDateLabel(planningExamDate)}</p>
+              </div>
+              <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 p-4">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-indigo-200">Today's target</p>
+                <p className="mt-1 text-xl font-bold">{stats.dailyStreak} day streak</p>
+                <p className="text-sm text-indigo-100 mt-1">{stats.accuracy}% accuracy • {stats.topicsMastered} topics mastered</p>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2 md:gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap gap-2 md:gap-3">
             <Link
               to={continuePath}
               onClick={() => saveLastSection(continuePath, continueLabel)}
-              className="flex-1 md:flex-none bg-yellow-400 text-indigo-900 hover:bg-yellow-300 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
+              className="bg-yellow-400 text-indigo-900 hover:bg-yellow-300 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
             >
               <Clock className="w-4 h-4 md:w-5 md:h-5" />
               {continueLabel}
             </Link>
             <Link 
-              to="/practice" 
-              onClick={() => saveLastSection('/practice', 'Continue Practice')}
-              className="flex-1 md:flex-none bg-white text-indigo-700 hover:bg-indigo-50 px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2 group text-sm md:text-base"
-            >
-              <Zap className="w-4 h-4 md:w-5 md:h-5 group-hover:text-yellow-500 transition-colors" />
-              <span className="hidden sm:inline">Quick</span> Mock Test
-            </Link>
-            <Link 
               to="/study" 
               onClick={() => saveLastSection('/study', 'Continue Study')}
-              className="flex-1 md:flex-none bg-indigo-700/50 hover:bg-indigo-700/70 backdrop-blur-sm text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-indigo-400/30 text-sm md:text-base"
+              className="bg-indigo-700/50 hover:bg-indigo-700/70 backdrop-blur-sm text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2 border border-indigo-400/30 text-sm md:text-base"
             >
               <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
               Study
@@ -370,6 +498,141 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-4 md:gap-6">
+        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 md:p-6 shadow-sm space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">Today's Goal</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">One goal, one focus, one clean finish.</p>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 font-semibold">{pendingTodos.length} remaining</span>
+          </div>
+
+          <form onSubmit={handleAddGoal} className="flex flex-col sm:flex-row gap-2">
+            <input 
+              type="text" 
+              value={newGoal}
+              onChange={(e) => setNewGoal(e.target.value)}
+              placeholder="Add today's goal..."
+              className="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button 
+              type="submit"
+              disabled={!newGoal.trim()}
+              className="bg-indigo-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
+            >
+              <Plus className="w-4 h-4 inline mr-1" /> Add
+            </button>
+          </form>
+
+          <div className="rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30 p-4">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <p className="text-sm font-semibold text-gray-800 dark:text-white">Primary focus</p>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{todos.filter((todo) => todo.completed).length}/{todos.length} done</span>
+            </div>
+            <p className="text-sm text-gray-700 dark:text-gray-200 font-medium">{nextTodo ? nextTodo.task : 'No active goals right now.'}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{nextTodo ? `Subject: ${nextTodo.subject}` : 'Add a new goal or open practice to start a fresh session.'}</p>
+          </div>
+
+          <div className="space-y-2">
+            {pendingTodos.slice(0, 4).map((item) => (
+              <button
+                key={item.id}
+                onClick={() => toggleTodo(item.id)}
+                className="w-full text-left p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-start gap-3"
+              >
+                {item.completed ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Circle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                )}
+                <div className="min-w-0">
+                  <p className={`text-sm font-medium ${item.completed ? 'text-gray-400 line-through' : 'text-gray-800 dark:text-gray-100'}`}>{item.task}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">{item.subject}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl p-4 md:p-6 text-white shadow-lg">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <p className="text-sm font-semibold text-indigo-100">Exam Snapshot</p>
+              <p className="text-xs text-indigo-100/80">Date-by-date coverage by month</p>
+            </div>
+            <Calendar className="w-6 h-6 text-white/80" />
+          </div>
+          <p className="text-2xl font-bold">{selectedExam.shortTitle}</p>
+          <p className="text-sm text-indigo-100 mt-1">{selectedExam.title}</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs text-indigo-100">
+            <span className="rounded-full bg-white/15 px-3 py-1">{selectedExam.totalQuestions} questions</span>
+            <span className="rounded-full bg-white/15 px-3 py-1">{selectedExam.totalMarks} marks</span>
+            <span className="rounded-full bg-white/15 px-3 py-1">{selectedExam.durationMinutes} mins</span>
+            <span className="rounded-full bg-white/15 px-3 py-1">{selectedExam.negativeMarking}</span>
+          </div>
+          <div className="mt-4 text-sm text-indigo-100/90">
+            Daily goal: {learnerProfile.dailyStudyHoursGoal}h • {stats.accuracy}% accuracy • {stats.topicsMastered} mastered topics
+          </div>
+        </div>
+      </div>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">Monthly Goals</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Swipe sideways to move through each month’s sprint.</p>
+          </div>
+          <span className="text-[10px] px-2 py-1 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300 uppercase tracking-wider font-bold">Swipe</span>
+        </div>
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-1 px-1 custom-scrollbar">
+          {monthlyGoalCards.map((card) => (
+            <article key={card.monthKey} className="min-w-[86%] sm:min-w-[420px] snap-start bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 md:p-6 shadow-sm">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-gray-400">{card.monthLabel}</p>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-800 dark:text-white">{card.headline}</h3>
+                </div>
+                <span className="text-[10px] px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 font-semibold">Monthly</span>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{card.emphasis}</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {card.checkpoints.map((checkpoint) => (
+                  <span key={checkpoint} className="text-xs px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">{checkpoint}</span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">Date-by-Date Syllabus Sprint</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Each card is mapped to a study date and section focus.</p>
+          </div>
+          <span className="text-[10px] px-2 py-1 rounded-full bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300 uppercase tracking-wider font-bold">{formatDateLabel(today)}</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4">
+          {dateSprintCards.map((card) => (
+            <article key={`${card.dateLabel}-${card.section}`} className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-4 md:p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-gray-400">{card.weekday}</p>
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-white">{card.dateLabel}</h3>
+                </div>
+                <span className="text-[10px] px-2 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 font-semibold">{card.remainingDays} days left</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">{card.section}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{card.focus}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Checkpoint: {card.checkpoint}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
 
       <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
         <div>
@@ -686,8 +949,34 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Recommended Actions */}
+        {/* Extra / Miscellaneous */}
         <div className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-lg text-gray-800 dark:text-white">Extra / Miscellaneous</h3>
+              <span className="text-xs font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">Practice + support</span>
+            </div>
+
+            <Link
+              to="/practice"
+              onClick={() => saveLastSection('/practice', 'Continue Practice')}
+              className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-gradient-to-br from-slate-900 to-indigo-900 p-4 text-white hover:shadow-xl transition-all"
+            >
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-indigo-200">Test Arena</p>
+                <p className="font-bold text-base">Open practice modes and mock tests</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-indigo-200" />
+            </Link>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <Link to="/planner" className="rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">Study Planner</Link>
+              <Link to="/notes" className="rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">Quick Notes</Link>
+              <Link to="/revision" className="rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">Quick Revision</Link>
+              <Link to="/mentor" className="rounded-xl border border-gray-200 dark:border-gray-700 px-3 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">AI Mentor</Link>
+            </div>
+          </div>
+
           <div className="bg-gradient-to-br from-indigo-600 to-blue-700 text-white p-6 rounded-2xl shadow-lg relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="font-bold text-lg mb-1 flex items-center gap-2">

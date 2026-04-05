@@ -32,6 +32,6 @@ describe('critical flow smoke test', () => {
     window.location.hash = '#/practice';
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     await waitFor(() => expect(window.location.hash).toBe('#/practice'));
-    expect(await screen.findByText(/Test Arena/i, {}, { timeout: 8000 })).toBeInTheDocument();
+    expect((await screen.findAllByText(/Test Arena/i, {}, { timeout: 8000 })).length).toBeGreaterThan(1);
   }, 30000);
 });
